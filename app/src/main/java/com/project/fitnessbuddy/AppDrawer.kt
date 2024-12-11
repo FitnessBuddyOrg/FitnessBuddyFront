@@ -5,7 +5,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
@@ -18,68 +17,34 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AppDrawer(
     route: String,
     modifier: Modifier = Modifier,
-    navigateToHome: () -> Unit = {},
-    navigateToSettings: () -> Unit = {},
+    appRoutes: List<AppRoute> = listOf(),
     closeDrawer: () -> Unit = {}
 ) {
     ModalDrawerSheet(modifier = Modifier) {
         DrawerHeader(modifier)
         Spacer(modifier = Modifier.padding(dimensionResource(id = R.dimen.spacer_padding)))
 
-        NavigationDrawerItem(
-            label = {
-                Text(
-                    text = stringResource(id = R.string.home),
-                    style = MaterialTheme.typography.labelSmall
-                )
-            },
-            selected = route == AllDestinations.HOME,
-            onClick = {
-                navigateToHome()
-                closeDrawer()
-            },
-            icon = { Icon(imageVector = Icons.Default.Home, contentDescription = null) },
-            shape = MaterialTheme.shapes.small
-        )
-
-        NavigationDrawerItem(
-            label = {
-                Text(
-                    text = stringResource(id = R.string.profile),
-                    style = MaterialTheme.typography.labelSmall
-                )
-            },
-            selected = route == AllDestinations.PROFILE,
-            onClick = {
-                navigateToSettings()
-                closeDrawer()
-            },
-            icon = { Icon(imageVector = Icons.Default.Person, contentDescription = null) },
-            shape = MaterialTheme.shapes.small
-        )
-
-//        appRoutes.forEach{appRoute ->
-//            NavigationDrawerItem(
-//                label = {
-//                    Text(
-//                        text = route,
-//                        style = MaterialTheme.typography.labelSmall
-//                    )
-//                },
-//                selected = route == appRoute,
-//                onClick = {
-//                    navigateToSettings()
-//                    closeDrawer()
-//                },
-//                icon = { Icon(imageVector = Icons.Default.Person, contentDescription = null) },
-//                shape = MaterialTheme.shapes.small
-//            )
-//        }
+        appRoutes.forEach { appRoute ->
+            NavigationDrawerItem(
+                label = {
+                    Text(
+                        text = appRoute.name,
+                        style = MaterialTheme.typography.labelSmall
+                    )
+                },
+                selected = route == appRoute.name,
+                onClick = {
+                    appRoute.route.invoke()
+                    closeDrawer()
+                },
+                icon =  appRoute.icon,
+                shape = MaterialTheme.shapes.small
+            )
+        }
     }
 }
 
@@ -106,7 +71,7 @@ fun DrawerHeader(modifier: Modifier) {
         Spacer(modifier = Modifier.padding(dimensionResource(id = R.dimen.spacer_padding)))
 
         Text(
-            text = stringResource(id = R.string.app_name),
+            text = stringResource(id = R.string.username_placeholder),
             textAlign = TextAlign.Center,
             style = MaterialTheme.typography.bodyLarge,
             color = MaterialTheme.colorScheme.onPrimary,

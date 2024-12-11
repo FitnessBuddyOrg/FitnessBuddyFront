@@ -2,4 +2,11 @@
     <string name="app_name">FitnessBuddy</string>
     <string name="home">Home</string>
     <string name="profile">Profile</string>
+    <string name="browse_exercises">Browse Exercises</string>
+    <string name="my_exercises">My Exercises</string>
+    <string name="my_routines">My Routines</string>
+    <string name="progress_calendar">Progress Calendar</string>
+    <string name="statistics">Statistics</string>
+    <string name="username_placeholder">username</string>
+    <string name="browse_routines">Browse Routines</string>
 </resources>
