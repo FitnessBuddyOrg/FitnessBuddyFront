@@ -1,6 +1,5 @@
 package com.project.fitnessbuddy
 
-import android.graphics.drawable.VectorDrawable
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
@@ -12,7 +11,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.navigation.NavHostController
@@ -26,7 +24,7 @@ import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun sampleAppNavGraph(
+fun AppNavGraph(
     modifier: Modifier = Modifier,
     navController: NavHostController = rememberNavController(),
     coroutineScope: CoroutineScope = rememberCoroutineScope(),
@@ -50,7 +48,7 @@ fun sampleAppNavGraph(
     val appRoutes = listOf(
         AppRoute(
             home,
-            route = { navigationActions.navigateTo(home)},
+            route = { navigationActions.navigateTo(home) },
             icon = { Icon(imageVector = Icons.Default.Home, contentDescription = null) },
             screen = { homeScreen() }
         ),
@@ -75,13 +73,23 @@ fun sampleAppNavGraph(
         AppRoute(
             myExercises,
             route = { navigationActions.navigateTo(myExercises) },
-            icon = { Icon(imageVector = ImageVector.vectorResource(id = R.drawable.exercise), contentDescription = null) },
+            icon = {
+                Icon(
+                    imageVector = ImageVector.vectorResource(id = R.drawable.exercise),
+                    contentDescription = null
+                )
+            },
             screen = { myExercisesScreen() }
         ),
         AppRoute(
             myRoutines,
             route = { navigationActions.navigateTo(myRoutines) },
-            icon = { Icon(imageVector = ImageVector.vectorResource(id = R.drawable.routine), contentDescription = null) },
+            icon = {
+                Icon(
+                    imageVector = ImageVector.vectorResource(id = R.drawable.routine),
+                    contentDescription = null
+                )
+            },
             screen = { myRoutinesScreen() }
         ),
         AppRoute(
@@ -93,7 +101,12 @@ fun sampleAppNavGraph(
         AppRoute(
             statistics,
             route = { navigationActions.navigateTo(statistics) },
-            icon = { Icon(imageVector = ImageVector.vectorResource(id = R.drawable.monitoring), contentDescription = null) },
+            icon = {
+                Icon(
+                    imageVector = ImageVector.vectorResource(id = R.drawable.monitoring),
+                    contentDescription = null
+                )
+            },
             screen = { statisticsScreen() }
         ),
     )

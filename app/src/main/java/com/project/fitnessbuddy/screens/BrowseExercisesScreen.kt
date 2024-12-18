@@ -23,3 +23,8 @@ fun browseExercisesScreen() {
         )
     }
 }
+
+@Composable
+fun browseExerciseWidget() {
+
+}
