@@ -1,7 +1,8 @@
-package com.project.fitnessbuddy.screens
+package com.project.fitnessbuddy.screens.browseExercises
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -10,21 +11,26 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 
 @Composable
-fun browseExercisesScreen() {
+fun BrowseExercisesScreen() {
     Column(
         modifier = Modifier.fillMaxSize(),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Text(text = "Browse Exercises Screen", style = MaterialTheme.typography.headlineMedium)
+        BrowseExerciseWidget()
+        BrowseExerciseWidget()
+    }
+}
+
+@Composable
+fun BrowseExerciseWidget() {
+    Row(
+        modifier = Modifier.fillMaxSize(),
+    ) {
+        Text(text = "Browse Exercise Widget", style = MaterialTheme.typography.headlineMedium)
         Text(
             text = "This place will soon have a design",
             style = MaterialTheme.typography.bodyLarge
         )
     }
-}
-
-@Composable
-fun browseExerciseWidget() {
-
 }

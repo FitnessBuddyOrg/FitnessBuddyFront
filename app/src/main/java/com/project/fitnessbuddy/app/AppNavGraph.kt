@@ -1,4 +1,4 @@
-package com.project.fitnessbuddy
+package com.project.fitnessbuddy.app
 
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -18,7 +18,9 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.project.fitnessbuddy.R
 import com.project.fitnessbuddy.screens.*
+import com.project.fitnessbuddy.screens.browseExercises.BrowseExercisesScreen
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
@@ -62,7 +64,7 @@ fun AppNavGraph(
             browseExercises,
             route = { navigationActions.navigateTo(browseExercises) },
             icon = { Icon(imageVector = Icons.Default.FitnessCenter, contentDescription = null) },
-            screen = { browseExercisesScreen() }
+            screen = { BrowseExercisesScreen() }
         ),
         AppRoute(
             browseRoutines,

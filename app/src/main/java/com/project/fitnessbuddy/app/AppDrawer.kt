@@ -1,4 +1,4 @@
-package com.project.fitnessbuddy
+package com.project.fitnessbuddy.app
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -17,6 +17,7 @@ import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
+import com.project.fitnessbuddy.R
 
 @Composable
 fun AppDrawer(
