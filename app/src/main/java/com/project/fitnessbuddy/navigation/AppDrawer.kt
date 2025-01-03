@@ -1,8 +1,13 @@
-package com.project.fitnessbuddy
+package com.project.fitnessbuddy.navigation
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalDrawerSheet
@@ -17,12 +22,15 @@ import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
+import androidx.navigation.NavController
+import com.project.fitnessbuddy.R
 
 @Composable
 fun AppDrawer(
     route: String,
     modifier: Modifier = Modifier,
     appRoutes: List<AppRoute> = listOf(),
+    navController: NavController,
     closeDrawer: () -> Unit = {}
 ) {
     ModalDrawerSheet(modifier = Modifier) {
@@ -33,13 +41,19 @@ fun AppDrawer(
             NavigationDrawerItem(
                 label = {
                     Text(
-                        text = appRoute.name,
-                        style = MaterialTheme.typography.labelSmall
+                        text = if (appRoute.subRoutes.isNotEmpty()) appRoute.subRoutes[0].mainName else appRoute.mainName,
+                        style = MaterialTheme.typography.labelMedium
                     )
                 },
-                selected = route == appRoute.name,
+                selected = route == appRoute.mainName,
                 onClick = {
-                    appRoute.route.invoke()
+                    navController.navigate(appRoute.mainName) {
+                        launchSingleTop = true
+                        restoreState = true
+                        popUpTo(route) {
+                            inclusive = true
+                        }
+                    }
                     closeDrawer()
                 },
                 icon = appRoute.icon,

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">FitnessBuddy</string>
+    <string name="home">Accueil</string>
+    <string name="profile">Profil</string>
+    <string name="exercises">Exercices</string>
+    <string name="progress_calendar">Calendrier de Progression</string>
+    <string name="statistics">Statistiques</string>
+    <string name="username_placeholder">Pseudo</string>
+    <string name="routines">Routines</string>
+    <string name="add_edit_exercise">add_edit_exercise</string>
+    <string name="exercises_overview">Exercises Overview</string>
+    <string name="view_exercise">View Exercise</string>
+</resources>

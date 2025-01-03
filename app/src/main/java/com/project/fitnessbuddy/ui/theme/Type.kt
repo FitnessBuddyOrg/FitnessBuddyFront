@@ -18,10 +18,25 @@ val Typography = Typography(
         lineHeight = 28.sp,
         letterSpacing = 0.sp
     ),
+
     labelSmall = TextStyle(
         fontFamily = FontFamily.SansSerif,
         fontSize = 11.sp,
         lineHeight = 16.sp,
+        letterSpacing = 0.5.sp
+    ),
+
+    labelMedium = TextStyle(
+        fontFamily = FontFamily.SansSerif,
+        fontSize = 14.sp,
+        lineHeight = 20.sp,
+        letterSpacing = 0.5.sp
+    ),
+
+    labelLarge = TextStyle(
+        fontFamily = FontFamily.SansSerif,
+        fontSize = 18.sp,
+        lineHeight = 24.sp,
         letterSpacing = 0.5.sp
     )
 )

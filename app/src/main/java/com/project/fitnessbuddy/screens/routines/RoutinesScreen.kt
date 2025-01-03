@@ -1,4 +1,4 @@
-package com.project.fitnessbuddy.screens
+package com.project.fitnessbuddy.screens.routines
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -10,13 +10,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 
 @Composable
-fun myRoutinesScreen() {
+fun RoutinesScreen() {
     Column(
         modifier = Modifier.fillMaxSize(),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Text(text = "My Routines Screen", style = MaterialTheme.typography.headlineMedium)
+        Text(text = "Browse Routines Screen", style = MaterialTheme.typography.headlineMedium)
         Text(
             text = "This place will soon have a design",
             style = MaterialTheme.typography.bodyLarge
