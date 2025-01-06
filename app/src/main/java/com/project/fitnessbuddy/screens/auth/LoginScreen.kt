@@ -24,38 +24,47 @@ fun LoginScreen(
     var password by remember { mutableStateOf("") }
     val userState by authViewModel.userState.collectAsState()
 
-    Column(
+    Box(
         modifier = Modifier
             .fillMaxSize()
-            .padding(16.dp),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally
+            .background(MaterialTheme.colorScheme.background)
     ) {
-        Text(stringResource(id = R.string.login), style = MaterialTheme.typography.headlineMedium)
-        Spacer(modifier = Modifier.height(16.dp))
-        TextField(value = email, onValueChange = { email = it }, label = { Text(stringResource(id = R.string.email)) })
-        Spacer(modifier = Modifier.height(8.dp))
-        TextField(
-            value = password,
-            onValueChange = { password = it },
-            label = { Text(stringResource(id = R.string.password)) },
-            visualTransformation = PasswordVisualTransformation()
-        )
-        Spacer(modifier = Modifier.height(16.dp))
-        Button(onClick = {
-            authViewModel.login(context, email, password)
-        }) {
-            Text(stringResource(id = R.string.login))
-        }
-        Spacer(modifier = Modifier.height(8.dp))
-        TextButton(onClick = {
-            navController.navigate("register")
-        }) {
-            Text(stringResource(id = R.string.dont_have_account))
-        }
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(16.dp),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text(stringResource(id = R.string.login), style = MaterialTheme.typography.headlineMedium, color = MaterialTheme.colorScheme.primary)
+            Spacer(modifier = Modifier.height(16.dp))
+            TextField(value = email, onValueChange = { email = it }, label = { Text(stringResource(id = R.string.email)) })
+            Spacer(modifier = Modifier.height(8.dp))
+            TextField(
+                value = password,
+                onValueChange = { password = it },
+                label = { Text(stringResource(id = R.string.password)) },
+                visualTransformation = PasswordVisualTransformation()
+            )
+            Spacer(modifier = Modifier.height(16.dp))
+            Button(onClick = {
+                authViewModel.login(context, email, password)
+            }) {
+                Text(stringResource(id = R.string.login))
+            }
+            Spacer(modifier = Modifier.height(8.dp))
+            TextButton(onClick = {
+                navController.navigate("register")
+            }) {
+                Text(stringResource(id = R.string.dont_have_account))
+            }
 
-        if (userState.isLoggedIn) {
-            onLoginSuccess()
+
+
+
+            if (userState.isLoggedIn) {
+                onLoginSuccess()
+            }
         }
     }
 }
