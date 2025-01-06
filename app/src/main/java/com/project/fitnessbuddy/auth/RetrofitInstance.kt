@@ -1,4 +1,4 @@
-package com.project.fitnessbuddy.auth;
+package com.project.fitnessbuddy.auth
 
 
 import retrofit2.Retrofit
