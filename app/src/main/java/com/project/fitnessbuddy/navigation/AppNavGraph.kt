@@ -1,5 +1,6 @@
 package com.project.fitnessbuddy.navigation
 
+
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
@@ -35,11 +36,15 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.navigation
 import androidx.navigation.compose.rememberNavController
 import com.project.fitnessbuddy.R
+import com.project.fitnessbuddy.auth.AuthViewModel
+import com.project.fitnessbuddy.auth.UserState
 import com.project.fitnessbuddy.screens.HomeScreen
 import com.project.fitnessbuddy.screens.ProfileScreen
 import com.project.fitnessbuddy.screens.ProgressCalendarScreen
 import com.project.fitnessbuddy.screens.routines.RoutinesScreen
 import com.project.fitnessbuddy.screens.StatisticsScreen
+import com.project.fitnessbuddy.screens.auth.LoginScreen
+import com.project.fitnessbuddy.screens.auth.RegisterScreen
 import com.project.fitnessbuddy.screens.exercises.AddEditExerciseScreen
 import com.project.fitnessbuddy.screens.exercises.ExercisesScreen
 import com.project.fitnessbuddy.screens.exercises.ExercisesState
@@ -56,7 +61,8 @@ fun AppNavGraph(
     exercisesState: ExercisesState,
     navigationViewModel: NavigationViewModel,
     exercisesViewModel: ExercisesViewModel,
-
+    authViewModel: AuthViewModel,
+    userState: UserState,
     navController: NavHostController = rememberNavController(),
     coroutineScope: CoroutineScope = rememberCoroutineScope(),
     drawerState: DrawerState = rememberDrawerState(initialValue = DrawerValue.Closed),
@@ -65,16 +71,13 @@ fun AppNavGraph(
 
     val home = stringResource(id = R.string.home)
     val profile = stringResource(id = R.string.profile)
-
     val exercises = stringResource(id = R.string.exercises)
     val exercisesOverview = stringResource(id = R.string.exercises_overview)
     val addEditExercise = stringResource(id = R.string.add_edit_exercise)
     val viewExercise = stringResource(id = R.string.view_exercise)
-
     val routines = stringResource(id = R.string.routines)
     val progressCalendar = stringResource(id = R.string.progress_calendar)
     val statistics = stringResource(id = R.string.statistics)
-
 
     val currentNavBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = currentNavBackStackEntry?.destination?.route ?: home
@@ -91,7 +94,11 @@ fun AppNavGraph(
         AppRoute(
             mainName = profile,
             icon = { Icon(imageVector = Icons.Default.Person, contentDescription = null) },
-            screen = { ProfileScreen() }
+            screen = { ProfileScreen(
+                userState = userState,
+                authViewModel = authViewModel,
+                navController = navController
+            ) }
         ),
         AppRoute(
             mainName = exercisesOverview,
@@ -155,89 +162,150 @@ fun AppNavGraph(
         ),
     )
 
-    ModalNavigationDrawer(drawerContent = {
-        AppDrawer(
-            route = currentRoute,
-            closeDrawer = { coroutineScope.launch { drawerState.close() } },
-            appRoutes = appRoutes,
-            navController = navController,
-            modifier = Modifier
-        )
-    }, drawerState = drawerState) {
-        Scaffold(
-            topBar = {
-                TopAppBar(
-                    title = navigationState.titleWidget,
-                    modifier = Modifier.fillMaxWidth(),
-                    navigationIcon = {
-                        if (navigationState.backButtonEnabled) {
-                            IconButton(onClick = {
-                                navController.navigateUp()
-                            }, content = {
-                                Icon(
-                                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                                    contentDescription = null
-                                )
-                            })
-                        } else {
-                            IconButton(onClick = {
-                                coroutineScope.launch { drawerState.open() }
-                            }, content = {
-                                Icon(
-                                    imageVector = Icons.Default.Menu, contentDescription = null
-                                )
-                            })
-                        }
-                    },
-                    actions = {
-                        if (navigationState.searchButtonEnabled) {
-                            SearchButton(
-                                navigationState = navigationState,
-                                navigationViewModel = navigationViewModel,
-                                exercisesState = exercisesState,
-                                exercisesViewModel = exercisesViewModel,
-                            )
-                        }
-                        if (navigationState.addButtonEnabled) {
-                            CreateButton(navigationState, exercisesViewModel)
-                        }
-                        if(navigationState.editButtonEnabled) {
-                            EditButton(navigationState, exercisesViewModel)
-                        }
-                        if(navigationState.deleteButtonEnabled) {
-                            DeleteButton(navigationState)
-                        }
-                    },
-                    colors = TopAppBarDefaults.mediumTopAppBarColors(containerColor = MaterialTheme.colorScheme.primaryContainer)
-                )
-            }, modifier = Modifier
-        ) {
-            NavHost(
+    if (userState.isLoggedIn) {
+        ModalNavigationDrawer(drawerContent = {
+            AppDrawer(
+                route = currentRoute,
+                closeDrawer = { coroutineScope.launch { drawerState.close() } },
+                appRoutes = appRoutes,
                 navController = navController,
-                startDestination = exercisesOverview,
-                modifier = modifier.padding(it)
+                modifier = Modifier,
+                userState = userState
+            )
+        }, drawerState = drawerState) {
+            Scaffold(
+                topBar = {
+                    TopAppBar(
+                        title = navigationState.titleWidget,
+                        modifier = Modifier.fillMaxWidth(),
+                        navigationIcon = {
+                            if (navigationState.backButtonEnabled) {
+                                IconButton(onClick = {
+                                    navController.navigateUp()
+                                }, content = {
+                                    Icon(
+                                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                                        contentDescription = null
+                                    )
+                                })
+                            } else {
+                                IconButton(onClick = {
+                                    coroutineScope.launch { drawerState.open() }
+                                }, content = {
+                                    Icon(
+                                        imageVector = Icons.Default.Menu, contentDescription = null
+                                    )
+                                })
+                            }
+                        },
+                        actions = {
+                            if (navigationState.searchButtonEnabled) {
+                                SearchButton(
+                                    navigationState = navigationState,
+                                    navigationViewModel = navigationViewModel,
+                                    exercisesState = exercisesState,
+                                    exercisesViewModel = exercisesViewModel,
+                                )
+                            }
+                            if (navigationState.addButtonEnabled) {
+                                CreateButton(navigationState, exercisesViewModel)
+                            }
+                            if (navigationState.editButtonEnabled) {
+                                EditButton(navigationState, exercisesViewModel)
+                            }
+                            if (navigationState.deleteButtonEnabled) {
+                                DeleteButton(navigationState)
+                            }
+                        },
+                        colors = TopAppBarDefaults.mediumTopAppBarColors(containerColor = MaterialTheme.colorScheme.primaryContainer)
+                    )
+                }, modifier = Modifier
             ) {
-                appRoutes.forEach { appRoute ->
-                    if (appRoute.subRoutes.isNotEmpty()) {
-                        navigation(
-                            startDestination = appRoute.startDestination,
-                            route = appRoute.mainName
-                        ) {
-                            appRoute.subRoutes.forEach { subRoute ->
-                                composable(subRoute.mainName) {
-                                    subRoute.screen?.let { it1 -> it1() }
+                NavHost(
+                    navController = navController,
+                    startDestination = if (userState.isLoggedIn) "home" else "login",
+                    modifier = modifier.padding(it)
+                ) {
+                    composable("login") {
+                        LoginScreen(
+                            navController = navController,
+                            authViewModel = authViewModel,
+                            onLoginSuccess = {
+                                navController.navigate("home") {
+                                    popUpTo("login") { inclusive = true }
                                 }
                             }
-                        }
-                    } else {
-                        composable(appRoute.mainName) {
-                            appRoute.screen?.let { it1 -> it1() }
-                        }
+                        )
                     }
 
+                    composable("register") {
+                        RegisterScreen(
+                            navController = navController,
+                            authViewModel = authViewModel,
+                            onRegisterSuccess = {
+                                navController.navigate("home") {
+                                    popUpTo("register") { inclusive = true }
+                                }
+                            }
+                        )
+                    }
+
+                    composable("home") {
+                        HomeScreen(
+                            navigationState = navigationState,
+                            navigationViewModel = navigationViewModel
+                        )
+                    }
+                    appRoutes.forEach { appRoute ->
+                        if (appRoute.subRoutes.isNotEmpty()) {
+                            navigation(
+                                startDestination = appRoute.startDestination,
+                                route = appRoute.mainName
+                            ) {
+                                appRoute.subRoutes.forEach { subRoute ->
+                                    composable(subRoute.mainName) {
+                                        subRoute.screen?.let { it1 -> it1() }
+                                    }
+                                }
+                            }
+                        } else {
+                            composable(appRoute.mainName) {
+                                appRoute.screen?.let { it1 -> it1() }
+                            }
+                        }
+                    }
                 }
+            }
+        }
+    } else {
+        NavHost(
+            navController = navController,
+            startDestination = "login",
+            modifier = modifier
+        ) {
+            composable("login") {
+                LoginScreen(
+                    navController = navController,
+                    authViewModel = authViewModel,
+                    onLoginSuccess = {
+                        navController.navigate("home") {
+                            popUpTo("login") { inclusive = true }
+                        }
+                    }
+                )
+            }
+
+            composable("register") {
+                RegisterScreen(
+                    navController = navController,
+                    authViewModel = authViewModel,
+                    onRegisterSuccess = {
+                        navController.navigate("home") {
+                            popUpTo("register") { inclusive = true }
+                        }
+                    }
+                )
             }
         }
     }
 }
-

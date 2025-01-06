@@ -9,6 +9,7 @@ import androidx.compose.runtime.getValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.room.Room
+import com.project.fitnessbuddy.auth.AuthViewModel
 import com.project.fitnessbuddy.database.FitnessBuddyDatabase
 import com.project.fitnessbuddy.navigation.AppNavGraph
 import com.project.fitnessbuddy.navigation.NavigationViewModel
@@ -16,7 +17,7 @@ import com.project.fitnessbuddy.screens.exercises.ExercisesViewModel
 import com.project.fitnessbuddy.ui.theme.FitnessBuddyTheme
 
 class MainActivity : ComponentActivity() {
-
+    private val authViewModel by viewModels<AuthViewModel>()
     private val db by lazy {
         Room.databaseBuilder(
             applicationContext,
@@ -55,13 +56,13 @@ class MainActivity : ComponentActivity() {
             FitnessBuddyTheme {
                 val navigationState by navigationViewModel.state.collectAsState()
                 val exerciseState by exercisesViewModel.state.collectAsState()
-
-
+                val userState by authViewModel.userState.collectAsState()
                 AppNavGraph(
                     navigationState = navigationState,
                     navigationViewModel = navigationViewModel,
-
                     exercisesState = exerciseState,
+                    userState = userState,
+                    authViewModel = authViewModel,
                     exercisesViewModel = exercisesViewModel
                 )
             }
