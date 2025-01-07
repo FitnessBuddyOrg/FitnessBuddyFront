@@ -1,5 +1,7 @@
 package com.project.fitnessbuddy.screens.auth
 
+import android.app.Activity
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -58,9 +60,12 @@ fun LoginScreen(
             }) {
                 Text(stringResource(id = R.string.dont_have_account))
             }
-
-
-
+            Spacer(modifier = Modifier.height(8.dp))
+            Button(onClick = {
+                authViewModel.loginWithGoogle(context as Activity)
+            }) {
+                Text(text = "Sign in with Google")
+            }
 
             if (userState.isLoggedIn) {
                 onLoginSuccess()
