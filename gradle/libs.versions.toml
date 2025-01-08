@@ -1,5 +1,6 @@
 [versions]
 agp = "8.7.3"
+youtubePlayer = "12.1.0"
 hiltAndroidGradlePluginVersion = "2.40.5"
 kotlin = "2.0.21"
 coreKtx = "1.15.0"
@@ -25,6 +26,7 @@ serialization = "1.6.3"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
+youtubePlayer = { module = "com.pierfrancescosoffritti.androidyoutubeplayer:core", version.ref = "youtubePlayer" }
 hilt-android-gradle-plugin = { module = "com.google.dagger:hilt-android-gradle-plugin", version.ref = "hiltAndroidGradlePluginVersion" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }

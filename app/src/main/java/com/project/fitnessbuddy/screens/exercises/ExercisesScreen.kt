@@ -30,7 +30,7 @@ import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import com.project.fitnessbuddy.R
 import com.project.fitnessbuddy.database.entity.Exercise
-import com.project.fitnessbuddy.navigation.DefaultTitleWidget
+import com.project.fitnessbuddy.navigation.MediumTextWidget
 import com.project.fitnessbuddy.navigation.NavigationEvent
 import com.project.fitnessbuddy.navigation.NavigationState
 import com.project.fitnessbuddy.navigation.NavigationViewModel
@@ -59,7 +59,7 @@ fun ExercisesScreen(
 
             navigationViewModel.onEvent(NavigationEvent.SetTitle(context.getString(R.string.exercises)))
             navigationViewModel.onEvent(NavigationEvent.UpdateTitleWidget {
-                DefaultTitleWidget(context.getString(R.string.exercises))
+                MediumTextWidget(context.getString(R.string.exercises))
             })
         }
 

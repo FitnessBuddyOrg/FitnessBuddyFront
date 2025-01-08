@@ -28,7 +28,7 @@ import androidx.lifecycle.lifecycleScope
 import com.project.fitnessbuddy.database.entity.Category
 import com.project.fitnessbuddy.database.entity.Exercise
 import com.project.fitnessbuddy.database.entity.ShareType
-import com.project.fitnessbuddy.navigation.DefaultTitleWidget
+import com.project.fitnessbuddy.navigation.MediumTextWidget
 import com.project.fitnessbuddy.navigation.EditType
 import com.project.fitnessbuddy.navigation.NavigationEvent
 import com.project.fitnessbuddy.navigation.NavigationState
@@ -57,7 +57,7 @@ fun AddEditExerciseScreen(
             navigationViewModel.onEvent(NavigationEvent.EnableBackButton)
 
             navigationViewModel.onEvent(NavigationEvent.UpdateTitleWidget({
-                DefaultTitleWidget("${exercisesState.editType} Exercise")
+                MediumTextWidget("${exercisesState.editType} Exercise")
             }))
 
             if (exercisesState.editType == EditType.ADD) {
@@ -116,7 +116,7 @@ fun InputInformation(
 
                     if (succeeded) {
                         navigationState.navController?.navigateUp()
-                        Toast.makeText(context, "Saved Exercise ${exercisesState.editingExercise.name}", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(context, "Saved Exercise ${exercisesState.selectedExercise.name}", Toast.LENGTH_SHORT).show()
                     } else {
                         Toast.makeText(context, "Could not save exercise", Toast.LENGTH_SHORT).show()
                     }
@@ -138,7 +138,7 @@ fun InputInformation(
         ) {
             DefaultTextField(
                 label = "Add Name",
-                value = exercisesState.editingExercise.name,
+                value = exercisesState.selectedExercise.name,
                 onValueChange = {
                     exercisesViewModel.onEvent(ExercisesEvent.SetName(it))
                 }
@@ -146,7 +146,7 @@ fun InputInformation(
             Spacer(modifier = Modifier.height(20.dp))
             DefaultTextArea(
                 label = "Instructions",
-                value = exercisesState.editingExercise.instructions,
+                value = exercisesState.selectedExercise.instructions,
                 onValueChange = {
                     exercisesViewModel.onEvent(ExercisesEvent.SetInstructions(it))
                 }
@@ -154,7 +154,7 @@ fun InputInformation(
             Spacer(modifier = Modifier.height(20.dp))
             DefaultTextField(
                 label = "Video Link",
-                value = exercisesState.editingExercise.videoLink,
+                value = exercisesState.selectedExercise.videoLink,
                 onValueChange = {
                     exercisesViewModel.onEvent(ExercisesEvent.SetVideoLink(it))
                 }
@@ -163,7 +163,7 @@ fun InputInformation(
             DialogRadioButtonList(
                 label = "Category",
                 options = Category.entries,
-                value = exercisesState.editingExercise.category,
+                value = exercisesState.selectedExercise.category,
                 onValueChange = {
                     exercisesViewModel.onEvent(ExercisesEvent.SetCategory(it))
                 }
@@ -172,7 +172,7 @@ fun InputInformation(
             DialogRadioButtonList(
                 label = "Share Type",
                 options = ShareType.entries,
-                value = exercisesState.editingExercise.shareType,
+                value = exercisesState.selectedExercise.shareType,
                 onValueChange = {
                     exercisesViewModel.onEvent(ExercisesEvent.SetShareType(it))
                 }

@@ -59,7 +59,7 @@ class ExercisesViewModel(
             is ExercisesEvent.SetEditingExercise -> {
                 _state.update {
                     it.copy(
-                        editingExercise = exercisesEvent.selectedExercise
+                        selectedExercise = exercisesEvent.selectedExercise
                     )
                 }
             }
@@ -67,7 +67,7 @@ class ExercisesViewModel(
             is ExercisesEvent.ResetEditingExercise -> {
                 _state.update {
                     it.copy(
-                        editingExercise = Exercise(
+                        selectedExercise = Exercise(
                             "",
                             "",
                             "",
@@ -94,31 +94,31 @@ class ExercisesViewModel(
             }
 
             is ExercisesEvent.SaveExercise -> {
-                if (_state.value.editingExercise.name.isBlank()) {
+                if (_state.value.selectedExercise.name.isBlank()) {
                     return false
                 }
 
                 viewModelScope.launch {
-                    exerciseDao.upsert(_state.value.editingExercise)
+                    exerciseDao.upsert(_state.value.selectedExercise)
                 }
 
                 ExercisesEvent.ResetEditingExercise
             }
 
             is ExercisesEvent.UpdateExercise -> {
-                if (_state.value.editingExercise.name.isBlank()) {
+                if (_state.value.selectedExercise.name.isBlank()) {
                     return false
                 }
 
                 viewModelScope.launch {
-                    exerciseDao.upsert(_state.value.editingExercise)
+                    exerciseDao.upsert(_state.value.selectedExercise)
                 }
             }
 
             is ExercisesEvent.SetName -> {
                 _state.update {
                     it.copy(
-                        editingExercise = it.editingExercise.copy(
+                        selectedExercise = it.selectedExercise.copy(
                             name = exercisesEvent.name
                         )
                     )
@@ -128,7 +128,7 @@ class ExercisesViewModel(
             is ExercisesEvent.SetInstructions -> {
                 _state.update {
                     it.copy(
-                        editingExercise = it.editingExercise.copy(
+                        selectedExercise = it.selectedExercise.copy(
                             instructions = exercisesEvent.instructions
                         )
                     )
@@ -138,7 +138,7 @@ class ExercisesViewModel(
             is ExercisesEvent.SetVideoLink -> {
                 _state.update {
                     it.copy(
-                        editingExercise = it.editingExercise.copy(
+                        selectedExercise = it.selectedExercise.copy(
                             videoLink = exercisesEvent.videoLink
                         )
                     )
@@ -148,7 +148,7 @@ class ExercisesViewModel(
             is ExercisesEvent.SetCategory -> {
                 _state.update {
                     it.copy(
-                        editingExercise = it.editingExercise.copy(
+                        selectedExercise = it.selectedExercise.copy(
                             category = exercisesEvent.category
                         )
                     )
@@ -158,7 +158,7 @@ class ExercisesViewModel(
             is ExercisesEvent.SetShareType -> {
                 _state.update {
                     it.copy(
-                        editingExercise = it.editingExercise.copy(
+                        selectedExercise = it.selectedExercise.copy(
                             shareType = exercisesEvent.shareType
                         )
                     )
@@ -168,7 +168,7 @@ class ExercisesViewModel(
             is ExercisesEvent.SetLanguage -> {
                 _state.update {
                     it.copy(
-                        editingExercise = it.editingExercise.copy(
+                        selectedExercise = it.selectedExercise.copy(
                             language = exercisesEvent.language
                         )
                     )

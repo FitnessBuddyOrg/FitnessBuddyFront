@@ -11,4 +11,6 @@
     <string name="add_edit_exercise">add_edit_exercise</string>
     <string name="exercises_overview">Exercises Overview</string>
     <string name="view_exercise">View Exercise</string>
+    <string name="instructions">Instructions</string>
+    <string name="no_vid_available">No video available for this exercise</string>
 </resources>

@@ -63,12 +63,12 @@ fun DefaultTextArea(label: String, value: String, onValueChange: (String) -> Uni
 }
 
 @Composable
-fun <T> DialogRadioButtonList(label: String, options: List<T>, value: T, onValueChange: (T) -> Unit) {
+fun <T> DialogRadioButtonList(label: String, options: List<T>, value: T, onValueChange: (T) -> Unit, modifier: Modifier = Modifier) {
     var selectedOption by remember { mutableStateOf(options[options.indexOf(value)]) }
     var isDialogOpen by remember { mutableStateOf(false) }
 
     Row(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
             .height(50.dp)
             .background(Color.Transparent)

@@ -22,6 +22,7 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
@@ -36,32 +37,43 @@ import androidx.navigation.compose.navigation
 import androidx.navigation.compose.rememberNavController
 import com.project.fitnessbuddy.R
 import com.project.fitnessbuddy.screens.HomeScreen
-import com.project.fitnessbuddy.screens.ProfileScreen
+import com.project.fitnessbuddy.screens.profile.ProfileScreen
 import com.project.fitnessbuddy.screens.ProgressCalendarScreen
 import com.project.fitnessbuddy.screens.routines.RoutinesScreen
 import com.project.fitnessbuddy.screens.StatisticsScreen
+import com.project.fitnessbuddy.screens.common.ParametersEvent
+import com.project.fitnessbuddy.screens.common.ParametersState
+import com.project.fitnessbuddy.screens.common.ParametersViewModel
 import com.project.fitnessbuddy.screens.exercises.AddEditExerciseScreen
 import com.project.fitnessbuddy.screens.exercises.ExercisesScreen
 import com.project.fitnessbuddy.screens.exercises.ExercisesState
 import com.project.fitnessbuddy.screens.exercises.ExercisesViewModel
 import com.project.fitnessbuddy.screens.exercises.ViewExerciseScreen
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AppNavGraph(
     modifier: Modifier = Modifier,
+
     navigationState: NavigationState,
-    exercisesState: ExercisesState,
     navigationViewModel: NavigationViewModel,
+
+    exercisesState: ExercisesState,
     exercisesViewModel: ExercisesViewModel,
+
+    parametersState: ParametersState,
+    parametersViewModel: ParametersViewModel,
 
     navController: NavHostController = rememberNavController(),
     coroutineScope: CoroutineScope = rememberCoroutineScope(),
     drawerState: DrawerState = rememberDrawerState(initialValue = DrawerValue.Closed),
 ) {
     navigationViewModel.onEvent(NavigationEvent.SetNavController(navController))
+    parametersViewModel.onEvent(ParametersEvent.InitializeParameters)
+
 
     val home = stringResource(id = R.string.home)
     val profile = stringResource(id = R.string.profile)
@@ -83,15 +95,24 @@ fun AppNavGraph(
         AppRoute(
             mainName = home,
             icon = { Icon(imageVector = Icons.Default.Home, contentDescription = null) },
-            screen = { HomeScreen(
-                navigationState = navigationState,
-                navigationViewModel = navigationViewModel,
-            ) }
+            screen = {
+                HomeScreen(
+                    navigationState = navigationState,
+                    navigationViewModel = navigationViewModel,
+                )
+            }
         ),
         AppRoute(
             mainName = profile,
             icon = { Icon(imageVector = Icons.Default.Person, contentDescription = null) },
-            screen = { ProfileScreen() }
+            screen = {
+                ProfileScreen(
+                    navigationState = navigationState,
+                    navigationViewModel = navigationViewModel,
+                    parametersState = parametersState,
+                    parametersViewModel = parametersViewModel,
+                )
+            }
         ),
         AppRoute(
             mainName = exercisesOverview,
@@ -201,10 +222,10 @@ fun AppNavGraph(
                         if (navigationState.addButtonEnabled) {
                             CreateButton(navigationState, exercisesViewModel)
                         }
-                        if(navigationState.editButtonEnabled) {
+                        if (navigationState.editButtonEnabled) {
                             EditButton(navigationState, exercisesViewModel)
                         }
-                        if(navigationState.deleteButtonEnabled) {
+                        if (navigationState.deleteButtonEnabled) {
                             DeleteButton(navigationState)
                         }
                     },
