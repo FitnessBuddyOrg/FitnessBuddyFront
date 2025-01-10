@@ -66,6 +66,13 @@ fun LoginScreen(
             }) {
                 Text(text = "Sign in with Google")
             }
+            Spacer(modifier = Modifier.height(8.dp))
+            Button(onClick = {
+                authViewModel.loginWithGitHub(context as Activity)
+            }) {
+                Text(text = "Sign in with GitHub")
+            }
+
 
             if (userState.isLoggedIn) {
                 onLoginSuccess()

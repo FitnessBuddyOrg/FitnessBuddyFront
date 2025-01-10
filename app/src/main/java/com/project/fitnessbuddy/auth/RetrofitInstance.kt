@@ -6,8 +6,8 @@ import retrofit2.converter.gson.GsonConverterFactory
 
 
 object RetrofitInstance {
-private const val BASE_URL = "http://10.0.2.2:8080/"
-//private const val BASE_URL = "https://fitbud.ldelatullaye.fr/"
+//private const val BASE_URL = "http://10.0.2.2:8080/"
+private const val BASE_URL = "https://fitbud.ldelatullaye.fr/"
 
 
 val authService: AuthService by lazy {

@@ -2,6 +2,8 @@ package com.project.fitnessbuddy.auth
 
 import android.app.Activity
 import android.content.Context
+import android.content.Intent
+import android.net.Uri
 import android.util.Log
 import android.widget.Toast
 import androidx.credentials.CredentialManager
@@ -11,9 +13,6 @@ import androidx.credentials.GetCredentialResponse
 import androidx.credentials.exceptions.GetCredentialException
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.google.android.gms.auth.api.signin.GoogleSignIn
-import com.google.android.gms.auth.api.signin.GoogleSignInClient
-import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.libraries.identity.googleid.GetGoogleIdOption
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -43,6 +42,8 @@ class AuthViewModel : ViewModel() {
             }
         }
     }
+
+
 
     fun register(context: Context, email: String, password: String, confirmPassword: String) {
         viewModelScope.launch {
@@ -89,7 +90,6 @@ class AuthViewModel : ViewModel() {
                 Log.e("AuthViewModel", "Google Sign-In failed: ${e.localizedMessage}", e)
                 _error.value = "Google Sign-In failed: ${e.localizedMessage}"
                 Toast.makeText(activity, "Google Sign-In failed: ${e.localizedMessage}", Toast.LENGTH_LONG).show()
-                fallbackGoogleSignIn(activity)
             } catch (e: Exception) {
                 Log.e("AuthViewModel", "An unexpected error occurred: ${e.localizedMessage}", e)
                 _error.value = "An unexpected error occurred: ${e.localizedMessage}"
@@ -132,18 +132,20 @@ class AuthViewModel : ViewModel() {
         }
     }
 
-
-    fun fallbackGoogleSignIn(activity: Activity) {
-        val googleSignInOptions = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-            //.requestIdToken("663662917989-ckm453b7gt3dfmp29c74evda0nh2ki46.apps.googleusercontent.com") //android
-            .requestIdToken("663662917989-055c6as89abel9k2tb3fvri5kkj552r6.apps.googleusercontent.com") //web
-            .requestEmail()
-            .build()
-
-        val googleSignInClient: GoogleSignInClient = GoogleSignIn.getClient(activity, googleSignInOptions)
-
-        val signInIntent = googleSignInClient.signInIntent
-        activity.startActivityForResult(signInIntent, 1001)
+    fun loginWithGitHub(activity: Activity) {
+        val clientId = "Ov23liGkKX58yCWWxwHo"
+        val redirectUri = "https://fitbud.ldelatullaye.fr/login/oauth2/code/github"
+        val githubLoginUrl = "https://github.com/login/oauth/authorize?client_id=$clientId&redirect_uri=$redirectUri&scope=user:email"
+        val intent = Intent(Intent.ACTION_VIEW, Uri.parse(githubLoginUrl))
+        activity.startActivity(intent)
     }
+
+    fun handleSuccessfulLogin(accessToken: String, email: String) {
+        _userState.value = UserState(
+            accessToken = accessToken,
+            isLoggedIn = true,
+            email = email
+        )
     }
+}
 

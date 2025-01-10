@@ -11,6 +11,9 @@ data class UserResponse(
     @SerializedName("accessToken") val accessToken: String,
     val email: String
 )
+data class GitHubTokenRequestDTO(val code: String)
+
+
 
 interface AuthService {
     @POST("auth/login")
@@ -21,5 +24,9 @@ interface AuthService {
 
     @POST("auth/login/oauth2/code/google")
     suspend fun googleLogin(@Body request: GoogleLoginRequest): UserResponse
+
+    @POST("auth/login/oauth2/code/github")
+    suspend fun githubLogin(@Body request: GitHubTokenRequestDTO): UserResponse
+
 }
 
