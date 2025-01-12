@@ -24,6 +24,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.navigation.NavController
 import com.project.fitnessbuddy.R
+import com.project.fitnessbuddy.auth.UserState
 
 @Composable
 fun AppDrawer(
@@ -31,10 +32,11 @@ fun AppDrawer(
     modifier: Modifier = Modifier,
     appRoutes: List<AppRoute> = listOf(),
     navController: NavController,
+    userState: UserState,
     closeDrawer: () -> Unit = {}
 ) {
     ModalDrawerSheet(modifier = Modifier) {
-        DrawerHeader(modifier)
+        DrawerHeader(modifier, userState)
         Spacer(modifier = Modifier.padding(dimensionResource(id = R.dimen.spacer_padding)))
 
         appRoutes.forEach { appRoute ->
@@ -63,9 +65,8 @@ fun AppDrawer(
     }
 }
 
-
 @Composable
-fun DrawerHeader(modifier: Modifier) {
+fun DrawerHeader(modifier: Modifier, userState: UserState) {
     Column(
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.Start,
@@ -86,7 +87,7 @@ fun DrawerHeader(modifier: Modifier) {
         Spacer(modifier = Modifier.padding(dimensionResource(id = R.dimen.spacer_padding)))
 
         Text(
-            text = stringResource(id = R.string.username_placeholder),
+            text = userState.email ?: stringResource(id = R.string.username_placeholder),
             textAlign = TextAlign.Center,
             style = MaterialTheme.typography.bodyLarge,
             color = MaterialTheme.colorScheme.onPrimary,

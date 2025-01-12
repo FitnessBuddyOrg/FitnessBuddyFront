@@ -1,4 +1,3 @@
-<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">FitnessBuddy</string>
     <string name="home">Accueil</string>
@@ -11,4 +10,13 @@
     <string name="add_edit_exercise">add_edit_exercise</string>
     <string name="exercises_overview">Exercises Overview</string>
     <string name="view_exercise">View Exercise</string>
+    <string name="register">S\'inscrire</string>
+    <string name="email">Email</string>
+    <string name="password">Mot de passe</string>
+    <string name="confirm_password">Confirmer le mot de passe</string>
+    <string name="already_have_account">Vous avez déjà un compte? Connexion</string>
+    <string name="login">Connexion</string>
+    <string name="dont_have_account">Vous n\'avez pas de compte? S\'inscrire</string>
+    <string name="welcome">Bienvenue, %1$s</string>
+    <string name="logout">Déconnexion</string>
 </resources>
