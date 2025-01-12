@@ -57,7 +57,7 @@ fun RegisterScreen(
             )
             Spacer(modifier = Modifier.height(16.dp))
             Button(onClick = {
-                authViewModel.register(context, email, password, confirmPassword)
+                authViewModel.register(email, password, confirmPassword)
             }) {
                 Text(stringResource(id = R.string.register))
             }

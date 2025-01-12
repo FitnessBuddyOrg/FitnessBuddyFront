@@ -50,7 +50,7 @@ fun LoginScreen(
             )
             Spacer(modifier = Modifier.height(16.dp))
             Button(onClick = {
-                authViewModel.login(context, email, password)
+                authViewModel.login(email, password)
             }) {
                 Text(stringResource(id = R.string.login))
             }

@@ -24,7 +24,15 @@ import com.project.fitnessbuddy.ui.theme.FitnessBuddyTheme
 import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
-    private val authViewModel by viewModels<AuthViewModel>()
+    private val authViewModel by viewModels<AuthViewModel> {
+        object : ViewModelProvider.Factory {
+            override fun <T : ViewModel> create(modelClass: Class<T>): T {
+                @Suppress("UNCHECKED_CAST")
+                return AuthViewModel(application) as T
+            }
+        }
+    }
+
     private val db by lazy {
         Room.databaseBuilder(
             applicationContext,
@@ -108,6 +116,7 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        authViewModel.loadToken()
         setContent {
             FitnessBuddyTheme {
                 val navigationState by navigationViewModel.state.collectAsState()
@@ -124,6 +133,7 @@ class MainActivity : ComponentActivity() {
             }
         }
     }
+
 
 }
 

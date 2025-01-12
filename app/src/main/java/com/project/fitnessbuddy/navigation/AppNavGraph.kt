@@ -97,7 +97,8 @@ fun AppNavGraph(
             screen = { ProfileScreen(
                 userState = userState,
                 authViewModel = authViewModel,
-                navController = navController
+                navController = navController,
+                navigationViewModel = navigationViewModel,
             ) }
         ),
         AppRoute(

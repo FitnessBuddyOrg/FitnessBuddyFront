@@ -1,8 +1,10 @@
 package com.project.fitnessbuddy.auth
 
 import android.app.Activity
+import android.app.Application
 import android.content.Context
 import android.content.Intent
+import android.content.SharedPreferences
 import android.net.Uri
 import android.util.Log
 import android.widget.Toast
@@ -11,14 +13,14 @@ import androidx.credentials.CustomCredential
 import androidx.credentials.GetCredentialRequest
 import androidx.credentials.GetCredentialResponse
 import androidx.credentials.exceptions.GetCredentialException
-import androidx.lifecycle.ViewModel
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.android.libraries.identity.googleid.GetGoogleIdOption
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
-class AuthViewModel : ViewModel() {
+class AuthViewModel(application: Application) : AndroidViewModel(application) {
 
     private val _userState = MutableStateFlow(UserState())
     val userState: StateFlow<UserState> = _userState
@@ -26,7 +28,9 @@ class AuthViewModel : ViewModel() {
     private val _error = MutableStateFlow<String?>(null)
     val error: StateFlow<String?> = _error
 
-    fun login(context: Context, email: String, password: String) {
+    private val appContext: Context = application.applicationContext
+
+    fun login(email: String, password: String) {
         viewModelScope.launch {
             try {
                 val response = RetrofitInstance.authService.login(LoginRequest(email, password))
@@ -36,16 +40,17 @@ class AuthViewModel : ViewModel() {
                     email = email
                 )
                 _error.value = null
+                saveToken(response.accessToken, email)
             } catch (e: Exception) {
                 _error.value = "Login failed: ${e.localizedMessage}"
-                Toast.makeText(context, "Login failed: ${e.localizedMessage}", Toast.LENGTH_LONG).show()
+                Toast.makeText(appContext, "Login failed: ${e.localizedMessage}", Toast.LENGTH_LONG).show()
             }
         }
     }
 
 
-
-    fun register(context: Context, email: String, password: String, confirmPassword: String) {
+    //TODO handle errors
+    fun register(email: String, password: String, confirmPassword: String) {
         viewModelScope.launch {
             try {
                 val response = RetrofitInstance.authService.register(RegisterRequest(email, password, confirmPassword))
@@ -54,22 +59,21 @@ class AuthViewModel : ViewModel() {
                     isLoggedIn = true,
                     email = email
                 )
-                Toast.makeText(context, "Registration successful", Toast.LENGTH_LONG).show()
+                Toast.makeText(appContext, "Registration successful", Toast.LENGTH_LONG).show()
             } catch (e: Exception) {
                 _error.value = "Registration failed: ${e.localizedMessage}"
-                Toast.makeText(context, "Registration failed: ${e.localizedMessage}", Toast.LENGTH_LONG).show()
+                Toast.makeText(appContext, "Registration failed: ${e.localizedMessage}", Toast.LENGTH_LONG).show()
             }
         }
     }
 
     fun logout() {
-        _userState.value = UserState()
+        clearToken()
     }
 
     fun loginWithGoogle(activity: Activity) {
         val googleIdOption = GetGoogleIdOption.Builder()
-            //.setServerClientId("663662917989-ckm453b7gt3dfmp29c74evda0nh2ki46.apps.googleusercontent.com") //android
-            .setServerClientId("663662917989-055c6as89abel9k2tb3fvri5kkj552r6.apps.googleusercontent.com") //web
+            .setServerClientId("663662917989-055c6as89abel9k2tb3fvri5kkj552r6.apps.googleusercontent.com")
             .setFilterByAuthorizedAccounts(false)
             .setAutoSelectEnabled(false)
             .build()
@@ -78,7 +82,7 @@ class AuthViewModel : ViewModel() {
             .addCredentialOption(googleIdOption)
             .build()
 
-        val credentialManager = CredentialManager.create(activity.applicationContext)
+        val credentialManager = CredentialManager.create(appContext)
 
         viewModelScope.launch {
             try {
@@ -89,11 +93,11 @@ class AuthViewModel : ViewModel() {
             } catch (e: GetCredentialException) {
                 Log.e("AuthViewModel", "Google Sign-In failed: ${e.localizedMessage}", e)
                 _error.value = "Google Sign-In failed: ${e.localizedMessage}"
-                Toast.makeText(activity, "Google Sign-In failed: ${e.localizedMessage}", Toast.LENGTH_LONG).show()
+                Toast.makeText(appContext, "Google Sign-In failed: ${e.localizedMessage}", Toast.LENGTH_LONG).show()
             } catch (e: Exception) {
                 Log.e("AuthViewModel", "An unexpected error occurred: ${e.localizedMessage}", e)
                 _error.value = "An unexpected error occurred: ${e.localizedMessage}"
-                Toast.makeText(activity, "An unexpected error occurred: ${e.localizedMessage}", Toast.LENGTH_LONG).show()
+                Toast.makeText(appContext, "An unexpected error occurred: ${e.localizedMessage}", Toast.LENGTH_LONG).show()
             }
         }
     }
@@ -107,7 +111,7 @@ class AuthViewModel : ViewModel() {
             if (idToken != null) {
                 viewModelScope.launch {
                     try {
-                        Log.d("AuthViewModel", "Google Sign-In successful with my metyhod, ID Token: $idToken")
+                        Log.d("AuthViewModel", "Google Sign-In successful, ID Token: $idToken")
                         val userResponse = RetrofitInstance.authService.googleLogin(GoogleLoginRequest(idToken))
                         Log.d("AuthViewModel", "UserResponse from googleLogin: $userResponse")
                         _userState.value = UserState(
@@ -116,6 +120,7 @@ class AuthViewModel : ViewModel() {
                             name = credential.data.getString("com.google.android.libraries.identity.googleid.BUNDLE_KEY_DISPLAY_NAME"),
                             email = userResponse.email
                         )
+                        saveToken(userResponse.accessToken, userResponse.email)
                         Log.d("AuthViewModel", "Google Sign-In successful, UserResponse: $userResponse")
                     } catch (e: Exception) {
                         Log.e("AuthViewModel", "Google Sign-In failed: ${e.localizedMessage}", e)
@@ -146,6 +151,37 @@ class AuthViewModel : ViewModel() {
             isLoggedIn = true,
             email = email
         )
+        saveToken(accessToken, email)
+    }
+
+    private fun saveToken(token: String, email: String) {
+        val sharedPreferences: SharedPreferences = appContext.getSharedPreferences("FitnessBuddyPrefs", Context.MODE_PRIVATE)
+        val editor = sharedPreferences.edit()
+        editor.putString("accessToken", token)
+        editor.putString("email", email)
+        editor.apply()
+    }
+    fun loadToken() {
+        val sharedPreferences: SharedPreferences = appContext.getSharedPreferences("FitnessBuddyPrefs", Context.MODE_PRIVATE)
+        val token = sharedPreferences.getString("accessToken", null)
+        val email = sharedPreferences.getString("email", null)
+
+        if (token != null && email != null) {
+            _userState.value = UserState(
+                accessToken = token,
+                isLoggedIn = true,
+                email = email
+            )
+        }
+    }
+
+    fun clearToken() {
+        val sharedPreferences: SharedPreferences = appContext.getSharedPreferences("FitnessBuddyPrefs", Context.MODE_PRIVATE)
+        val editor = sharedPreferences.edit()
+        editor.clear()
+        editor.apply()
+        _userState.value = UserState()
     }
 }
+
 
