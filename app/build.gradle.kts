@@ -67,6 +67,8 @@ dependencies {
     implementation(libs.hilt.android)
     implementation(libs.androidx.hilt.navigation.compose)
     implementation(libs.retrofit)
+    implementation(libs.retrofit.converter.gson)
+
     implementation(libs.okhttp)
 
     implementation(libs.androidx.room.ktx)
@@ -81,8 +83,15 @@ dependencies {
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
 
+    implementation(libs.hilt.android)
+    ksp(libs.hilt.compiler)
 
+    implementation(libs.play.services.auth)
+    implementation(libs.androidx.credentials)
+    implementation (libs.googleid)
+    implementation (libs.androidx.credentials.play.services.auth)
 
+    
     ksp(libs.hilt.android.compiler)
     ksp(libs.androidx.hilt.compiler)
     ksp(libs.androidx.room.compiler)

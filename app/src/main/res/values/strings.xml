@@ -10,4 +10,13 @@
     <string name="add_edit_exercise">Add Edit Exercises</string>
     <string name="exercises_overview">Exercises Overview</string>
     <string name="view_exercise">View Exercise</string>
+    <string name="register">Register</string>
+    <string name="email">Email</string>
+    <string name="password">Password</string>
+    <string name="confirm_password">Confirm Password</string>
+    <string name="already_have_account">Already have an account? Login</string>
+    <string name="login">Login</string>
+    <string name="dont_have_account">Don\'t have an account? Register</string>
+    <string name="welcome">Welcome, %1$s</string>
+    <string name="logout">Logout</string>
 </resources>
