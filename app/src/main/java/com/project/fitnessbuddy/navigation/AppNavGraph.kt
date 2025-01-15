@@ -79,6 +79,11 @@ fun AppNavGraph(
     navigationViewModel.onEvent(NavigationEvent.SetNavController(navController))
     parametersViewModel.onEvent(ParametersEvent.InitializeParameters)
 
+    // TODO - REMOVE THIS FOR PRODUCTION
+    val bypassLogin = false
+
+    val loginRoute = stringResource(id = R.string.login_route)
+    val registerRoute = stringResource(id = R.string.register_route)
 
     val homeRoute = stringResource(id = R.string.home_route)
     val profileRoute = stringResource(id = R.string.profile_route)
@@ -193,7 +198,7 @@ fun AppNavGraph(
         ),
     )
 
-    if (userState.isLoggedIn) {
+    if (userState.isLoggedIn || bypassLogin) {
         ModalNavigationDrawer(drawerContent = {
             AppDrawer(
                 route = currentRoute,
@@ -254,39 +259,33 @@ fun AppNavGraph(
             ) {
                 NavHost(
                     navController = navController,
-                    startDestination = if (userState.isLoggedIn) "home" else "login",
+                    startDestination = if (userState.isLoggedIn || bypassLogin) homeRoute else loginRoute,
                     modifier = modifier.padding(it)
                 ) {
-                    composable("login") {
+                    composable(loginRoute) {
                         LoginScreen(
                             navController = navController,
                             authViewModel = authViewModel,
                             onLoginSuccess = {
-                                navController.navigate("home") {
-                                    popUpTo("login") { inclusive = true }
+                                navController.navigate(homeRoute) {
+                                    popUpTo(loginRoute) { inclusive = true }
                                 }
                             }
                         )
                     }
 
-                    composable("register") {
+                    composable(registerRoute) {
                         RegisterScreen(
                             navController = navController,
                             authViewModel = authViewModel,
                             onRegisterSuccess = {
-                                navController.navigate("home") {
-                                    popUpTo("register") { inclusive = true }
+                                navController.navigate(homeRoute) {
+                                    popUpTo(registerRoute) { inclusive = true }
                                 }
                             }
                         )
                     }
 
-                    composable("home") {
-                        HomeScreen(
-                            navigationState = navigationState,
-                            navigationViewModel = navigationViewModel
-                        )
-                    }
                     appRoutes.forEach { appRoute ->
                         if (appRoute.subRoutes.isNotEmpty()) {
                             navigation(
@@ -312,28 +311,28 @@ fun AppNavGraph(
     } else {
         NavHost(
             navController = navController,
-            startDestination = "login",
+            startDestination = loginRoute,
             modifier = modifier
         ) {
-            composable("login") {
+            composable(loginRoute) {
                 LoginScreen(
                     navController = navController,
                     authViewModel = authViewModel,
                     onLoginSuccess = {
-                        navController.navigate("home") {
-                            popUpTo("login") { inclusive = true }
+                        navController.navigate(homeRoute) {
+                            popUpTo(loginRoute) { inclusive = true }
                         }
                     }
                 )
             }
 
-            composable("register") {
+            composable(registerRoute) {
                 RegisterScreen(
                     navController = navController,
                     authViewModel = authViewModel,
                     onRegisterSuccess = {
-                        navController.navigate("home") {
-                            popUpTo("register") { inclusive = true }
+                        navController.navigate(homeRoute) {
+                            popUpTo(registerRoute) { inclusive = true }
                         }
                     }
                 )

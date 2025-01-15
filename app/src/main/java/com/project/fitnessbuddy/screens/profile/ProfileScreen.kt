@@ -79,6 +79,14 @@ fun ProfileScreen(
         parametersState = parametersState,
         parametersViewModel = parametersViewModel
     )
+
+    LoginLogout(
+        navigationState = navigationState,
+        navigationViewModel = navigationViewModel,
+
+        userState = userState,
+        authViewModel = authViewModel
+    )
 }
 
 @Composable
@@ -137,6 +145,8 @@ fun LoginLogout(
     userState: UserState,
     authViewModel: AuthViewModel
 ) {
+    val context = LocalContext.current
+
     Column(
         modifier = Modifier.fillMaxSize(),
         verticalArrangement = Arrangement.Center,
@@ -149,7 +159,7 @@ fun LoginLogout(
 
         Button(onClick = {
             authViewModel.logout()
-            navigationState.navController?.navigate("login") {
+            navigationState.navController?.navigate(context.getString(R.string.login_route)) {
                 popUpTo(0) { inclusive = true }
             }
         }) {

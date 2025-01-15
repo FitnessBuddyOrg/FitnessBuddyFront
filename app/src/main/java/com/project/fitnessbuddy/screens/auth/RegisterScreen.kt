@@ -63,7 +63,7 @@ fun RegisterScreen(
             }
             Spacer(modifier = Modifier.height(8.dp))
             TextButton(onClick = {
-                navController.navigate("login")
+                navController.navigate(context.getString(R.string.login_route))
             }) {
                 Text(stringResource(id = R.string.already_have_account))
             }
