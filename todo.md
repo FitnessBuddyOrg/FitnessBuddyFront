@@ -1,20 +1,20 @@
 MUST:
-- [x] notification 
-- [x] handle errors in login and registration
-- [x] users statistics for admin
-- [x] user statistics for user (including screen time)
-- [x] user profile page
-- [x] sharing exercises with other users
-- [x] changing languages
-- [x] unit test
+- [ ] notification 
+- [ ] handle errors in login and registration
+- [ ] users statistics for admin
+- [ ] user statistics for user (including screen time)
+- [ ] user profile page
+- [ ] sharing exercises with other users
+- [ ] changing languages
+- [ ] unit test
 
 SHOULD:
 
-- [x] password reset
-- [x] pfp
-- [x] sharing routines with other users
-- [x] design a cool home page with links to other pages
+- [ ] password reset
+- [ ] pfp
+- [ ] sharing routines with other users
+- [ ] design a cool home page with links to other pages
 
 COULD:
 
-- [v] dark mode (already implemented)
+- [x] dark mode (already implemented)
