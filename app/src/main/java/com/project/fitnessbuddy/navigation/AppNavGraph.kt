@@ -38,9 +38,7 @@ import com.project.fitnessbuddy.R
 import com.project.fitnessbuddy.auth.AuthViewModel
 import com.project.fitnessbuddy.auth.UserState
 import com.project.fitnessbuddy.screens.HomeScreen
-import com.project.fitnessbuddy.screens.profile.ProfileScreen
 import com.project.fitnessbuddy.screens.ProgressCalendarScreen
-import com.project.fitnessbuddy.screens.routines.RoutinesScreen
 import com.project.fitnessbuddy.screens.StatisticsScreen
 import com.project.fitnessbuddy.screens.auth.LoginScreen
 import com.project.fitnessbuddy.screens.auth.RegisterScreen
@@ -52,6 +50,8 @@ import com.project.fitnessbuddy.screens.exercises.ExercisesScreen
 import com.project.fitnessbuddy.screens.exercises.ExercisesState
 import com.project.fitnessbuddy.screens.exercises.ExercisesViewModel
 import com.project.fitnessbuddy.screens.exercises.ViewExerciseScreen
+import com.project.fitnessbuddy.screens.profile.ProfileScreen
+import com.project.fitnessbuddy.screens.routines.RoutinesScreen
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
@@ -307,6 +307,36 @@ fun AppNavGraph(
                     }
 
                 }
+            }
+        }
+    } else {
+        NavHost(
+            navController = navController,
+            startDestination = "login",
+            modifier = modifier
+        ) {
+            composable("login") {
+                LoginScreen(
+                    navController = navController,
+                    authViewModel = authViewModel,
+                    onLoginSuccess = {
+                        navController.navigate("home") {
+                            popUpTo("login") { inclusive = true }
+                        }
+                    }
+                )
+            }
+
+            composable("register") {
+                RegisterScreen(
+                    navController = navController,
+                    authViewModel = authViewModel,
+                    onRegisterSuccess = {
+                        navController.navigate("home") {
+                            popUpTo("register") { inclusive = true }
+                        }
+                    }
+                )
             }
         }
     }

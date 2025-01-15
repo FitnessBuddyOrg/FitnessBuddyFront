@@ -6,16 +6,19 @@ import android.os.Build
 import android.os.LocaleList
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -24,6 +27,8 @@ import androidx.core.os.LocaleListCompat
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import com.project.fitnessbuddy.R
+import com.project.fitnessbuddy.auth.AuthViewModel
+import com.project.fitnessbuddy.auth.UserState
 import com.project.fitnessbuddy.navigation.MediumTextWidget
 import com.project.fitnessbuddy.navigation.NavigationEvent
 import com.project.fitnessbuddy.navigation.NavigationState
@@ -42,8 +47,12 @@ import kotlinx.coroutines.launch
 fun ProfileScreen(
     navigationState: NavigationState,
     navigationViewModel: NavigationViewModel,
+
     parametersState: ParametersState,
-    parametersViewModel: ParametersViewModel
+    parametersViewModel: ParametersViewModel,
+
+    userState: UserState,
+    authViewModel: AuthViewModel
 ) {
     val context = LocalContext.current
     val lifecycleOwner = LocalLifecycleOwner.current
@@ -116,6 +125,35 @@ fun ParametersList(
                 )
             }
 
+        }
+    }
+}
+
+@Composable
+fun LoginLogout(
+    navigationState: NavigationState,
+    navigationViewModel: NavigationViewModel,
+
+    userState: UserState,
+    authViewModel: AuthViewModel
+) {
+    Column(
+        modifier = Modifier.fillMaxSize(),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Text(
+            text = stringResource(id = R.string.welcome, userState.email ?: ""),
+            style = MaterialTheme.typography.headlineMedium
+        )
+
+        Button(onClick = {
+            authViewModel.logout()
+            navigationState.navController?.navigate("login") {
+                popUpTo(0) { inclusive = true }
+            }
+        }) {
+            Text(stringResource(id = R.string.logout))
         }
     }
 }

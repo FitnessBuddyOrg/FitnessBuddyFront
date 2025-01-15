@@ -11,6 +11,15 @@
     <string name="add_edit_exercise">Добавить/Редактировать Упражнения</string>
     <string name="exercises_overview">Обзор Упражнений</string>
     <string name="view_exercise">Просмотр Упражнения</string>
+    <string name="register">Регистрация</string>
+    <string name="email">Электронная почта</string>
+    <string name="password">Пароль</string>
+    <string name="confirm_password">Подтвердите пароль</string>
+    <string name="already_have_account">Уже есть аккаунт? Войти</string>
+    <string name="login">Войти</string>
+    <string name="dont_have_account">Нет аккаунта? Зарегистрироваться</string>
+    <string name="welcome">Добро пожаловать, %1$s</string>
+    <string name="logout">Выйти</string>
     <string name="instructions">Инструкции</string>
     <string name="no_vid_available">Видео для этого упражнения недоступно</string>
     <string name="exercise">Упражнение</string>
