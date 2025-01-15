@@ -1,6 +1,5 @@
 package com.project.fitnessbuddy.navigation
 
-
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
@@ -39,12 +38,15 @@ import com.project.fitnessbuddy.R
 import com.project.fitnessbuddy.auth.AuthViewModel
 import com.project.fitnessbuddy.auth.UserState
 import com.project.fitnessbuddy.screens.HomeScreen
-import com.project.fitnessbuddy.screens.ProfileScreen
+import com.project.fitnessbuddy.screens.profile.ProfileScreen
 import com.project.fitnessbuddy.screens.ProgressCalendarScreen
 import com.project.fitnessbuddy.screens.routines.RoutinesScreen
 import com.project.fitnessbuddy.screens.StatisticsScreen
 import com.project.fitnessbuddy.screens.auth.LoginScreen
 import com.project.fitnessbuddy.screens.auth.RegisterScreen
+import com.project.fitnessbuddy.screens.common.ParametersEvent
+import com.project.fitnessbuddy.screens.common.ParametersState
+import com.project.fitnessbuddy.screens.common.ParametersViewModel
 import com.project.fitnessbuddy.screens.exercises.AddEditExerciseScreen
 import com.project.fitnessbuddy.screens.exercises.ExercisesScreen
 import com.project.fitnessbuddy.screens.exercises.ExercisesState
@@ -57,57 +59,80 @@ import kotlinx.coroutines.launch
 @Composable
 fun AppNavGraph(
     modifier: Modifier = Modifier,
+
     navigationState: NavigationState,
-    exercisesState: ExercisesState,
     navigationViewModel: NavigationViewModel,
+
+    exercisesState: ExercisesState,
     exercisesViewModel: ExercisesViewModel,
+
+    parametersState: ParametersState,
+    parametersViewModel: ParametersViewModel,
+
     authViewModel: AuthViewModel,
     userState: UserState,
+
     navController: NavHostController = rememberNavController(),
     coroutineScope: CoroutineScope = rememberCoroutineScope(),
     drawerState: DrawerState = rememberDrawerState(initialValue = DrawerValue.Closed),
 ) {
     navigationViewModel.onEvent(NavigationEvent.SetNavController(navController))
+    parametersViewModel.onEvent(ParametersEvent.InitializeParameters)
 
-    val home = stringResource(id = R.string.home)
-    val profile = stringResource(id = R.string.profile)
-    val exercises = stringResource(id = R.string.exercises)
-    val exercisesOverview = stringResource(id = R.string.exercises_overview)
-    val addEditExercise = stringResource(id = R.string.add_edit_exercise)
-    val viewExercise = stringResource(id = R.string.view_exercise)
-    val routines = stringResource(id = R.string.routines)
-    val progressCalendar = stringResource(id = R.string.progress_calendar)
-    val statistics = stringResource(id = R.string.statistics)
+
+    val homeRoute = stringResource(id = R.string.home_route)
+    val profileRoute = stringResource(id = R.string.profile_route)
+
+    val exercisesRoute = stringResource(id = R.string.exercises_route)
+    val exercisesOverviewRoute = stringResource(id = R.string.exercises_overview_route)
+    val addEditExerciseRoute = stringResource(id = R.string.add_edit_exercise_route)
+    val viewExerciseRoute = stringResource(id = R.string.view_exercise_route)
+
+    val routinesRoute = stringResource(id = R.string.routines_route)
+    val progressCalendarRoute = stringResource(id = R.string.progress_calendar_route)
+    val statisticsRoute = stringResource(id = R.string.statistics_route)
 
     val currentNavBackStackEntry by navController.currentBackStackEntryAsState()
-    val currentRoute = currentNavBackStackEntry?.destination?.route ?: home
+    val currentRoute = currentNavBackStackEntry?.destination?.route ?: homeRoute
 
     val appRoutes: List<AppRoute> = listOf(
         AppRoute(
-            mainName = home,
+            routeName = homeRoute,
+            name = stringResource(id = R.string.home),
             icon = { Icon(imageVector = Icons.Default.Home, contentDescription = null) },
-            screen = { HomeScreen(
-                navigationState = navigationState,
-                navigationViewModel = navigationViewModel,
-            ) }
+            screen = {
+                HomeScreen(
+                    navigationState = navigationState,
+                    navigationViewModel = navigationViewModel,
+                )
+            }
         ),
         AppRoute(
-            mainName = profile,
+            routeName = profileRoute,
+            name = stringResource(id = R.string.profile),
             icon = { Icon(imageVector = Icons.Default.Person, contentDescription = null) },
-            screen = { ProfileScreen(
-                userState = userState,
-                authViewModel = authViewModel,
-                navController = navController,
-                navigationViewModel = navigationViewModel,
-            ) }
+            screen = {
+                ProfileScreen(
+                    navigationState = navigationState,
+                    navigationViewModel = navigationViewModel,
+
+                    parametersState = parametersState,
+                    parametersViewModel = parametersViewModel,
+
+                    userState = userState,
+                    authViewModel = authViewModel,
+                )
+            }
         ),
         AppRoute(
-            mainName = exercisesOverview,
-            startDestination = exercises,
+            routeName = exercisesOverviewRoute,
+            name = stringResource(id = R.string.exercises_overview),
+            startDestination = exercisesRoute,
             icon = { Icon(imageVector = Icons.Default.FitnessCenter, contentDescription = null) },
             subRoutes = listOf(
                 AppRoute(
-                    mainName = exercises,
+                    routeName = exercisesRoute,
+                    name = stringResource(id = R.string.exercises),
                     screen = {
                         ExercisesScreen(
                             navigationState = navigationState,
@@ -118,7 +143,8 @@ fun AppNavGraph(
                     }
                 ),
                 AppRoute(
-                    mainName = addEditExercise,
+                    routeName = addEditExerciseRoute,
+                    name = stringResource(id = R.string.add_edit_exercise),
                     screen = {
                         AddEditExerciseScreen(
                             navigationState = navigationState,
@@ -129,7 +155,8 @@ fun AppNavGraph(
                     }
                 ),
                 AppRoute(
-                    mainName = viewExercise,
+                    routeName = viewExerciseRoute,
+                    name = stringResource(id = R.string.view_exercise),
                     screen = {
                         ViewExerciseScreen(
                             navigationState = navigationState,
@@ -142,17 +169,20 @@ fun AppNavGraph(
             )
         ),
         AppRoute(
-            mainName = routines,
+            routeName = routinesRoute,
+            name = stringResource(id = R.string.routines),
             icon = { Icon(imageVector = Icons.Default.BrowseGallery, contentDescription = null) },
             screen = { RoutinesScreen() }
         ),
         AppRoute(
-            mainName = progressCalendar,
+            routeName = progressCalendarRoute,
+            name = stringResource(id = R.string.progress_calendar),
             icon = { Icon(imageVector = Icons.Default.CalendarMonth, contentDescription = null) },
             screen = { ProgressCalendarScreen() }
         ),
         AppRoute(
-            mainName = statistics,
+            routeName = statisticsRoute,
+            name = stringResource(id = R.string.statistics),
             icon = {
                 Icon(
                     imageVector = ImageVector.vectorResource(id = R.drawable.monitoring),
@@ -261,52 +291,24 @@ fun AppNavGraph(
                         if (appRoute.subRoutes.isNotEmpty()) {
                             navigation(
                                 startDestination = appRoute.startDestination,
-                                route = appRoute.mainName
+                                route = appRoute.routeName
                             ) {
                                 appRoute.subRoutes.forEach { subRoute ->
-                                    composable(subRoute.mainName) {
+                                    composable(subRoute.routeName) {
                                         subRoute.screen?.let { it1 -> it1() }
                                     }
                                 }
                             }
                         } else {
-                            composable(appRoute.mainName) {
+                            composable(appRoute.routeName) {
                                 appRoute.screen?.let { it1 -> it1() }
                             }
                         }
                     }
-                }
-            }
-        }
-    } else {
-        NavHost(
-            navController = navController,
-            startDestination = "login",
-            modifier = modifier
-        ) {
-            composable("login") {
-                LoginScreen(
-                    navController = navController,
-                    authViewModel = authViewModel,
-                    onLoginSuccess = {
-                        navController.navigate("home") {
-                            popUpTo("login") { inclusive = true }
-                        }
-                    }
-                )
-            }
 
-            composable("register") {
-                RegisterScreen(
-                    navController = navController,
-                    authViewModel = authViewModel,
-                    onRegisterSuccess = {
-                        navController.navigate("home") {
-                            popUpTo("register") { inclusive = true }
-                        }
-                    }
-                )
+                }
             }
         }
     }
 }
+

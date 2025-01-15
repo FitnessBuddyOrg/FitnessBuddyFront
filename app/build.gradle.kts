@@ -75,6 +75,9 @@ dependencies {
 
     implementation(libs.kotlinx.serialization.json)
 
+    implementation(libs.youtubePlayer)
+    implementation(libs.androidx.appcompat)
+
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

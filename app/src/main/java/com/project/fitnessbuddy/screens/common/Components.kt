@@ -27,9 +27,11 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
+import com.project.fitnessbuddy.R
 
 @Composable
 fun DefaultTextField(label: String, value: String, onValueChange: (String) -> Unit) {
@@ -62,13 +64,63 @@ fun DefaultTextArea(label: String, value: String, onValueChange: (String) -> Uni
     )
 }
 
-@Composable
-fun <T> DialogRadioButtonList(label: String, options: List<T>, value: T, onValueChange: (T) -> Unit) {
-    var selectedOption by remember { mutableStateOf(options[options.indexOf(value)]) }
-    var isDialogOpen by remember { mutableStateOf(false) }
+fun countryCodeToFlag(countryCode: String): String {
+    if (countryCode.length != 2) return ""
+    val codePoints = countryCode.uppercase().map {
+        it.code + 0x1F1A5
+    }
+    return String(codePoints.toIntArray(), 0, codePoints.size)
+}
 
+@Composable
+fun CountryFlagComposable(localeString: String, displayValue: String) {
     Row(
         modifier = Modifier
+            .padding(end = 8.dp)
+    ) {
+        val flagEmoji = countryCodeToFlag(localeString)
+
+        Text(
+            text = flagEmoji,
+            modifier = Modifier.padding(end = 16.dp),
+            style = MaterialTheme.typography.labelMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
+
+        Text(
+            text = displayValue,
+            style = MaterialTheme.typography.labelMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
+    }
+}
+
+@Composable
+fun <T, V : StoredValue<T>> DialogRadioButtonList(
+    label: String,
+    options: List<V>,
+    initialStoredValue: V,
+    onValueChange: (V) -> Unit,
+    modifier: Modifier = Modifier,
+    valueComposable: @Composable (V) -> Unit = {
+        Text(
+            text = it.displayValue,
+            style = MaterialTheme.typography.labelMedium
+        )
+    }
+) {
+
+    var selectedStoredValue by remember {
+        mutableStateOf(
+            options.find { it.value == initialStoredValue.value } ?: options.first()
+        )
+    }
+
+    var isDialogOpen by remember { mutableStateOf(false) }
+
+
+    Row(
+        modifier = modifier
             .fillMaxWidth()
             .height(50.dp)
             .background(Color.Transparent)
@@ -85,17 +137,7 @@ fun <T> DialogRadioButtonList(label: String, options: List<T>, value: T, onValue
             text = label,
             style = MaterialTheme.typography.labelMedium,
         )
-
-        Text(
-            modifier = Modifier
-                .align(Alignment.CenterVertically)
-                .weight(1f)
-                .padding(end = 8.dp),
-            text = selectedOption.toString(),
-            style = MaterialTheme.typography.labelMedium,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-            textAlign = TextAlign.End
-        )
+        valueComposable(selectedStoredValue)
     }
 
     if (isDialogOpen) {
@@ -120,23 +162,21 @@ fun <T> DialogRadioButtonList(label: String, options: List<T>, value: T, onValue
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .clickable {
-                                        selectedOption = option
+                                        selectedStoredValue = option
+                                        onValueChange(option)
                                         isDialogOpen = false
                                     }
                             ) {
                                 RadioButton(
-                                    selected = selectedOption == option,
+                                    selected = selectedStoredValue == option,
                                     onClick = {
+                                        selectedStoredValue = option
                                         onValueChange(option)
-                                        selectedOption = option
                                         isDialogOpen = false
                                     }
                                 )
                                 Spacer(modifier = Modifier.width(8.dp))
-                                Text(
-                                    text = option.toString(),
-                                    style = MaterialTheme.typography.labelMedium
-                                )
+                                valueComposable(option)
                             }
                         }
                     }
@@ -150,7 +190,7 @@ fun <T> DialogRadioButtonList(label: String, options: List<T>, value: T, onValue
                             .clickable {
                                 isDialogOpen = false
                             },
-                        text = "Ok",
+                        text = stringResource(R.string.ok),
                         style = MaterialTheme.typography.labelMedium,
                         color = MaterialTheme.colorScheme.secondary,
                         textAlign = TextAlign.End
@@ -160,3 +200,10 @@ fun <T> DialogRadioButtonList(label: String, options: List<T>, value: T, onValue
         }
     }
 }
+
+open class StoredValue<T>(open val value: T, open val displayValue: String)
+class StoredLanguageValue<T>(
+    override val value: T,
+    override val displayValue: String,
+    val localeString: String
+) : StoredValue<T>(value, displayValue)

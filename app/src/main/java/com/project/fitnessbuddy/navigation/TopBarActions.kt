@@ -29,7 +29,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.project.fitnessbuddy.R
 import com.project.fitnessbuddy.screens.exercises.ExercisesEvent
@@ -71,7 +71,7 @@ fun SearchButton(
                     },
                     placeholder = {
                         Text(
-                            text = "Search...",
+                            text = "${stringResource(R.string.search)}...",
                             style = MaterialTheme.typography.labelMedium
                         )
                     },
@@ -109,7 +109,7 @@ fun SearchButton(
                 }
             }
         } else {
-            DefaultTitleWidget(navigationState.title)
+            MediumTextWidget(navigationState.title)
         }
     })
 
@@ -160,10 +160,29 @@ fun EditButton(navigationState: NavigationState, exercisesViewModel: ExercisesVi
 }
 
 @Composable
-fun DefaultTitleWidget(title: String) {
+fun LargeTextWidget(text: String, modifier: Modifier = Modifier) {
     Text(
-        text = title,
-        style = MaterialTheme.typography.labelMedium
+        text = text,
+        style = MaterialTheme.typography.labelLarge,
+        modifier = modifier
+    )
+}
+
+@Composable
+fun MediumTextWidget(text: String, modifier: Modifier = Modifier) {
+    Text(
+        text = text,
+        style = MaterialTheme.typography.labelMedium,
+        modifier = modifier
+    )
+}
+
+@Composable
+fun SmallTextWidget(text: String, modifier: Modifier = Modifier) {
+    Text(
+        text = text,
+        style = MaterialTheme.typography.labelSmall,
+        modifier = modifier
     )
 }
 

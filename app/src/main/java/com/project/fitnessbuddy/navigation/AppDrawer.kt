@@ -43,13 +43,13 @@ fun AppDrawer(
             NavigationDrawerItem(
                 label = {
                     Text(
-                        text = if (appRoute.subRoutes.isNotEmpty()) appRoute.subRoutes[0].mainName else appRoute.mainName,
+                        text = if (appRoute.subRoutes.isNotEmpty()) appRoute.subRoutes[0].name else appRoute.name,
                         style = MaterialTheme.typography.labelMedium
                     )
                 },
-                selected = route == appRoute.mainName,
+                selected = route == appRoute.routeName,
                 onClick = {
-                    navController.navigate(appRoute.mainName) {
+                    navController.navigate(appRoute.routeName) {
                         launchSingleTop = true
                         restoreState = true
                         popUpTo(route) {
