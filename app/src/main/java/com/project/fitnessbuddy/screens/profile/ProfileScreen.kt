@@ -6,15 +6,19 @@ import android.os.Build
 import android.os.LocaleList
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.core.os.LocaleListCompat
 import androidx.lifecycle.compose.LocalLifecycleOwner
@@ -24,12 +28,14 @@ import com.project.fitnessbuddy.navigation.MediumTextWidget
 import com.project.fitnessbuddy.navigation.NavigationEvent
 import com.project.fitnessbuddy.navigation.NavigationState
 import com.project.fitnessbuddy.navigation.NavigationViewModel
+import com.project.fitnessbuddy.screens.common.CountryFlagComposable
 import com.project.fitnessbuddy.screens.common.DialogRadioButtonList
 import com.project.fitnessbuddy.screens.common.Language
 import com.project.fitnessbuddy.screens.common.ParametersEvent
 import com.project.fitnessbuddy.screens.common.ParametersState
 import com.project.fitnessbuddy.screens.common.ParametersViewModel
-import com.project.fitnessbuddy.screens.common.StoredValue
+import com.project.fitnessbuddy.screens.common.StoredLanguageValue
+import com.project.fitnessbuddy.screens.common.countryCodeToFlag
 import kotlinx.coroutines.launch
 
 @Composable
@@ -73,6 +79,8 @@ fun ParametersList(
 ) {
     val context = LocalContext.current
 
+    val language = Language.getLanguage(parametersState.languageParameter.value)
+
     Scaffold(
         modifier = Modifier
             .fillMaxSize()
@@ -85,12 +93,25 @@ fun ParametersList(
             item {
                 DialogRadioButtonList(
                     modifier = Modifier.padding(16.dp),
-                    label = "Language",
-                    options = Language.entries.map { StoredValue(it.name, it.name) },
-                    storedValue = StoredValue(parametersState.languageParameter.value, parametersState.languageParameter.value),
+                    label = stringResource(R.string.language),
+                    options = Language.entries.map {
+                        StoredLanguageValue(
+                            it,
+                            stringResource(it.resourceId),
+                            it.localeString
+                        )
+                    },
+                    initialStoredValue = StoredLanguageValue(
+                        language,
+                        language.name,
+                        language.localeString
+                    ),
                     onValueChange = {
-                        parametersViewModel.onEvent(ParametersEvent.SetLanguageParameterValue(it.value))
-                        changeLocales(context, Language.getLocaleString(it.value))
+                        parametersViewModel.onEvent(ParametersEvent.SetLanguageParameterValue(it.value.name))
+                        changeLocales(context, it.localeString)
+                    },
+                    valueComposable = {
+                        CountryFlagComposable(it.localeString, it.displayValue)
                     }
                 )
             }
@@ -100,7 +121,6 @@ fun ParametersList(
 }
 
 fun changeLocales(context: Context, localeString: String) {
-    println("Setting locales to $localeString")
 
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
         context.getSystemService(LocaleManager::class.java)

@@ -33,4 +33,9 @@
     <string name="history">История</string>
     <string name="charts">Графики</string>
     <string name="search">Поиск</string>
+    <string name="language">Язык</string>
+    <string name="english">Английский</string>
+    <string name="french">Французский</string>
+    <string name="russian">Русский</string>
+    <string name="ok">Ок</string>
 </resources>

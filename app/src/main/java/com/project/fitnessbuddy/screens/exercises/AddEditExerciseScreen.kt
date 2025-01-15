@@ -166,7 +166,7 @@ fun InputInformation(
             DialogRadioButtonList(
                 label = stringResource(R.string.category),
                 options = Category.entries.map { StoredValue(it, stringResource(it.resourceId)) },
-                storedValue = StoredValue(exercisesState.selectedExercise.category, stringResource(exercisesState.selectedExercise.category.resourceId)),
+                initialStoredValue = StoredValue(exercisesState.selectedExercise.category, stringResource(exercisesState.selectedExercise.category.resourceId)),
                 onValueChange = {
                     exercisesViewModel.onEvent(ExercisesEvent.SetCategory(it.value))
                 }
@@ -175,7 +175,7 @@ fun InputInformation(
             DialogRadioButtonList(
                 label = stringResource(R.string.share_type),
                 options = ShareType.entries.map { StoredValue(it, stringResource(it.resourceId))},
-                storedValue = StoredValue(exercisesState.selectedExercise.shareType, stringResource(exercisesState.selectedExercise.shareType.resourceId)),
+                initialStoredValue = StoredValue(exercisesState.selectedExercise.shareType, stringResource(exercisesState.selectedExercise.shareType.resourceId)),
                 onValueChange = {
                     exercisesViewModel.onEvent(ExercisesEvent.SetShareType(it.value))
                 }
