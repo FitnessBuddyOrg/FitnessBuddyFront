@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">FitnessBuddy</string>
+    <string name="home">Главная</string>
+    <string name="profile">Профиль</string>
+    <string name="exercises">Упражнения</string>
+    <string name="progress_calendar">Календарь Прогресса</string>
+    <string name="statistics">Статистика</string>
+    <string name="username_placeholder">Имя пользователя</string>
+    <string name="routines">Рутины</string>
+    <string name="add_edit_exercise">Добавить/Редактировать Упражнения</string>
+    <string name="exercises_overview">Обзор Упражнений</string>
+    <string name="view_exercise">Просмотр Упражнения</string>
+    <string name="instructions">Инструкции</string>
+    <string name="no_vid_available">Видео для этого упражнения недоступно</string>
+    <string name="exercise">Упражнение</string>
+    <string name="add">Добавить</string>
+    <string name="edit">Редактировать</string>
+    <string name="public_res">Публичный</string>
+    <string name="private_res">Приватный</string>
+    <string name="shared_res">Общий</string>
+    <string name="arms">Руки</string>
+    <string name="back">Спина</string>
+    <string name="chest">Грудь</string>
+    <string name="legs">Ноги</string>
+    <string name="shoulders">Плечи</string>
+    <string name="abs">Пресс</string>
+    <string name="name">Имя</string>
+    <string name="video_link">Ссылка на видео</string>
+    <string name="category">Категория</string>
+    <string name="share_type">Тип общего доступа</string>
+    <string name="about">О приложении</string>
+    <string name="history">История</string>
+    <string name="charts">Графики</string>
+    <string name="search">Поиск</string>
+</resources>

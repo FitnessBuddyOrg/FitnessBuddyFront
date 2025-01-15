@@ -29,7 +29,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.project.fitnessbuddy.R
 import com.project.fitnessbuddy.screens.exercises.ExercisesEvent
 import com.project.fitnessbuddy.screens.exercises.ExercisesState
 import com.project.fitnessbuddy.screens.exercises.ExercisesViewModel
@@ -69,7 +71,7 @@ fun SearchButton(
                     },
                     placeholder = {
                         Text(
-                            text = "Search...",
+                            text = "${stringResource(R.string.search)}...",
                             style = MaterialTheme.typography.labelMedium
                         )
                     },

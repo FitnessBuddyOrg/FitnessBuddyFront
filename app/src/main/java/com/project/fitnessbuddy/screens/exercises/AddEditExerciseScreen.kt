@@ -22,9 +22,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.lifecycleScope
+import com.project.fitnessbuddy.R
 import com.project.fitnessbuddy.database.entity.Category
 import com.project.fitnessbuddy.database.entity.Exercise
 import com.project.fitnessbuddy.database.entity.ShareType
@@ -37,6 +39,7 @@ import com.project.fitnessbuddy.screens.common.DefaultTextArea
 import com.project.fitnessbuddy.screens.common.DefaultTextField
 import com.project.fitnessbuddy.screens.common.DialogRadioButtonList
 import com.project.fitnessbuddy.screens.common.Language
+import com.project.fitnessbuddy.screens.common.StoredValue
 import kotlinx.coroutines.launch
 
 @Composable
@@ -56,9 +59,9 @@ fun AddEditExerciseScreen(
             navigationViewModel.onEvent(NavigationEvent.DisableAllButtons)
             navigationViewModel.onEvent(NavigationEvent.EnableBackButton)
 
-            navigationViewModel.onEvent(NavigationEvent.UpdateTitleWidget({
-                MediumTextWidget("${exercisesState.editType} Exercise")
-            }))
+            navigationViewModel.onEvent(NavigationEvent.UpdateTitleWidget {
+                MediumTextWidget("${stringResource(exercisesState.editType.resourceId)} ${stringResource(R.string.exercise)}")
+            })
 
             if (exercisesState.editType == EditType.ADD) {
                 exercisesViewModel.onEvent(ExercisesEvent.SetEditingExercise(
@@ -137,7 +140,7 @@ fun InputInformation(
                 .padding(padding),
         ) {
             DefaultTextField(
-                label = "Add Name",
+                label = stringResource(R.string.name),
                 value = exercisesState.selectedExercise.name,
                 onValueChange = {
                     exercisesViewModel.onEvent(ExercisesEvent.SetName(it))
@@ -145,7 +148,7 @@ fun InputInformation(
             )
             Spacer(modifier = Modifier.height(20.dp))
             DefaultTextArea(
-                label = "Instructions",
+                label = stringResource(R.string.instructions),
                 value = exercisesState.selectedExercise.instructions,
                 onValueChange = {
                     exercisesViewModel.onEvent(ExercisesEvent.SetInstructions(it))
@@ -153,7 +156,7 @@ fun InputInformation(
             )
             Spacer(modifier = Modifier.height(20.dp))
             DefaultTextField(
-                label = "Video Link",
+                label = stringResource(R.string.video_link),
                 value = exercisesState.selectedExercise.videoLink,
                 onValueChange = {
                     exercisesViewModel.onEvent(ExercisesEvent.SetVideoLink(it))
@@ -161,20 +164,20 @@ fun InputInformation(
             )
             Spacer(modifier = Modifier.height(20.dp))
             DialogRadioButtonList(
-                label = "Category",
-                options = Category.entries,
-                value = exercisesState.selectedExercise.category,
+                label = stringResource(R.string.category),
+                options = Category.entries.map { StoredValue(it, stringResource(it.resourceId)) },
+                storedValue = StoredValue(exercisesState.selectedExercise.category, stringResource(exercisesState.selectedExercise.category.resourceId)),
                 onValueChange = {
-                    exercisesViewModel.onEvent(ExercisesEvent.SetCategory(it))
+                    exercisesViewModel.onEvent(ExercisesEvent.SetCategory(it.value))
                 }
             )
             Spacer(modifier = Modifier.height(20.dp))
             DialogRadioButtonList(
-                label = "Share Type",
-                options = ShareType.entries,
-                value = exercisesState.selectedExercise.shareType,
+                label = stringResource(R.string.share_type),
+                options = ShareType.entries.map { StoredValue(it, stringResource(it.resourceId))},
+                storedValue = StoredValue(exercisesState.selectedExercise.shareType, stringResource(exercisesState.selectedExercise.shareType.resourceId)),
                 onValueChange = {
-                    exercisesViewModel.onEvent(ExercisesEvent.SetShareType(it))
+                    exercisesViewModel.onEvent(ExercisesEvent.SetShareType(it.value))
                 }
             )
         }

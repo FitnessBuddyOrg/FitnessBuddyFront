@@ -5,11 +5,40 @@
     <string name="exercises">Exercises</string>
     <string name="progress_calendar">Progress Calendar</string>
     <string name="statistics">Statistics</string>
-    <string name="username_placeholder">username</string>
+    <string name="username_placeholder">Username</string>
     <string name="routines">Routines</string>
     <string name="add_edit_exercise">Add Edit Exercises</string>
     <string name="exercises_overview">Exercises Overview</string>
     <string name="view_exercise">View Exercise</string>
     <string name="instructions">Instructions</string>
     <string name="no_vid_available">No video available for this exercise</string>
+    <string name="home_route" translatable="false">home</string>
+    <string name="profile_route" translatable="false">profile</string>
+    <string name="exercises_route" translatable="false">exercices</string>
+    <string name="progress_calendar_route" translatable="false">progress_calendar</string>
+    <string name="statistics_route" translatable="false">statistics</string>
+    <string name="routines_route" translatable="false">routines</string>
+    <string name="add_edit_exercise_route" translatable="false">add_edit_exercise</string>
+    <string name="exercises_overview_route" translatable="false">exercises_overview</string>
+    <string name="view_exercise_route" translatable="false">view_exercise</string>
+    <string name="exercise">an exercise</string>
+    <string name="add">Add</string>
+    <string name="edit">Edit</string>
+    <string name="public_res">Public</string>
+    <string name="private_res">Private</string>
+    <string name="shared_res">Shared</string>
+    <string name="arms">Arms</string>
+    <string name="back">Back</string>
+    <string name="chest">Chest</string>
+    <string name="legs">Legs</string>
+    <string name="shoulders">Shoulders</string>
+    <string name="abs">Abs</string>
+    <string name="name">Name</string>
+    <string name="video_link">Video Link</string>
+    <string name="category">Category</string>
+    <string name="share_type">Share Type</string>
+    <string name="about">About</string>
+    <string name="history">History</string>
+    <string name="charts">Charts</string>
+    <string name="search">Search</string>
 </resources>

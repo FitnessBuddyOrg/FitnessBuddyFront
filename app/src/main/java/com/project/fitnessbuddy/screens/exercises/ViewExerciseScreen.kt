@@ -36,6 +36,7 @@ import com.project.fitnessbuddy.navigation.MediumTextWidget
 import com.project.fitnessbuddy.navigation.NavigationEvent
 import com.project.fitnessbuddy.navigation.NavigationState
 import com.project.fitnessbuddy.navigation.NavigationViewModel
+import com.project.fitnessbuddy.screens.common.StoredValue
 import kotlinx.coroutines.launch
 
 @Composable
@@ -115,22 +116,22 @@ fun TabLayout(
     exercisesViewModel: ExercisesViewModel
 ) {
     var selectedTabIndex by remember { mutableIntStateOf(0) }
-    val tabs = listOf("ABOUT", "HISTORY", "CHARTS")
 
     Column {
         TabRow(selectedTabIndex = selectedTabIndex) {
-            tabs.forEachIndexed { index, title ->
-                Tab(
-                    selected = selectedTabIndex == index,
-                    onClick = { selectedTabIndex = index },
-                    text = {
-                        Text(
-                            text = title,
-                            style = MaterialTheme.typography.labelSmall,
-                        )
-                    }
-                )
-            }
+            ViewExerciseTab.entries.map { StoredValue(it, stringResource(it.resourceId)) }
+                .forEachIndexed { index, storedValue ->
+                    Tab(
+                        selected = selectedTabIndex == index,
+                        onClick = { selectedTabIndex = index },
+                        text = {
+                            Text(
+                                text = storedValue.displayValue.uppercase(),
+                                style = MaterialTheme.typography.labelSmall,
+                            )
+                        }
+                    )
+                }
         }
         when (selectedTabIndex) {
             0 -> AboutTab(

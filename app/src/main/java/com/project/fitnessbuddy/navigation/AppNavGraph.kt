@@ -22,7 +22,6 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
@@ -50,7 +49,6 @@ import com.project.fitnessbuddy.screens.exercises.ExercisesState
 import com.project.fitnessbuddy.screens.exercises.ExercisesViewModel
 import com.project.fitnessbuddy.screens.exercises.ViewExerciseScreen
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -75,25 +73,26 @@ fun AppNavGraph(
     parametersViewModel.onEvent(ParametersEvent.InitializeParameters)
 
 
-    val home = stringResource(id = R.string.home)
-    val profile = stringResource(id = R.string.profile)
+    val homeRoute = stringResource(id = R.string.home_route)
+    val profileRoute = stringResource(id = R.string.profile_route)
 
-    val exercises = stringResource(id = R.string.exercises)
-    val exercisesOverview = stringResource(id = R.string.exercises_overview)
-    val addEditExercise = stringResource(id = R.string.add_edit_exercise)
-    val viewExercise = stringResource(id = R.string.view_exercise)
+    val exercisesRoute = stringResource(id = R.string.exercises_route)
+    val exercisesOverviewRoute = stringResource(id = R.string.exercises_overview_route)
+    val addEditExerciseRoute = stringResource(id = R.string.add_edit_exercise_route)
+    val viewExerciseRoute = stringResource(id = R.string.view_exercise_route)
 
-    val routines = stringResource(id = R.string.routines)
-    val progressCalendar = stringResource(id = R.string.progress_calendar)
-    val statistics = stringResource(id = R.string.statistics)
+    val routinesRoute = stringResource(id = R.string.routines_route)
+    val progressCalendarRoute = stringResource(id = R.string.progress_calendar_route)
+    val statisticsRoute = stringResource(id = R.string.statistics_route)
 
 
     val currentNavBackStackEntry by navController.currentBackStackEntryAsState()
-    val currentRoute = currentNavBackStackEntry?.destination?.route ?: home
+    val currentRoute = currentNavBackStackEntry?.destination?.route ?: homeRoute
 
     val appRoutes: List<AppRoute> = listOf(
         AppRoute(
-            mainName = home,
+            routeName = homeRoute,
+            name = stringResource(id = R.string.home),
             icon = { Icon(imageVector = Icons.Default.Home, contentDescription = null) },
             screen = {
                 HomeScreen(
@@ -103,7 +102,8 @@ fun AppNavGraph(
             }
         ),
         AppRoute(
-            mainName = profile,
+            routeName = profileRoute,
+            name = stringResource(id = R.string.profile),
             icon = { Icon(imageVector = Icons.Default.Person, contentDescription = null) },
             screen = {
                 ProfileScreen(
@@ -115,12 +115,14 @@ fun AppNavGraph(
             }
         ),
         AppRoute(
-            mainName = exercisesOverview,
-            startDestination = exercises,
+            routeName = exercisesOverviewRoute,
+            name = stringResource(id = R.string.exercises_overview),
+            startDestination = exercisesRoute,
             icon = { Icon(imageVector = Icons.Default.FitnessCenter, contentDescription = null) },
             subRoutes = listOf(
                 AppRoute(
-                    mainName = exercises,
+                    routeName = exercisesRoute,
+                    name = stringResource(id = R.string.exercises),
                     screen = {
                         ExercisesScreen(
                             navigationState = navigationState,
@@ -131,7 +133,8 @@ fun AppNavGraph(
                     }
                 ),
                 AppRoute(
-                    mainName = addEditExercise,
+                    routeName = addEditExerciseRoute,
+                    name = stringResource(id = R.string.add_edit_exercise),
                     screen = {
                         AddEditExerciseScreen(
                             navigationState = navigationState,
@@ -142,7 +145,8 @@ fun AppNavGraph(
                     }
                 ),
                 AppRoute(
-                    mainName = viewExercise,
+                    routeName = viewExerciseRoute,
+                    name = stringResource(id = R.string.view_exercise),
                     screen = {
                         ViewExerciseScreen(
                             navigationState = navigationState,
@@ -155,17 +159,20 @@ fun AppNavGraph(
             )
         ),
         AppRoute(
-            mainName = routines,
+            routeName = routinesRoute,
+            name = stringResource(id = R.string.routines),
             icon = { Icon(imageVector = Icons.Default.BrowseGallery, contentDescription = null) },
             screen = { RoutinesScreen() }
         ),
         AppRoute(
-            mainName = progressCalendar,
+            routeName = progressCalendarRoute,
+            name = stringResource(id = R.string.progress_calendar),
             icon = { Icon(imageVector = Icons.Default.CalendarMonth, contentDescription = null) },
             screen = { ProgressCalendarScreen() }
         ),
         AppRoute(
-            mainName = statistics,
+            routeName = statisticsRoute,
+            name = stringResource(id = R.string.statistics),
             icon = {
                 Icon(
                     imageVector = ImageVector.vectorResource(id = R.drawable.monitoring),
@@ -235,23 +242,23 @@ fun AppNavGraph(
         ) {
             NavHost(
                 navController = navController,
-                startDestination = exercisesOverview,
+                startDestination = exercisesOverviewRoute,
                 modifier = modifier.padding(it)
             ) {
                 appRoutes.forEach { appRoute ->
                     if (appRoute.subRoutes.isNotEmpty()) {
                         navigation(
                             startDestination = appRoute.startDestination,
-                            route = appRoute.mainName
+                            route = appRoute.routeName
                         ) {
                             appRoute.subRoutes.forEach { subRoute ->
-                                composable(subRoute.mainName) {
+                                composable(subRoute.routeName) {
                                     subRoute.screen?.let { it1 -> it1() }
                                 }
                             }
                         }
                     } else {
-                        composable(appRoute.mainName) {
+                        composable(appRoute.routeName) {
                             appRoute.screen?.let { it1 -> it1() }
                         }
                     }

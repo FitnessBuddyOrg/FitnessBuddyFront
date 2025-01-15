@@ -63,9 +63,22 @@ fun DefaultTextArea(label: String, value: String, onValueChange: (String) -> Uni
 }
 
 @Composable
-fun <T> DialogRadioButtonList(label: String, options: List<T>, value: T, onValueChange: (T) -> Unit, modifier: Modifier = Modifier) {
-    var selectedOption by remember { mutableStateOf(options[options.indexOf(value)]) }
+fun <T> DialogRadioButtonList(
+    label: String,
+    options: List<StoredValue<T>>,
+    storedValue: StoredValue<T>,
+    onValueChange: (StoredValue<T>) -> Unit,
+    modifier: Modifier = Modifier
+) {
+
+    var selectedStoredValue by remember {
+        mutableStateOf(
+            options.find { it.value == storedValue.value } ?: options.first()
+        )
+    }
+
     var isDialogOpen by remember { mutableStateOf(false) }
+
 
     Row(
         modifier = modifier
@@ -91,7 +104,7 @@ fun <T> DialogRadioButtonList(label: String, options: List<T>, value: T, onValue
                 .align(Alignment.CenterVertically)
                 .weight(1f)
                 .padding(end = 8.dp),
-            text = selectedOption.toString(),
+            text = selectedStoredValue.displayValue,
             style = MaterialTheme.typography.labelMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             textAlign = TextAlign.End
@@ -120,21 +133,22 @@ fun <T> DialogRadioButtonList(label: String, options: List<T>, value: T, onValue
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .clickable {
-                                        selectedOption = option
+                                        onValueChange(option)
+                                        selectedStoredValue = option
                                         isDialogOpen = false
                                     }
                             ) {
                                 RadioButton(
-                                    selected = selectedOption == option,
+                                    selected = selectedStoredValue == option,
                                     onClick = {
                                         onValueChange(option)
-                                        selectedOption = option
+                                        selectedStoredValue = option
                                         isDialogOpen = false
                                     }
                                 )
                                 Spacer(modifier = Modifier.width(8.dp))
                                 Text(
-                                    text = option.toString(),
+                                    text = option.displayValue,
                                     style = MaterialTheme.typography.labelMedium
                                 )
                             }
@@ -160,3 +174,5 @@ fun <T> DialogRadioButtonList(label: String, options: List<T>, value: T, onValue
         }
     }
 }
+
+class StoredValue<T>(val value: T, val displayValue: String)
