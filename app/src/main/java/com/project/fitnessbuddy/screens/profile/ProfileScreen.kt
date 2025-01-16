@@ -7,7 +7,6 @@ import android.os.LocaleList
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
@@ -35,12 +34,11 @@ import com.project.fitnessbuddy.navigation.NavigationState
 import com.project.fitnessbuddy.navigation.NavigationViewModel
 import com.project.fitnessbuddy.screens.common.CountryFlagComposable
 import com.project.fitnessbuddy.screens.common.DialogRadioButtonList
-import com.project.fitnessbuddy.screens.common.Language
+import com.project.fitnessbuddy.database.entity.enums.Language
 import com.project.fitnessbuddy.screens.common.ParametersEvent
 import com.project.fitnessbuddy.screens.common.ParametersState
 import com.project.fitnessbuddy.screens.common.ParametersViewModel
 import com.project.fitnessbuddy.screens.common.StoredLanguageValue
-import com.project.fitnessbuddy.screens.common.countryCodeToFlag
 import kotlinx.coroutines.launch
 
 @Composable
@@ -111,7 +109,10 @@ fun ParametersList(
                 DialogRadioButtonList(
                     modifier = Modifier.padding(16.dp),
                     label = stringResource(R.string.language),
-                    options = Language.entries.map {
+                    options = Language
+                        .entries
+                        .filter { !it.isCustom }
+                        .map {
                         StoredLanguageValue(
                             it,
                             stringResource(it.resourceId),

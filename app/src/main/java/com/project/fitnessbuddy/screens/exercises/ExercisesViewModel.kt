@@ -3,10 +3,7 @@ package com.project.fitnessbuddy.screens.exercises
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.project.fitnessbuddy.database.dao.ExerciseDao
-import com.project.fitnessbuddy.database.entity.Category
 import com.project.fitnessbuddy.database.entity.Exercise
-import com.project.fitnessbuddy.database.entity.ShareType
-import com.project.fitnessbuddy.screens.common.Language
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -56,7 +53,7 @@ class ExercisesViewModel(
             is ExercisesEvent.SortExercises -> _sortType.value = exercisesEvent.sortType
             is ExercisesEvent.SetSearchValue -> _searchValue.value = exercisesEvent.searchValue
 
-            is ExercisesEvent.SetEditingExercise -> {
+            is ExercisesEvent.SetSelectedExercise -> {
                 _state.update {
                     it.copy(
                         selectedExercise = exercisesEvent.selectedExercise
@@ -64,17 +61,10 @@ class ExercisesViewModel(
                 }
             }
 
-            is ExercisesEvent.ResetEditingExercise -> {
+            is ExercisesEvent.ResetSelectedExercise -> {
                 _state.update {
                     it.copy(
-                        selectedExercise = Exercise(
-                            "",
-                            "",
-                            "",
-                            Category.ABS,
-                            ShareType.PUBLIC,
-                            Language.ENGLISH
-                        )
+                        selectedExercise = Exercise()
                     )
                 }
             }
@@ -102,7 +92,7 @@ class ExercisesViewModel(
                     exerciseDao.upsert(_state.value.selectedExercise)
                 }
 
-                ExercisesEvent.ResetEditingExercise
+                ExercisesEvent.ResetSelectedExercise
             }
 
             is ExercisesEvent.UpdateExercise -> {

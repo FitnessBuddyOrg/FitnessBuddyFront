@@ -48,6 +48,17 @@ android {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
         }
     }
+    sourceSets {
+        getByName("main") {
+            assets {
+                srcDirs("src\\main\\assets", "src\\main\\assets")
+            }
+        }
+    }
+}
+
+ksp {
+    arg("room.schemaLocation", "$projectDir/schemas")
 }
 
 dependencies {
@@ -94,8 +105,10 @@ dependencies {
     implementation (libs.googleid)
     implementation (libs.androidx.credentials.play.services.auth)
 
-    
+
     ksp(libs.hilt.android.compiler)
     ksp(libs.androidx.hilt.compiler)
     ksp(libs.androidx.room.compiler)
+
+
 }

@@ -51,7 +51,10 @@ import com.project.fitnessbuddy.screens.exercises.ExercisesState
 import com.project.fitnessbuddy.screens.exercises.ExercisesViewModel
 import com.project.fitnessbuddy.screens.exercises.ViewExerciseScreen
 import com.project.fitnessbuddy.screens.profile.ProfileScreen
+import com.project.fitnessbuddy.screens.routines.AddEditRoutineScreen
 import com.project.fitnessbuddy.screens.routines.RoutinesScreen
+import com.project.fitnessbuddy.screens.routines.RoutinesState
+import com.project.fitnessbuddy.screens.routines.RoutinesViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
@@ -65,6 +68,9 @@ fun AppNavGraph(
 
     exercisesState: ExercisesState,
     exercisesViewModel: ExercisesViewModel,
+
+    routinesState: RoutinesState,
+    routinesViewModel: RoutinesViewModel,
 
     parametersState: ParametersState,
     parametersViewModel: ParametersViewModel,
@@ -94,6 +100,10 @@ fun AppNavGraph(
     val viewExerciseRoute = stringResource(id = R.string.view_exercise_route)
 
     val routinesRoute = stringResource(id = R.string.routines_route)
+    val routinesOverviewRoute = stringResource(id = R.string.routines_overview_route)
+    val addEditRoutineRoute = stringResource(id = R.string.add_edit_routine_route)
+    val viewRoutineRoute = stringResource(id = R.string.view_routine_route)
+
     val progressCalendarRoute = stringResource(id = R.string.progress_calendar_route)
     val statisticsRoute = stringResource(id = R.string.statistics_route)
 
@@ -144,6 +154,8 @@ fun AppNavGraph(
                             navigationViewModel = navigationViewModel,
                             exercisesState = exercisesState,
                             exercisesViewModel = exercisesViewModel,
+                            parametersState = parametersState,
+                            parametersViewModel = parametersViewModel,
                         )
                     }
                 ),
@@ -174,10 +186,45 @@ fun AppNavGraph(
             )
         ),
         AppRoute(
-            routeName = routinesRoute,
-            name = stringResource(id = R.string.routines),
+            routeName = routinesOverviewRoute,
+            name = stringResource(id = R.string.routines_overview),
+            startDestination = routinesRoute,
             icon = { Icon(imageVector = Icons.Default.BrowseGallery, contentDescription = null) },
-            screen = { RoutinesScreen() }
+            subRoutes = listOf(
+                AppRoute(
+                    routeName = routinesRoute,
+                    name = stringResource(id = R.string.routines),
+                    screen = {
+                        RoutinesScreen(
+                            navigationState = navigationState,
+                            navigationViewModel = navigationViewModel,
+                            routinesState = routinesState,
+                            routinesViewModel = routinesViewModel,
+                            parametersState = parametersState,
+                            parametersViewModel = parametersViewModel,
+                        )
+                    }
+                ),
+                AppRoute(
+                    routeName = addEditRoutineRoute,
+                    name = stringResource(id = R.string.add_edit_routine),
+                    screen = {
+                        AddEditRoutineScreen(
+                            navigationState = navigationState,
+                            navigationViewModel = navigationViewModel,
+                            routinesState = routinesState,
+                            routinesViewModel = routinesViewModel,
+                        )
+                    }
+                ),
+                AppRoute(
+                    routeName = viewRoutineRoute,
+                    name = stringResource(id = R.string.view_routine),
+                    screen = {
+
+                    }
+                )
+            )
         ),
         AppRoute(
             routeName = progressCalendarRoute,

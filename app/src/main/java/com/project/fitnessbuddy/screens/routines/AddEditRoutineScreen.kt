@@ -1,4 +1,4 @@
-package com.project.fitnessbuddy.screens.exercises
+package com.project.fitnessbuddy.screens.routines
 
 import android.widget.Toast
 import androidx.compose.foundation.background
@@ -27,8 +27,9 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import com.project.fitnessbuddy.R
-import com.project.fitnessbuddy.database.entity.Exercise
+import com.project.fitnessbuddy.database.dto.RoutineDTO
 import com.project.fitnessbuddy.database.entity.enums.Category
+import com.project.fitnessbuddy.database.entity.enums.Frequency
 import com.project.fitnessbuddy.database.entity.enums.ShareType
 import com.project.fitnessbuddy.navigation.EditType
 import com.project.fitnessbuddy.navigation.MediumTextWidget
@@ -39,14 +40,15 @@ import com.project.fitnessbuddy.screens.common.DefaultTextArea
 import com.project.fitnessbuddy.screens.common.DefaultTextField
 import com.project.fitnessbuddy.screens.common.DialogRadioButtonList
 import com.project.fitnessbuddy.screens.common.StoredValue
+import com.project.fitnessbuddy.screens.exercises.ExercisesEvent
 import kotlinx.coroutines.launch
 
 @Composable
-fun AddEditExerciseScreen(
+fun AddEditRoutineScreen(
     navigationState: NavigationState,
     navigationViewModel: NavigationViewModel,
-    exercisesState: ExercisesState,
-    exercisesViewModel: ExercisesViewModel
+    routinesState: RoutinesState,
+    routinesViewModel: RoutinesViewModel
 ) {
     val lifecycleOwner = LocalLifecycleOwner.current
     val coroutineScope = remember {
@@ -60,17 +62,17 @@ fun AddEditExerciseScreen(
 
             navigationViewModel.onEvent(NavigationEvent.UpdateTitleWidget {
                 MediumTextWidget(
-                    "${stringResource(exercisesState.editType.resourceId)} ${
+                    "${stringResource(routinesState.editType.resourceId)} ${
                         stringResource(
-                            R.string.an_exercise
+                            R.string.a_routine
                         )
                     }"
                 )
             })
 
-            if (exercisesState.editType == EditType.ADD) {
-                exercisesViewModel.onEvent(
-                    ExercisesEvent.SetSelectedExercise(Exercise())
+            if (routinesState.editType == EditType.ADD) {
+                routinesViewModel.onEvent(
+                    RoutinesEvent.SetSelectedRoutineDTO(RoutineDTO())
                 )
             }
         }
@@ -83,17 +85,18 @@ fun AddEditExerciseScreen(
     InputInformation(
         navigationState = navigationState,
         navigationViewModel = navigationViewModel,
-        exercisesState = exercisesState,
-        exercisesViewModel = exercisesViewModel,
+        routinesState = routinesState,
+        routinesViewModel = routinesViewModel
     )
 }
+
 
 @Composable
 fun InputInformation(
     navigationState: NavigationState,
     navigationViewModel: NavigationViewModel,
-    exercisesState: ExercisesState,
-    exercisesViewModel: ExercisesViewModel
+    routinesState: RoutinesState,
+    routinesViewModel: RoutinesViewModel
 ) {
     val context = LocalContext.current
 
@@ -109,21 +112,21 @@ fun InputInformation(
                     .clip(CircleShape)
                     .background(MaterialTheme.colorScheme.primary),
                 onClick = {
-                    val succeeded: Boolean = if (exercisesState.editType == EditType.ADD) {
-                        exercisesViewModel.onEvent(ExercisesEvent.SaveExercise)
+                    val succeeded: Boolean = if (routinesState.editType == EditType.ADD) {
+                        routinesViewModel.onEvent(RoutinesEvent.SaveRoutine)
                     } else {
-                        exercisesViewModel.onEvent(ExercisesEvent.UpdateExercise)
+                        routinesViewModel.onEvent(RoutinesEvent.UpdateRoutine)
                     }
 
                     if (succeeded) {
                         navigationState.navController?.navigateUp()
                         Toast.makeText(
                             context,
-                            "${context.getString(R.string.saved_exercise)} ${exercisesState.selectedExercise.name}",
+                            "${context.getString(R.string.saved_routine)} ${routinesState.selectedRoutineDTO.routine.name}",
                             Toast.LENGTH_SHORT
                         ).show()
                     } else {
-                        Toast.makeText(context, context.getString(R.string.savednt_exercise), Toast.LENGTH_SHORT)
+                        Toast.makeText(context, context.getString(R.string.savednt_routine), Toast.LENGTH_SHORT)
                             .show()
                     }
                 },
@@ -144,37 +147,21 @@ fun InputInformation(
         ) {
             DefaultTextField(
                 label = stringResource(R.string.name),
-                value = exercisesState.selectedExercise.name,
+                value = routinesState.selectedRoutineDTO.routine.name,
                 onValueChange = {
-                    exercisesViewModel.onEvent(ExercisesEvent.SetName(it))
-                }
-            )
-            Spacer(modifier = Modifier.height(20.dp))
-            DefaultTextArea(
-                label = stringResource(R.string.instructions),
-                value = exercisesState.selectedExercise.instructions,
-                onValueChange = {
-                    exercisesViewModel.onEvent(ExercisesEvent.SetInstructions(it))
-                }
-            )
-            Spacer(modifier = Modifier.height(20.dp))
-            DefaultTextField(
-                label = stringResource(R.string.video_link),
-                value = exercisesState.selectedExercise.videoLink,
-                onValueChange = {
-                    exercisesViewModel.onEvent(ExercisesEvent.SetVideoLink(it))
+                    routinesViewModel.onEvent(RoutinesEvent.SetName(it))
                 }
             )
             Spacer(modifier = Modifier.height(20.dp))
             DialogRadioButtonList(
-                label = stringResource(R.string.category),
-                options = Category.entries.map { StoredValue(it, stringResource(it.resourceId)) },
+                label = stringResource(R.string.frequency),
+                options = Frequency.entries.map { StoredValue(it, stringResource(it.resourceId)) },
                 initialStoredValue = StoredValue(
-                    exercisesState.selectedExercise.category,
-                    stringResource(exercisesState.selectedExercise.category.resourceId)
+                    routinesState.selectedRoutineDTO.routine.frequency,
+                    stringResource(routinesState.selectedRoutineDTO.routine.frequency.resourceId)
                 ),
                 onValueChange = {
-                    exercisesViewModel.onEvent(ExercisesEvent.SetCategory(it.value))
+                    routinesViewModel.onEvent(RoutinesEvent.SetFrequency(it.value))
                 }
             )
             Spacer(modifier = Modifier.height(20.dp))
@@ -182,17 +169,15 @@ fun InputInformation(
                 label = stringResource(R.string.share_type),
                 options = ShareType.entries.map { StoredValue(it, stringResource(it.resourceId)) },
                 initialStoredValue = StoredValue(
-                    exercisesState.selectedExercise.shareType,
-                    stringResource(exercisesState.selectedExercise.shareType.resourceId)
+                    routinesState.selectedRoutineDTO.routine.shareType,
+                    stringResource(routinesState.selectedRoutineDTO.routine.shareType.resourceId)
                 ),
                 onValueChange = {
-                    exercisesViewModel.onEvent(ExercisesEvent.SetShareType(it.value))
+                    routinesViewModel.onEvent(RoutinesEvent.SetShareType(it.value))
                 }
             )
         }
 
 
     }
-
-
 }

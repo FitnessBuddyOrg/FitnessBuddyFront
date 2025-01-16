@@ -21,6 +21,7 @@ import com.project.fitnessbuddy.navigation.AppNavGraph
 import com.project.fitnessbuddy.navigation.NavigationViewModel
 import com.project.fitnessbuddy.screens.common.ParametersViewModel
 import com.project.fitnessbuddy.screens.exercises.ExercisesViewModel
+import com.project.fitnessbuddy.screens.routines.RoutinesViewModel
 import com.project.fitnessbuddy.ui.theme.FitnessBuddyTheme
 import kotlinx.coroutines.launch
 
@@ -38,7 +39,7 @@ class MainActivity : ComponentActivity() {
         Room.databaseBuilder(
             applicationContext,
             FitnessBuddyDatabase::class.java,
-            "fitnessBuddy.db"
+            FitnessBuddyDatabase.DATABASE_NAME
         )
             .fallbackToDestructiveMigration()
             .build()
@@ -117,6 +118,20 @@ class MainActivity : ComponentActivity() {
         }
     )
 
+    private val routinesViewModel by viewModels<RoutinesViewModel>(
+        factoryProducer = {
+            object : ViewModelProvider.Factory {
+                override fun <T : ViewModel> create(modelClass: Class<T>): T {
+                    return RoutinesViewModel(
+                        routineDao = db.routineDao,
+                        routineExerciseDao = db.routineExerciseDao,
+                        routineExerciseSetDao = db.routineExerciseSetDao
+                    ) as T
+                }
+            }
+        }
+    )
+
     private val parametersViewModel by viewModels<ParametersViewModel>(
         factoryProducer = {
             object : ViewModelProvider.Factory {
@@ -134,6 +149,8 @@ class MainActivity : ComponentActivity() {
             FitnessBuddyTheme {
                 val navigationState by navigationViewModel.state.collectAsState()
                 val exerciseState by exercisesViewModel.state.collectAsState()
+                val routinesState by routinesViewModel.state.collectAsState()
+
                 val userState by authViewModel.userState.collectAsState()
                 val parametersState by parametersViewModel.state.collectAsState()
 
@@ -143,6 +160,9 @@ class MainActivity : ComponentActivity() {
 
                     exercisesState = exerciseState,
                     exercisesViewModel = exercisesViewModel,
+
+                    routinesState = routinesState,
+                    routinesViewModel = routinesViewModel,
 
                     parametersState = parametersState,
                     parametersViewModel = parametersViewModel,

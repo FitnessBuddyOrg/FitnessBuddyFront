@@ -99,7 +99,7 @@ fun onDeleteExercise(
             "Deleted ${exercisesState.selectedExercise.name}",
             Toast.LENGTH_SHORT
         ).show()
-        exercisesViewModel.onEvent(ExercisesEvent.ResetEditingExercise)
+        exercisesViewModel.onEvent(ExercisesEvent.ResetSelectedExercise)
     } else {
         Toast.makeText(
             context,

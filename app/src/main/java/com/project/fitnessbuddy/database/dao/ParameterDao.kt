@@ -15,6 +15,6 @@ interface ParameterDao {
     @Delete
     suspend fun delete(parameter: Parameter)
 
-    @Query("SELECT * FROM parameter WHERE parameterId = :parameterId")
+    @Query("SELECT * FROM parameter WHERE parameter_id = :parameterId")
     suspend fun getParameterById(parameterId: String): Parameter?
 }

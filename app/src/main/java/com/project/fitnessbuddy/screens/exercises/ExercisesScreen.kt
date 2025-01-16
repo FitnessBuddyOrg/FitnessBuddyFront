@@ -35,6 +35,8 @@ import com.project.fitnessbuddy.navigation.MediumTextWidget
 import com.project.fitnessbuddy.navigation.NavigationEvent
 import com.project.fitnessbuddy.navigation.NavigationState
 import com.project.fitnessbuddy.navigation.NavigationViewModel
+import com.project.fitnessbuddy.screens.common.ParametersState
+import com.project.fitnessbuddy.screens.common.ParametersViewModel
 import com.project.fitnessbuddy.screens.common.StoredValue
 import com.project.fitnessbuddy.screens.common.WidgetLetterImage
 import kotlinx.coroutines.launch
@@ -43,8 +45,12 @@ import kotlinx.coroutines.launch
 fun ExercisesScreen(
     navigationState: NavigationState,
     navigationViewModel: NavigationViewModel,
+
     exercisesState: ExercisesState,
-    exercisesViewModel: ExercisesViewModel
+    exercisesViewModel: ExercisesViewModel,
+
+    parametersState: ParametersState,
+    parametersViewModel: ParametersViewModel
 ) {
     val context = LocalContext.current
     val lifecycleOwner = LocalLifecycleOwner.current
@@ -73,7 +79,8 @@ fun ExercisesScreen(
     AlphabeticallyGroupedWidgetList(
         exercisesState = exercisesState,
         exercisesViewModel = exercisesViewModel,
-        navigationState = navigationState
+        navigationState = navigationState,
+        parametersState = parametersState
     )
 }
 
@@ -81,7 +88,8 @@ fun ExercisesScreen(
 fun AlphabeticallyGroupedWidgetList(
     exercisesState: ExercisesState,
     exercisesViewModel: ExercisesViewModel,
-    navigationState: NavigationState
+    navigationState: NavigationState,
+    parametersState: ParametersState
 ) {
     val context = LocalContext.current
 
@@ -103,38 +111,44 @@ fun AlphabeticallyGroupedWidgetList(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.SpaceEvenly
                 ) {
-                    SortType.entries.map { StoredValue(it, stringResource(it.resourceId)) }.forEach { storedValue ->
-                        Row(
-                            modifier = Modifier
-                                .weight(0.5f)
-                                .pointerInput(Unit) {
-                                    detectTapGestures(onPress = {
+                    SortType.entries.map { StoredValue(it, stringResource(it.resourceId)) }
+                        .forEach { storedValue ->
+                            Row(
+                                modifier = Modifier
+                                    .weight(0.5f)
+                                    .pointerInput(Unit) {
+                                        detectTapGestures(onPress = {
+                                            exercisesViewModel.onEvent(
+                                                ExercisesEvent.SortExercises(
+                                                    storedValue.value
+                                                )
+                                            )
+                                        })
+                                    },
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.Center
+                            ) {
+                                RadioButton(
+                                    selected = exercisesState.sortType == storedValue.value,
+                                    onClick = {
                                         exercisesViewModel.onEvent(
                                             ExercisesEvent.SortExercises(
                                                 storedValue.value
                                             )
                                         )
-                                    })
-                                },
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.Center
-                        ) {
-                            RadioButton(
-                                selected = exercisesState.sortType == storedValue.value,
-                                onClick = {
-                                    exercisesViewModel.onEvent(ExercisesEvent.SortExercises(storedValue.value))
-                                },
-                            )
-                            Text(
-                                text = storedValue.displayValue.uppercase(),
-                                style = MaterialTheme.typography.labelSmall,
-                            )
+                                    },
+                                )
+                                Text(
+                                    text = storedValue.displayValue.uppercase(),
+                                    style = MaterialTheme.typography.labelSmall,
+                                )
+                            }
                         }
-                    }
                 }
             }
 
             exercisesState.exercises
+                .filter { (it.language.name == parametersState.languageParameter.value) || it.language.isCustom }
                 .groupBy {
                     when (exercisesState.sortType) {
                         SortType.NAME -> it.name.first().uppercase()
@@ -162,7 +176,6 @@ fun AlphabeticallyGroupedWidgetList(
                 }
         }
     }
-
 }
 
 @Composable
@@ -179,7 +192,7 @@ fun ExerciseWidget(
             .height(80.dp)
             .clickable(
                 onClick = {
-                    exercisesViewModel.onEvent(ExercisesEvent.SetEditingExercise(exercise))
+                    exercisesViewModel.onEvent(ExercisesEvent.SetSelectedExercise(exercise))
                     navigationState.navController?.navigate(context.getString(R.string.view_exercise_route))
                 }
             ),

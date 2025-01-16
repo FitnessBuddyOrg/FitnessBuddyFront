@@ -9,7 +9,6 @@
     <string name="username_placeholder">Имя пользователя</string>
     <string name="routines">Рутины</string>
     <string name="add_edit_exercise">Добавить/Редактировать Упражнения</string>
-    <string name="exercises_overview">Обзор Упражнений</string>
     <string name="view_exercise">Просмотр Упражнения</string>
     <string name="register">Регистрация</string>
     <string name="email">Электронная почта</string>
@@ -22,7 +21,7 @@
     <string name="logout">Выйти</string>
     <string name="instructions">Инструкции</string>
     <string name="no_vid_available">Видео для этого упражнения недоступно</string>
-    <string name="exercise">Упражнение</string>
+    <string name="an_exercise">Упражнение</string>
     <string name="add">Добавить</string>
     <string name="edit">Редактировать</string>
     <string name="public_res">Публичный</string>
@@ -47,4 +46,16 @@
     <string name="french">Французский</string>
     <string name="russian">Русский</string>
     <string name="ok">Ок</string>
+    <string name="last_performed">Last performed</string>
+    <string name="add_edit_routine">Add Edit Routine</string>
+    <string name="view_routine">View Routine</string>
+    <string name="a_routine">a routine</string>
+    <string name="frequency">Frequency</string>
+    <string name="daily">Daily</string>
+    <string name="weekly">Weekly</string>
+    <string name="monthly">Monthly</string>
+    <string name="saved_exercise">Saved Exercise</string>
+    <string name="savednt_exercise">Could Not Save Exercise</string>
+    <string name="saved_routine">Saved Routine</string>
+    <string name="savednt_routine">Could Not Save Routine</string>
 </resources>
