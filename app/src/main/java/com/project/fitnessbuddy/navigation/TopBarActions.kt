@@ -45,10 +45,10 @@ fun MoreVertButton() {
 
 @Composable
 fun SearchButton(
-    navigationState: NavigationState,
+    title: String,
     navigationViewModel: NavigationViewModel,
-    exercisesState: ExercisesState,
-    exercisesViewModel: ExercisesViewModel
+    onValueChange: (String) -> Unit,
+    onClear: () -> Unit
 ) {
     var isSearchEnabled by remember { mutableStateOf(false) }
     var searchText by remember { mutableStateOf("") }
@@ -65,8 +65,7 @@ fun SearchButton(
                 OutlinedTextField(
                     value = searchText,
                     onValueChange = {
-//                        navigationViewModel.onEvent(NavigationEvent.SetSearchValue(it))
-                        exercisesViewModel.onEvent(ExercisesEvent.SetSearchValue(it))
+                        onValueChange(it)
                         searchText = it
                     },
                     placeholder = {
@@ -93,8 +92,7 @@ fun SearchButton(
                     shape = RoundedCornerShape(8.dp),
                     trailingIcon = {
                         IconButton(onClick = {
-//                            navigationViewModel.onEvent(NavigationEvent.SetSearchValue(""))
-                            exercisesViewModel.onEvent(ExercisesEvent.SetSearchValue(""))
+                            onClear()
                             searchText = ""
                         }) {
                             Icon(Icons.Default.Delete, contentDescription = "Delete Search")
@@ -109,7 +107,7 @@ fun SearchButton(
                 }
             }
         } else {
-            MediumTextWidget(navigationState.title)
+            MediumTextWidget(title)
         }
     })
 
@@ -131,30 +129,22 @@ fun SearchButton(
 }
 
 @Composable
-fun CreateButton(navigationState: NavigationState, exercisesViewModel: ExercisesViewModel) {
-    IconButton(onClick = {
-        exercisesViewModel.onEvent(ExercisesEvent.SetEditType(EditType.ADD))
-        navigationState.navController?.navigate(navigationState.addButtonRoute)
-    }) {
+fun CreateButton(onClick: () -> Unit) {
+    IconButton(onClick = onClick) {
         Icon(Icons.Default.Add, contentDescription = "Create")
     }
 }
 
 @Composable
-fun DeleteButton(navigationState: NavigationState) {
-    IconButton(onClick = {
-        navigationState.onDeleteButtonClicked?.invoke()
-    }) {
+fun DeleteButton(onClick: () -> Unit) {
+    IconButton(onClick = onClick) {
         Icon(Icons.Default.Delete, contentDescription = "Delete")
     }
 }
 
 @Composable
-fun EditButton(navigationState: NavigationState, exercisesViewModel: ExercisesViewModel) {
-    IconButton(onClick = {
-        exercisesViewModel.onEvent(ExercisesEvent.SetEditType(EditType.EDIT))
-        navigationState.navController?.navigate(navigationState.editButtonRoute)
-    }) {
+fun EditButton(onClick: () -> Unit) {
+    IconButton(onClick = onClick) {
         Icon(Icons.Default.Edit, contentDescription = "Edit")
     }
 }

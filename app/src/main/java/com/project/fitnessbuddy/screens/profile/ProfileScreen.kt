@@ -60,7 +60,9 @@ fun ProfileScreen(
 
     DisposableEffect(Unit) {
         val job = coroutineScope.launch {
+            navigationViewModel.onEvent(NavigationEvent.ClearTopBarActions)
             navigationViewModel.onEvent(NavigationEvent.DisableAllButtons)
+
 
             navigationViewModel.onEvent(NavigationEvent.SetTitle(context.getString(R.string.profile)))
             navigationViewModel.onEvent(NavigationEvent.UpdateTitleWidget {

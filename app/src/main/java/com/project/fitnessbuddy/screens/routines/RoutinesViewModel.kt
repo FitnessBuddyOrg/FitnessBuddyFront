@@ -6,7 +6,6 @@ import com.project.fitnessbuddy.database.dao.RoutineDao
 import com.project.fitnessbuddy.database.dao.RoutineExerciseDao
 import com.project.fitnessbuddy.database.dao.RoutineExerciseSetDao
 import com.project.fitnessbuddy.database.dto.RoutineDTO
-import com.project.fitnessbuddy.screens.exercises.ExercisesEvent
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -120,7 +119,9 @@ class RoutinesViewModel(
                                 routineExerciseDTOs = it.selectedRoutineDTO.routineExerciseDTOs.map { routineExerciseDTO ->
                                     routineExerciseDTO.copy(
                                         routineExercise = routineExerciseDTO.routineExercise.copy(
-                                            routineExerciseId = routineExerciseDao.upsert(routineExerciseDTO.routineExercise)
+                                            routineExerciseId = routineExerciseDao.upsert(
+                                                routineExerciseDTO.routineExercise
+                                            )
                                         )
                                     )
                                 }
@@ -153,7 +154,9 @@ class RoutinesViewModel(
                                     routineExerciseDTO.copy(
                                         routineExerciseSets = routineExerciseDTO.routineExerciseSets.map { routineExerciseSet ->
                                             routineExerciseSet.copy(
-                                                routineExerciseSetId = routineExerciseSetDao.upsert(routineExerciseSet)
+                                                routineExerciseSetId = routineExerciseSetDao.upsert(
+                                                    routineExerciseSet
+                                                )
                                             )
                                         }
                                     )

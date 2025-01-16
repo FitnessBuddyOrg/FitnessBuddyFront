@@ -28,7 +28,6 @@ import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import com.project.fitnessbuddy.R
 import com.project.fitnessbuddy.database.dto.RoutineDTO
-import com.project.fitnessbuddy.database.entity.enums.Category
 import com.project.fitnessbuddy.database.entity.enums.Frequency
 import com.project.fitnessbuddy.database.entity.enums.ShareType
 import com.project.fitnessbuddy.navigation.EditType
@@ -36,11 +35,9 @@ import com.project.fitnessbuddy.navigation.MediumTextWidget
 import com.project.fitnessbuddy.navigation.NavigationEvent
 import com.project.fitnessbuddy.navigation.NavigationState
 import com.project.fitnessbuddy.navigation.NavigationViewModel
-import com.project.fitnessbuddy.screens.common.DefaultTextArea
 import com.project.fitnessbuddy.screens.common.DefaultTextField
 import com.project.fitnessbuddy.screens.common.DialogRadioButtonList
 import com.project.fitnessbuddy.screens.common.StoredValue
-import com.project.fitnessbuddy.screens.exercises.ExercisesEvent
 import kotlinx.coroutines.launch
 
 @Composable
@@ -58,6 +55,7 @@ fun AddEditRoutineScreen(
     DisposableEffect(Unit) {
         val job = coroutineScope.launch {
             navigationViewModel.onEvent(NavigationEvent.DisableAllButtons)
+            navigationViewModel.onEvent(NavigationEvent.ClearTopBarActions)
             navigationViewModel.onEvent(NavigationEvent.EnableBackButton)
 
             navigationViewModel.onEvent(NavigationEvent.UpdateTitleWidget {
@@ -126,7 +124,11 @@ fun InputInformation(
                             Toast.LENGTH_SHORT
                         ).show()
                     } else {
-                        Toast.makeText(context, context.getString(R.string.savednt_routine), Toast.LENGTH_SHORT)
+                        Toast.makeText(
+                            context,
+                            context.getString(R.string.savednt_routine),
+                            Toast.LENGTH_SHORT
+                        )
                             .show()
                     }
                 },

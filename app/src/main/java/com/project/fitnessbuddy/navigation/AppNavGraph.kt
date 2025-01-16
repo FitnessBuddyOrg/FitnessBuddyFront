@@ -282,22 +282,25 @@ fun AppNavGraph(
                             }
                         },
                         actions = {
-                            if (navigationState.searchButtonEnabled) {
-                                SearchButton(
-                                    navigationState = navigationState,
-                                    navigationViewModel = navigationViewModel,
-                                    exercisesState = exercisesState,
-                                    exercisesViewModel = exercisesViewModel,
-                                )
-                            }
-                            if (navigationState.addButtonEnabled) {
-                                CreateButton(navigationState, exercisesViewModel)
-                            }
-                            if (navigationState.editButtonEnabled) {
-                                EditButton(navigationState, exercisesViewModel)
-                            }
-                            if (navigationState.deleteButtonEnabled) {
-                                DeleteButton(navigationState)
+//                            if (navigationState.searchButtonEnabled) {
+//                                SearchButton(
+//                                    navigationState = navigationState,
+//                                    navigationViewModel = navigationViewModel,
+//                                    exercisesState = exercisesState,
+//                                    exercisesViewModel = exercisesViewModel,
+//                                )
+//                            }
+//                            if (navigationState.addButtonEnabled) {
+//                                CreateButton(navigationState, exercisesViewModel)
+//                            }
+//                            if (navigationState.editButtonEnabled) {
+//                                EditButton(navigationState, exercisesViewModel)
+//                            }
+//                            if (navigationState.deleteButtonEnabled) {
+//                                DeleteButton(navigationState)
+//                            }
+                            navigationState.topBarActions.forEach { action ->
+                                action()
                             }
                         },
                         colors = TopAppBarDefaults.mediumTopAppBarColors(containerColor = MaterialTheme.colorScheme.primaryContainer)

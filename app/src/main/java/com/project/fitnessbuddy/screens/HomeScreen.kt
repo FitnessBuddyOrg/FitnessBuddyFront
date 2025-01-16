@@ -34,7 +34,7 @@ fun HomeScreen(
 
     DisposableEffect(Unit) {
         val job = coroutineScope.launch {
-            navigationViewModel.onEvent(NavigationEvent.DisableAllButtons)
+//            navigationViewModel.onEvent(NavigationEvent.DisableAllButtons)
 
             navigationViewModel.onEvent(NavigationEvent.UpdateTitleWidget {
                 MediumTextWidget(context.getString(R.string.home))

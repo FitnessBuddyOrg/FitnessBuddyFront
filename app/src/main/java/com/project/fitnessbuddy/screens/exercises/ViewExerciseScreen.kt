@@ -31,11 +31,17 @@ import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.YouTubePlayer
 import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.listeners.AbstractYouTubePlayerListener
 import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.views.YouTubePlayerView
 import com.project.fitnessbuddy.R
+import com.project.fitnessbuddy.database.entity.Exercise
+import com.project.fitnessbuddy.navigation.CreateButton
+import com.project.fitnessbuddy.navigation.DeleteButton
+import com.project.fitnessbuddy.navigation.EditButton
+import com.project.fitnessbuddy.navigation.EditType
 import com.project.fitnessbuddy.navigation.LargeTextWidget
 import com.project.fitnessbuddy.navigation.MediumTextWidget
 import com.project.fitnessbuddy.navigation.NavigationEvent
 import com.project.fitnessbuddy.navigation.NavigationState
 import com.project.fitnessbuddy.navigation.NavigationViewModel
+import com.project.fitnessbuddy.navigation.SearchButton
 import com.project.fitnessbuddy.screens.common.StoredValue
 import kotlinx.coroutines.launch
 
@@ -54,24 +60,31 @@ fun ViewExerciseScreen(
 
     DisposableEffect(Unit) {
         val job = coroutineScope.launch {
+            navigationViewModel.onEvent(NavigationEvent.ClearTopBarActions)
             navigationViewModel.onEvent(NavigationEvent.DisableAllButtons)
             navigationViewModel.onEvent(NavigationEvent.EnableBackButton)
 
-            navigationViewModel.onEvent(NavigationEvent.EnableEditButton)
-            navigationViewModel.onEvent(NavigationEvent.SetEditButtonRoute(context.getString(R.string.add_edit_exercise)))
-
-            navigationViewModel.onEvent(NavigationEvent.EnableDeleteButton)
-            navigationViewModel.onEvent(NavigationEvent.SetOnDeleteButtonClicked {
-                onDeleteExercise(
-                    navigationState = navigationState,
-                    exercisesViewModel = exercisesViewModel,
-                    exercisesState = exercisesState,
-                    context = context
-                )
-            })
-
             navigationViewModel.onEvent(NavigationEvent.UpdateTitleWidget {
                 exercisesState.selectedExercise.name.let { MediumTextWidget(it) }
+            })
+
+            navigationViewModel.onEvent(NavigationEvent.AddTopBarActions {
+                EditButton(
+                    onClick = {
+                        exercisesViewModel.onEvent(ExercisesEvent.SetEditType(EditType.EDIT))
+                        navigationState.navController?.navigate(context.getString(R.string.add_edit_exercise))
+                    }
+                )
+                DeleteButton(
+                    onClick = {
+                        onDeleteExercise(
+                            navigationState = navigationState,
+                            exercisesViewModel = exercisesViewModel,
+                            exercisesState = exercisesState,
+                            context = context
+                        )
+                    }
+                )
             })
         }
 

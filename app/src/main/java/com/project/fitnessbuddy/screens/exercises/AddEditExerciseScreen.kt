@@ -30,11 +30,14 @@ import com.project.fitnessbuddy.R
 import com.project.fitnessbuddy.database.entity.Exercise
 import com.project.fitnessbuddy.database.entity.enums.Category
 import com.project.fitnessbuddy.database.entity.enums.ShareType
+import com.project.fitnessbuddy.navigation.CreateButton
+import com.project.fitnessbuddy.navigation.DeleteButton
 import com.project.fitnessbuddy.navigation.EditType
 import com.project.fitnessbuddy.navigation.MediumTextWidget
 import com.project.fitnessbuddy.navigation.NavigationEvent
 import com.project.fitnessbuddy.navigation.NavigationState
 import com.project.fitnessbuddy.navigation.NavigationViewModel
+import com.project.fitnessbuddy.navigation.SearchButton
 import com.project.fitnessbuddy.screens.common.DefaultTextArea
 import com.project.fitnessbuddy.screens.common.DefaultTextField
 import com.project.fitnessbuddy.screens.common.DialogRadioButtonList
@@ -56,6 +59,7 @@ fun AddEditExerciseScreen(
     DisposableEffect(Unit) {
         val job = coroutineScope.launch {
             navigationViewModel.onEvent(NavigationEvent.DisableAllButtons)
+            navigationViewModel.onEvent(NavigationEvent.ClearTopBarActions)
             navigationViewModel.onEvent(NavigationEvent.EnableBackButton)
 
             navigationViewModel.onEvent(NavigationEvent.UpdateTitleWidget {

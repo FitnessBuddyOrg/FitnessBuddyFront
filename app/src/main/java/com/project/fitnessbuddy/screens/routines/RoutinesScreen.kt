@@ -30,14 +30,15 @@ import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import com.project.fitnessbuddy.R
 import com.project.fitnessbuddy.database.dto.RoutineDTO
+import com.project.fitnessbuddy.navigation.CreateButton
 import com.project.fitnessbuddy.navigation.EditType
 import com.project.fitnessbuddy.navigation.MediumTextWidget
 import com.project.fitnessbuddy.navigation.NavigationEvent
 import com.project.fitnessbuddy.navigation.NavigationState
 import com.project.fitnessbuddy.navigation.NavigationViewModel
+import com.project.fitnessbuddy.navigation.SearchButton
 import com.project.fitnessbuddy.screens.common.ParametersState
 import com.project.fitnessbuddy.screens.common.ParametersViewModel
-import com.project.fitnessbuddy.screens.exercises.ExercisesEvent
 import kotlinx.coroutines.launch
 
 @Composable
@@ -59,16 +60,31 @@ fun RoutinesScreen(
 
     DisposableEffect(Unit) {
         val job = coroutineScope.launch {
+            navigationViewModel.onEvent(NavigationEvent.ClearTopBarActions)
             navigationViewModel.onEvent(NavigationEvent.DisableAllButtons)
-            navigationViewModel.onEvent(NavigationEvent.EnableSearchButton)
-            navigationViewModel.onEvent(NavigationEvent.EnableAddButton)
-
-            navigationViewModel.onEvent(NavigationEvent.SetAddButtonRoute(context.getString(R.string.add_edit_routine_route)))
-            navigationViewModel.onEvent(NavigationEvent.SetEditButtonRoute(context.getString(R.string.add_edit_routine_route)))
 
             navigationViewModel.onEvent(NavigationEvent.SetTitle(context.getString(R.string.routines)))
             navigationViewModel.onEvent(NavigationEvent.UpdateTitleWidget {
                 MediumTextWidget(context.getString(R.string.routines))
+            })
+
+            navigationViewModel.onEvent(NavigationEvent.AddTopBarActions {
+                SearchButton(
+                    title = stringResource(R.string.routines),
+                    navigationViewModel = navigationViewModel,
+                    onValueChange = {
+                        routinesViewModel.onEvent(RoutinesEvent.SetSearchValue(it))
+                    },
+                    onClear = {
+                        routinesViewModel.onEvent(RoutinesEvent.SetSearchValue(""))
+                    }
+                )
+                CreateButton(
+                    onClick = {
+                        routinesViewModel.onEvent(RoutinesEvent.SetSelectedRoutineDTO(RoutineDTO()))
+                        navigationState.navController?.navigate(context.getString(R.string.add_edit_routine_route))
+                    }
+                )
             })
         }
 
@@ -157,7 +173,8 @@ fun RoutineWidget(
             modifier = Modifier.align(Alignment.TopEnd),
             onClick = {
                 routinesViewModel.onEvent(RoutinesEvent.SetEditType(EditType.EDIT))
-                navigationState.navController?.navigate(navigationState.editButtonRoute)
+                routinesViewModel.onEvent(RoutinesEvent.SetSelectedRoutineDTO(routineDTO))
+                navigationState.navController?.navigate(context.getString(R.string.add_edit_routine_route))
             }
         ) {
             Icon(Icons.Default.Edit, contentDescription = "Edit")

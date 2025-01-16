@@ -31,10 +31,12 @@ import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import com.project.fitnessbuddy.R
 import com.project.fitnessbuddy.database.entity.Exercise
+import com.project.fitnessbuddy.navigation.CreateButton
 import com.project.fitnessbuddy.navigation.MediumTextWidget
 import com.project.fitnessbuddy.navigation.NavigationEvent
 import com.project.fitnessbuddy.navigation.NavigationState
 import com.project.fitnessbuddy.navigation.NavigationViewModel
+import com.project.fitnessbuddy.navigation.SearchButton
 import com.project.fitnessbuddy.screens.common.ParametersState
 import com.project.fitnessbuddy.screens.common.ParametersViewModel
 import com.project.fitnessbuddy.screens.common.StoredValue
@@ -60,14 +62,31 @@ fun ExercisesScreen(
 
     DisposableEffect(Unit) {
         val job = coroutineScope.launch {
+            navigationViewModel.onEvent(NavigationEvent.ClearTopBarActions)
             navigationViewModel.onEvent(NavigationEvent.DisableAllButtons)
-            navigationViewModel.onEvent(NavigationEvent.EnableSearchButton)
-            navigationViewModel.onEvent(NavigationEvent.EnableAddButton)
-            navigationViewModel.onEvent(NavigationEvent.SetAddButtonRoute(context.getString(R.string.add_edit_exercise_route)))
 
             navigationViewModel.onEvent(NavigationEvent.SetTitle(context.getString(R.string.exercises)))
             navigationViewModel.onEvent(NavigationEvent.UpdateTitleWidget {
                 MediumTextWidget(context.getString(R.string.exercises))
+            })
+
+            navigationViewModel.onEvent(NavigationEvent.AddTopBarActions {
+                SearchButton(
+                    title = stringResource(R.string.exercises),
+                    navigationViewModel = navigationViewModel,
+                    onValueChange = {
+                        exercisesViewModel.onEvent(ExercisesEvent.SetSearchValue(it))
+                    },
+                    onClear = {
+                        exercisesViewModel.onEvent(ExercisesEvent.SetSearchValue(""))
+                    }
+                )
+                CreateButton(
+                    onClick = {
+                        exercisesViewModel.onEvent(ExercisesEvent.SetSelectedExercise(Exercise()))
+                        navigationState.navController?.navigate(context.getString(R.string.add_edit_exercise_route))
+                    }
+                )
             })
         }
 
