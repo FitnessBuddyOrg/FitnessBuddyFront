@@ -1,68 +1,116 @@
 package com.project.fitnessbuddy.screens
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.Button
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.remember
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.stringResource
-import androidx.lifecycle.compose.LocalLifecycleOwner
-import androidx.lifecycle.lifecycleScope
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
-import com.project.fitnessbuddy.R
-import com.project.fitnessbuddy.api.auth.AuthViewModel
 import com.project.fitnessbuddy.api.auth.UserState
-import com.project.fitnessbuddy.navigation.DefaultTitleWidget
+import com.project.fitnessbuddy.api.user.ProfileViewModel
 import com.project.fitnessbuddy.navigation.NavigationEvent
 import com.project.fitnessbuddy.navigation.NavigationViewModel
-import kotlinx.coroutines.launch
 
 @Composable
-fun ProfileScreen(userState: UserState, authViewModel: AuthViewModel, navController: NavHostController, navigationViewModel: NavigationViewModel,) {
-    val context = LocalContext.current
-    val lifecycleOwner = LocalLifecycleOwner.current
+fun ProfileScreen(
+    userState: UserState,
+    navController: NavHostController,
+    navigationViewModel: NavigationViewModel,
+    profileViewModel: ProfileViewModel
+) {
+    var isEditing by remember { mutableStateOf(false) }
+    var name by remember { mutableStateOf(userState.name ?: "") }
 
-    val coroutineScope = remember {
-        lifecycleOwner.lifecycleScope
-    }
+    val user = profileViewModel.user.collectAsState()
 
-    DisposableEffect(Unit) {
-        val job = coroutineScope.launch {
-            navigationViewModel.onEvent(NavigationEvent.SetTitle(context.getString(R.string.profile)))
-            navigationViewModel.onEvent(NavigationEvent.UpdateTitleWidget {
-                DefaultTitleWidget(context.getString(R.string.profile))
-            })
-        }
-
-        onDispose {
-            job.cancel()
-        }
+    LaunchedEffect(Unit) {
+        navigationViewModel.onEvent(NavigationEvent.SetTitle("Profile"))
     }
 
     Column(
-        modifier = Modifier.fillMaxSize(),
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Text(
-            text = stringResource(id = R.string.welcome, userState.email ?: ""),
-            style = MaterialTheme.typography.headlineMedium
-        )
+        Card(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(8.dp),
+            elevation = CardDefaults.cardElevation(8.dp)
+        ) {
+            Column(
+                modifier = Modifier.padding(16.dp),
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text(
+                    text = "User Information",
+                    style = MaterialTheme.typography.headlineMedium.copy(fontSize = 20.sp),
+                    color = MaterialTheme.colorScheme.primary
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+
+                Text(text = "Email: ${user.value?.email ?: "Loading..."}")
+                Spacer(modifier = Modifier.height(8.dp))
+
+                if (isEditing) {
+                    BasicTextField(
+                        value = name,
+                        onValueChange = { name = it },
+                        textStyle = TextStyle(fontSize = 16.sp, color = Color.Black),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(8.dp)
+                            .background(Color.LightGray, MaterialTheme.shapes.small)
+                            .padding(8.dp)
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceEvenly
+                    ) {
+                        Button(onClick = {
+                            isEditing = false
+                            name = user.value?.name ?: ""
+                        }) {
+                            Text("Cancel")
+                        }
+                        Button(onClick = {
+                            isEditing = false
+                            user.value?.let {
+                                profileViewModel.updateUser(it.id, name)
+                            }
+                        }) {
+                            Text("Save")
+                        }
+                    }
+                } else {
+                    Text(text = "Name: ${user.value?.name ?: "Loading..."}")
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Button(onClick = { isEditing = true }) {
+                        Text("Edit Name")
+                    }
+                }
+            }
+        }
+        Spacer(modifier = Modifier.height(16.dp))
 
         Button(onClick = {
-            authViewModel.logout()
             navController.navigate("login") {
                 popUpTo(0) { inclusive = true }
             }
         }) {
-            Text(stringResource(id = R.string.logout))
+            Text("Logout")
         }
     }
 }

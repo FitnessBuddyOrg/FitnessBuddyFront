@@ -14,12 +14,17 @@ data class AppOpenDTO (
     }
 }
 
-data class User (
+data class UserDTO (
     val id: Long,
     val name: String,
     val email: String,
     val role: String,
     val provider: String
+)
+
+data class UpdateUser (
+    val id: Long,
+    val name: String,
 )
 
 interface UserApi {
@@ -31,5 +36,9 @@ interface UserApi {
     suspend fun getAppOpenCount(@Path("userId") userId: Long): List<AppOpenDTO>
 
     @GET("user/me")
-    suspend fun getMe(): User
+    suspend fun getMe(): UserDTO
+
+    @PATCH("user/patch")
+    suspend fun updateMe(@Body updateUserDTO: UpdateUser): UserDTO
+
 }

@@ -23,6 +23,7 @@ import com.project.fitnessbuddy.screens.exercises.ExercisesViewModel
 import com.project.fitnessbuddy.ui.theme.FitnessBuddyTheme
 import kotlinx.coroutines.launch
 import com.github.mikephil.charting.utils.Utils
+import com.project.fitnessbuddy.api.user.ProfileViewModel
 
 
 class MainActivity : ComponentActivity() {
@@ -119,6 +120,16 @@ class MainActivity : ComponentActivity() {
         }
     }
 
+    private val profileViewModel by viewModels<ProfileViewModel> {
+        object : ViewModelProvider.Factory {
+            override fun <T : ViewModel> create(modelClass: Class<T>): T {
+                @Suppress("UNCHECKED_CAST")
+                return ProfileViewModel(RetrofitInstance.userService) as T
+            }
+        }
+    }
+
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         Utils.init(this)
@@ -138,7 +149,8 @@ class MainActivity : ComponentActivity() {
                     userState = userState,
                     authViewModel = authViewModel,
                     exercisesViewModel = exercisesViewModel,
-                    statisticsViewModel = statisticsViewModel
+                    statisticsViewModel = statisticsViewModel,
+                    profileViewModel = profileViewModel
                 )
             }
         }
