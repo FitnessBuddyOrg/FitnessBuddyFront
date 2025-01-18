@@ -4,6 +4,7 @@ import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Query
 import androidx.room.Transaction
+import androidx.room.Update
 import androidx.room.Upsert
 import com.project.fitnessbuddy.database.dto.RoutineDTO
 import com.project.fitnessbuddy.database.entity.Routine
@@ -13,6 +14,9 @@ import kotlinx.coroutines.flow.Flow
 interface RoutineDao {
     @Upsert
     suspend fun upsert(routine: Routine): Long
+
+    @Update
+    suspend fun update(routine: Routine): Int
 
     @Delete
     suspend fun delete(routine: Routine)

@@ -11,5 +11,7 @@ data class NavigationState(
     var titleWidget: @Composable () -> Unit = {},
 
     var topBarActions: List<@Composable RowScope.() -> Unit> = emptyList(),
-    var backButtonEnabled: Boolean = false
+    var iconButton: @Composable () -> Unit = {},
+
+    var customButtonEnabled: Boolean = false
 )

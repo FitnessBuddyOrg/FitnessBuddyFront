@@ -23,7 +23,7 @@ import com.project.fitnessbuddy.database.entity.RoutineExerciseSet
         Routine::class,
         Parameter::class
     ],
-    version = 21
+    version = 23
 )
 @TypeConverters(Converters::class)
 abstract class FitnessBuddyDatabase : RoomDatabase() {

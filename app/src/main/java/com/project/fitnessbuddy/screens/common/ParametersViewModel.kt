@@ -29,15 +29,13 @@ class ParametersViewModel(
                             )
                         }
                     } else {
-                        println("Using default language ${state.value.languageParameter.value}")
+//                        println("Using default language ${state.value.languageParameter.value}")
                     }
 
                 }
             }
 
             is ParametersEvent.SetLanguageParameterValue -> {
-                println("Setting language to ${parametersEvent.value}")
-
                 _state.update {
                     it.copy(
                         languageParameter = it.languageParameter.copy(

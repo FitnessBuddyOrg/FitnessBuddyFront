@@ -1,24 +1,28 @@
 package com.project.fitnessbuddy.navigation
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.IconButtonColors
+import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -29,12 +33,27 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
 import com.project.fitnessbuddy.R
-import com.project.fitnessbuddy.screens.exercises.ExercisesEvent
-import com.project.fitnessbuddy.screens.exercises.ExercisesState
-import com.project.fitnessbuddy.screens.exercises.ExercisesViewModel
+
+
+@Composable
+fun BackButton(navController: NavController?, onClick: () -> Unit = {}) {
+    IconButton(onClick = {
+        navController?.navigateUp()
+        onClick()
+    }) {
+        Icon(
+            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+            contentDescription = null
+        )
+    }
+}
 
 @Composable
 fun MoreVertButton() {
@@ -43,6 +62,7 @@ fun MoreVertButton() {
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SearchButton(
     title: String,
@@ -56,50 +76,55 @@ fun SearchButton(
 
     navigationViewModel.onEvent(NavigationEvent.UpdateTitleWidget {
         if (isSearchEnabled) {
-            Box(
+            BasicTextField(
+                value = searchText,
+                onValueChange = {
+                    onValueChange(it)
+                    searchText = it
+                },
+                singleLine = true,
+                textStyle = MaterialTheme.typography.labelMedium.copy(
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                ),
+                cursorBrush = SolidColor(MaterialTheme.colorScheme.tertiary),
                 modifier = Modifier
+                    .padding(8.dp)
                     .fillMaxWidth()
                     .fillMaxHeight()
-                    .padding(4.dp)
-            ) {
-                OutlinedTextField(
-                    value = searchText,
-                    onValueChange = {
-                        onValueChange(it)
-                        searchText = it
-                    },
-                    placeholder = {
-                        Text(
-                            text = "${stringResource(R.string.search)}...",
-                            style = MaterialTheme.typography.labelMedium
-                        )
-                    },
-                    singleLine = true,
-                    textStyle = MaterialTheme.typography.labelMedium,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .fillMaxHeight()
-                        .padding(0.dp)
-                        .background(
-                            color = MaterialTheme.colorScheme.onPrimary,
-                            shape = RoundedCornerShape(8.dp)
-                        )
-                        .focusRequester(focusRequester),
-                    colors = OutlinedTextFieldDefaults.colors(
-                        focusedBorderColor = Color.Transparent,
-                        unfocusedBorderColor = Color.Transparent,
-                    ),
-                    shape = RoundedCornerShape(8.dp),
-                    trailingIcon = {
-                        IconButton(onClick = {
-                            onClear()
-                            searchText = ""
-                        }) {
-                            Icon(Icons.Default.Delete, contentDescription = "Delete Search")
+                    .focusRequester(focusRequester),
+                decorationBox = { innerTextField ->
+                    TextFieldDefaults.DecorationBox(
+                        value = searchText,
+                        innerTextField = innerTextField,
+                        enabled = true,
+                        singleLine = true,
+                        visualTransformation = VisualTransformation.None,
+                        interactionSource = remember { MutableInteractionSource() },
+                        contentPadding = PaddingValues(start = 12.dp),
+                        shape = RoundedCornerShape(8.dp),
+                        colors = TextFieldDefaults.colors(
+                            focusedContainerColor = MaterialTheme.colorScheme.onPrimary,
+                            unfocusedContainerColor = MaterialTheme.colorScheme.onPrimary,
+                            focusedIndicatorColor = Color.Transparent,
+                            unfocusedIndicatorColor = Color.Transparent
+                        ),
+                        placeholder = {
+                            Text(
+                                text = "${stringResource(R.string.search)}...",
+                                style = MaterialTheme.typography.labelMedium
+                            )
+                        },
+                        trailingIcon = {
+                            IconButton(onClick = {
+                                onClear()
+                                searchText = ""
+                            }) {
+                                Icon(Icons.Default.Delete, contentDescription = "Delete Search")
+                            }
                         }
-                    }
-                )
-            }
+                    )
+                }
+            )
 
             LaunchedEffect(isSearchEnabled) {
                 if (isSearchEnabled) {
@@ -136,8 +161,18 @@ fun CreateButton(onClick: () -> Unit) {
 }
 
 @Composable
-fun DeleteButton(onClick: () -> Unit) {
-    IconButton(onClick = onClick) {
+fun DeleteButton(
+    onClick: () -> Unit,
+    colors: IconButtonColors = IconButtonDefaults.iconButtonColors(),
+    modifier: Modifier = Modifier,
+    enabled : Boolean = true
+) {
+    IconButton(
+        onClick = onClick,
+        colors = colors,
+        modifier = modifier,
+        enabled = enabled
+    ) {
         Icon(Icons.Default.Delete, contentDescription = "Delete")
     }
 }
@@ -168,11 +203,16 @@ fun MediumTextWidget(text: String, modifier: Modifier = Modifier) {
 }
 
 @Composable
-fun SmallTextWidget(text: String, modifier: Modifier = Modifier) {
+fun SmallTextWidget(
+    text: String,
+    modifier: Modifier = Modifier,
+    textAlign: TextAlign = TextAlign.Start
+) {
     Text(
         text = text,
         style = MaterialTheme.typography.labelSmall,
-        modifier = modifier
+        modifier = modifier,
+        textAlign = textAlign
     )
 }
 

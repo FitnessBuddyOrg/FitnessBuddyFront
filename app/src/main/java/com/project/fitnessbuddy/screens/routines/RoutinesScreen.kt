@@ -5,18 +5,14 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -37,6 +33,7 @@ import com.project.fitnessbuddy.navigation.NavigationEvent
 import com.project.fitnessbuddy.navigation.NavigationState
 import com.project.fitnessbuddy.navigation.NavigationViewModel
 import com.project.fitnessbuddy.navigation.SearchButton
+import com.project.fitnessbuddy.screens.common.AlphabeticallyGroupedWidgetList
 import com.project.fitnessbuddy.screens.common.ParametersState
 import com.project.fitnessbuddy.screens.common.ParametersViewModel
 import kotlinx.coroutines.launch
@@ -61,9 +58,8 @@ fun RoutinesScreen(
     DisposableEffect(Unit) {
         val job = coroutineScope.launch {
             navigationViewModel.onEvent(NavigationEvent.ClearTopBarActions)
-            navigationViewModel.onEvent(NavigationEvent.DisableAllButtons)
+            navigationViewModel.onEvent(NavigationEvent.DisableCustomButton)
 
-            navigationViewModel.onEvent(NavigationEvent.SetTitle(context.getString(R.string.routines)))
             navigationViewModel.onEvent(NavigationEvent.UpdateTitleWidget {
                 MediumTextWidget(context.getString(R.string.routines))
             })
@@ -81,6 +77,7 @@ fun RoutinesScreen(
                 )
                 CreateButton(
                     onClick = {
+                        routinesViewModel.onEvent(RoutinesEvent.SetEditType(EditType.ADD))
                         routinesViewModel.onEvent(RoutinesEvent.SetSelectedRoutineDTO(RoutineDTO()))
                         navigationState.navController?.navigate(context.getString(R.string.add_edit_routine_route))
                     }
@@ -93,60 +90,18 @@ fun RoutinesScreen(
         }
     }
 
-
     AlphabeticallyGroupedWidgetList(
-        routinesState = routinesState,
-        routinesViewModel = routinesViewModel,
-        navigationState = navigationState,
-        parametersState = parametersState
+        itemsList = routinesState.routineDTOs,
+        widget = @Composable {
+            RoutineWidget(
+                routineDTO = it,
+                navigationState = navigationState,
+                routinesViewModel = routinesViewModel
+            )
+        },
+        parametersState = parametersState,
+        verticalArrangement = Arrangement.spacedBy(8.dp)
     )
-}
-
-@Composable
-fun AlphabeticallyGroupedWidgetList(
-    routinesState: RoutinesState,
-    routinesViewModel: RoutinesViewModel,
-    navigationState: NavigationState,
-    parametersState: ParametersState
-) {
-    val context = LocalContext.current
-
-
-    Scaffold(
-        modifier = Modifier
-            .fillMaxSize()
-    ) { padding ->
-        LazyColumn(
-            modifier = Modifier.fillMaxSize(),
-            contentPadding = padding,
-            verticalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
-            routinesState.routineDTOs
-                .filter { (it.routine.language.name == parametersState.languageParameter.value) || it.routine.language.isCustom }
-                .groupBy {
-                    it.routine.name.first().uppercase()
-                }
-                .toSortedMap()
-                .forEach { (letter, routineDTOsInGroup) ->
-                    item {
-                        Text(
-                            text = letter.toString(),
-                            style = MaterialTheme.typography.labelSmall,
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(start = 16.dp, top = 12.dp, bottom = 12.dp)
-                        )
-                    }
-                    items(routineDTOsInGroup) { routineDTO ->
-                        RoutineWidget(
-                            routineDTO = routineDTO,
-                            navigationState = navigationState,
-                            routinesViewModel = routinesViewModel
-                        )
-                    }
-                }
-        }
-    }
 }
 
 @Composable
@@ -200,7 +155,7 @@ fun RoutineWidget(
 
             routineDTO.routineExerciseDTOs.forEach { routineExerciseDTO ->
                 Text(
-                    text = "${routineExerciseDTO.routineExerciseSets.size} x ${routineExerciseDTO.exercise.name}",
+                    text = "${routineExerciseDTO.routineExerciseSetDTOs.size} x ${routineExerciseDTO.exercise.name}",
                     style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -208,54 +163,3 @@ fun RoutineWidget(
         }
     }
 }
-
-//@Composable
-//fun ThreeDotsMenu(modifier: Modifier = Modifier) {
-//    var expanded by remember { mutableStateOf(false) }
-//
-//    Box(
-//        modifier = modifier
-//    ) {
-//        IconButton(onClick = { expanded = true }) {
-//            Icon(
-//                imageVector = Icons.Default.MoreVert,
-//                contentDescription = "More Options"
-//            )
-//        }
-//
-//        DropdownMenu(
-//            modifier = Modifier,
-//            shape = RoundedCornerShape(8.dp),
-//            expanded = expanded,
-//            onDismissRequest = { expanded = false }
-//        ) {
-//            DropdownMenuItem(
-//                text = { Text(
-//                    text = "Option 1",
-//                    style = MaterialTheme.typography.labelMedium
-//                ) },
-//                onClick = {
-//                    expanded = false
-//                }
-//            )
-//            DropdownMenuItem(
-//                text = { Text(
-//                    text = "Option 2",
-//                    style = MaterialTheme.typography.labelMedium
-//                ) },
-//                onClick = {
-//                    expanded = false
-//                }
-//            )
-//            DropdownMenuItem(
-//                text = { Text(
-//                    text = "Option 3",
-//                    style = MaterialTheme.typography.labelMedium
-//                ) },
-//                onClick = {
-//                    expanded = false
-//                }
-//            )
-//        }
-//    }
-//}

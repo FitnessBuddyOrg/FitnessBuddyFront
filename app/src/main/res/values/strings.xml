@@ -28,6 +28,7 @@
     <string name="routines_route" translatable="false">routines_route</string>
     <string name="add_edit_exercise_route" translatable="false">add_edit_exercise_route</string>
     <string name="add_edit_routine_route" translatable="false">add_edit_routine_route</string>
+    <string name="add_exercises_route" translatable="false">add_exercises_route</string>
     <string name="exercises_overview_route" translatable="false">exercises_overview_route</string>
     <string name="exercises_overview" translatable="false">exercises_overview</string>
     <string name="routines_overview" translatable="false">routines_overview</string>
@@ -71,7 +72,15 @@
     <string name="weekly">Weekly</string>
     <string name="monthly">Monthly</string>
     <string name="saved_exercise">Saved Exercise</string>
+    <string name="updated_exercise">Updated Exercise</string>
     <string name="savednt_exercise">Could Not Save Exercise</string>
+    <string name="updatednt_exercise">Could Not Update Exercise</string>
     <string name="saved_routine">Saved Routine</string>
     <string name="savednt_routine">Could Not Save Routine</string>
+    <string name="add_exercises">Add Exercises</string>
+    <string name="updated_routine">Updated Routine</string>
+    <string name="updatednt_routine">Could Not Update Routine</string>
+    <string name="weight">Weight</string>
+    <string name="reps">Reps</string>
+    <string name="add_set">Add Set</string>
 </resources>

@@ -1,47 +1,34 @@
 package com.project.fitnessbuddy.screens.exercises
 
-import android.widget.Toast
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Check
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import com.project.fitnessbuddy.R
-import com.project.fitnessbuddy.database.entity.Exercise
 import com.project.fitnessbuddy.database.entity.enums.Category
 import com.project.fitnessbuddy.database.entity.enums.ShareType
-import com.project.fitnessbuddy.navigation.CreateButton
-import com.project.fitnessbuddy.navigation.DeleteButton
 import com.project.fitnessbuddy.navigation.EditType
 import com.project.fitnessbuddy.navigation.MediumTextWidget
 import com.project.fitnessbuddy.navigation.NavigationEvent
 import com.project.fitnessbuddy.navigation.NavigationState
 import com.project.fitnessbuddy.navigation.NavigationViewModel
-import com.project.fitnessbuddy.navigation.SearchButton
 import com.project.fitnessbuddy.screens.common.DefaultTextArea
 import com.project.fitnessbuddy.screens.common.DefaultTextField
 import com.project.fitnessbuddy.screens.common.DialogRadioButtonList
 import com.project.fitnessbuddy.screens.common.StoredValue
+import com.project.fitnessbuddy.screens.common.ValidationFloatingActionButton
 import kotlinx.coroutines.launch
 
 @Composable
@@ -58,9 +45,11 @@ fun AddEditExerciseScreen(
 
     DisposableEffect(Unit) {
         val job = coroutineScope.launch {
-            navigationViewModel.onEvent(NavigationEvent.DisableAllButtons)
+            navigationViewModel.onEvent(NavigationEvent.DisableCustomButton)
             navigationViewModel.onEvent(NavigationEvent.ClearTopBarActions)
-            navigationViewModel.onEvent(NavigationEvent.EnableBackButton)
+
+            navigationViewModel.onEvent(NavigationEvent.EnableCustomButton)
+            navigationViewModel.onEvent(NavigationEvent.SetBackButton(navigationState.navController))
 
             navigationViewModel.onEvent(NavigationEvent.UpdateTitleWidget {
                 MediumTextWidget(
@@ -71,12 +60,6 @@ fun AddEditExerciseScreen(
                     }"
                 )
             })
-
-            if (exercisesState.editType == EditType.ADD) {
-                exercisesViewModel.onEvent(
-                    ExercisesEvent.SetSelectedExercise(Exercise())
-                )
-            }
         }
 
         onDispose {
@@ -107,38 +90,31 @@ fun InputInformation(
             .imePadding()
             .padding(16.dp),
         floatingActionButton = {
-            IconButton(
-                modifier = Modifier
-                    .size(60.dp)
-                    .clip(CircleShape)
-                    .background(MaterialTheme.colorScheme.primary),
-                onClick = {
-                    val succeeded: Boolean = if (exercisesState.editType == EditType.ADD) {
-                        exercisesViewModel.onEvent(ExercisesEvent.SaveExercise)
-                    } else {
-                        exercisesViewModel.onEvent(ExercisesEvent.UpdateExercise)
-                    }
-
-                    if (succeeded) {
-                        navigationState.navController?.navigateUp()
-                        Toast.makeText(
-                            context,
-                            "${context.getString(R.string.saved_exercise)} ${exercisesState.selectedExercise.name}",
-                            Toast.LENGTH_SHORT
-                        ).show()
-                    } else {
-                        Toast.makeText(context, context.getString(R.string.savednt_exercise), Toast.LENGTH_SHORT)
-                            .show()
-                    }
-                },
-            ) {
-                Icon(
-                    modifier = Modifier.size(30.dp),
-                    imageVector = Icons.Default.Check,
-                    contentDescription = "Save",
-                    tint = MaterialTheme.colorScheme.onPrimary
-                )
+            fun getSuccessMessage(): String {
+                return if (exercisesState.editType == EditType.ADD) {
+                    "${context.getString(R.string.saved_exercise)} ${exercisesState.selectedExercise.name}"
+                } else {
+                    "${context.getString(R.string.updated_exercise)} ${exercisesState.selectedExercise.name}"
+                }
             }
+
+            fun getFailureMessage(): String {
+                return if (exercisesState.editType == EditType.ADD) {
+                    context.getString(R.string.savednt_exercise)
+                } else {
+                    context.getString(R.string.updatednt_exercise)
+                }
+            }
+
+            ValidationFloatingActionButton(
+                context = context,
+                onClick = ({exercisesViewModel.onEvent(ExercisesEvent.UpsertExercise)}),
+                onSuccess = {
+                    navigationState.navController?.navigateUp()
+                },
+                successMessage = getSuccessMessage(),
+                failureMessage = getFailureMessage()
+            )
         }
     ) { padding ->
         Column(
@@ -194,9 +170,7 @@ fun InputInformation(
                 }
             )
         }
-
-
     }
-
-
 }
+
+

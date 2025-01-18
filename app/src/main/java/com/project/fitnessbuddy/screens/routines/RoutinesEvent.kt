@@ -1,27 +1,47 @@
 package com.project.fitnessbuddy.screens.routines
 
 import com.project.fitnessbuddy.database.dto.RoutineDTO
+import com.project.fitnessbuddy.database.dto.RoutineExerciseDTO
+import com.project.fitnessbuddy.database.dto.RoutineExerciseSetDTO
+import com.project.fitnessbuddy.database.entity.Exercise
 import com.project.fitnessbuddy.database.entity.Routine
+import com.project.fitnessbuddy.database.entity.RoutineExercise
 import com.project.fitnessbuddy.database.entity.enums.Frequency
 import com.project.fitnessbuddy.database.entity.enums.Language
 import com.project.fitnessbuddy.database.entity.enums.ShareType
 import com.project.fitnessbuddy.navigation.EditType
 
 sealed interface RoutinesEvent {
-    data object SaveRoutine : RoutinesEvent
-    data object UpdateRoutine : RoutinesEvent
+    data object UpsertRoutine : RoutinesEvent
 
     data class SetName(val name: String) : RoutinesEvent
     data class SetFrequency(val frequency: Frequency) : RoutinesEvent
     data class SetShareType(val shareType: ShareType) : RoutinesEvent
     data class SetLanguage(val language: Language) : RoutinesEvent
 
-    data class SetSelectedRoutineDTO(val selectedRoutineDTO: RoutineDTO) : RoutinesEvent
+    data class SetSelectedRoutineDTO(val routineDTO: RoutineDTO) : RoutinesEvent
     data object ResetSelectedRoutineDTO : RoutinesEvent
+
+    data class HandleExercise(val exercise: Exercise, val selected: Boolean) : RoutinesEvent
+    data object ClearExercisesLists : RoutinesEvent
+
+    data class RemoveRoutineExerciseDTO(val routineExerciseDTO: RoutineExerciseDTO) : RoutinesEvent
+    data object ApplyExercises : RoutinesEvent
+
+    data class AddRoutineExerciseSet(val routineExercise: RoutineExercise) : RoutinesEvent
+
+    data class RemoveRoutineExerciseSet(
+        val routineExercise: RoutineExercise,
+        val routineExerciseSetDTO: RoutineExerciseSetDTO
+    ) : RoutinesEvent
+
+    data class UpdateRoutineExerciseSet(
+        val routineExerciseSetDTO: RoutineExerciseSetDTO,
+        val routineExercise: RoutineExercise
+    ) : RoutinesEvent
 
     data class DeleteRoutineDTO(val routineDTO: Routine) : RoutinesEvent
 
     data class SetSearchValue(val searchValue: String) : RoutinesEvent
-
     data class SetEditType(val editType: EditType) : RoutinesEvent
 }

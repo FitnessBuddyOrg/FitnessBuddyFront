@@ -4,22 +4,22 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 
 class NavigationViewModel : ViewModel() {
-    private val _title = MutableStateFlow("")
     private val _state = MutableStateFlow(NavigationState())
+    val state =
+        _state.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), NavigationState())
 
-    val state = combine(
-        _state,
-        _title
-    ) { state, title ->
-        state.copy(
-            title = title
-        )
-    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), NavigationState())
+//    val state = combine(
+//        _state,
+//        _title
+//    ) { state, title ->
+//        state.copy(
+//            title = title
+//        )
+//    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), NavigationState())
 
     fun onEvent(navigationEvent: NavigationEvent) {
         when (navigationEvent) {
@@ -31,10 +31,6 @@ class NavigationViewModel : ViewModel() {
                 }
             }
 
-            is NavigationEvent.SetTitle -> {
-                _title.value = navigationEvent.title
-            }
-
             is NavigationEvent.UpdateTitleWidget -> {
                 _state.update {
                     it.copy(
@@ -43,34 +39,31 @@ class NavigationViewModel : ViewModel() {
                 }
             }
 
-//            is NavigationEvent.SetSearchValue -> {
-//                _state.update {
-//                    it.copy(
-//                        searchValue = navigationEvent.searchValue
-//                    )
-//                }
-//            }
-//
-//            is NavigationEvent.ClearSearchValue -> {
-//                _state.update {
-//                    it.copy(
-//                        searchValue = ""
-//                    )
-//                }
-//            }
-//
-            is NavigationEvent.DisableAllButtons -> {
+            is NavigationEvent.SetBackButton -> {
                 _state.update {
                     it.copy(
-                        backButtonEnabled = false,
+                        iconButton = {
+                            BackButton(
+                                navigationEvent.navController,
+                                navigationEvent.onClick
+                            )
+                        }
                     )
                 }
             }
 
-            is NavigationEvent.EnableBackButton -> {
+            is NavigationEvent.DisableCustomButton -> {
                 _state.update {
                     it.copy(
-                        backButtonEnabled = true
+                        customButtonEnabled = false,
+                    )
+                }
+            }
+
+            is NavigationEvent.EnableCustomButton -> {
+                _state.update {
+                    it.copy(
+                        customButtonEnabled = true
                     )
                 }
             }

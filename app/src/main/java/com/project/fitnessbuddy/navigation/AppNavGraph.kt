@@ -3,7 +3,6 @@ package com.project.fitnessbuddy.navigation
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.BrowseGallery
 import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.FitnessCenter
@@ -52,6 +51,7 @@ import com.project.fitnessbuddy.screens.exercises.ExercisesViewModel
 import com.project.fitnessbuddy.screens.exercises.ViewExerciseScreen
 import com.project.fitnessbuddy.screens.profile.ProfileScreen
 import com.project.fitnessbuddy.screens.routines.AddEditRoutineScreen
+import com.project.fitnessbuddy.screens.routines.AddExercisesScreen
 import com.project.fitnessbuddy.screens.routines.RoutinesScreen
 import com.project.fitnessbuddy.screens.routines.RoutinesState
 import com.project.fitnessbuddy.screens.routines.RoutinesViewModel
@@ -102,6 +102,7 @@ fun AppNavGraph(
     val routinesRoute = stringResource(id = R.string.routines_route)
     val routinesOverviewRoute = stringResource(id = R.string.routines_overview_route)
     val addEditRoutineRoute = stringResource(id = R.string.add_edit_routine_route)
+    val addExercisesRoute = stringResource(id = R.string.add_exercises_route)
     val viewRoutineRoute = stringResource(id = R.string.view_routine_route)
 
     val progressCalendarRoute = stringResource(id = R.string.progress_calendar_route)
@@ -218,6 +219,22 @@ fun AppNavGraph(
                     }
                 ),
                 AppRoute(
+                    routeName = addExercisesRoute,
+                    name = stringResource(id = R.string.add_exercises_route),
+                    screen = {
+                        AddExercisesScreen(
+                            navigationState = navigationState,
+                            navigationViewModel = navigationViewModel,
+                            exercisesState = exercisesState,
+                            exercisesViewModel = exercisesViewModel,
+                            routinesState = routinesState,
+                            routinesViewModel = routinesViewModel,
+                            parametersState = parametersState,
+                            parametersViewModel = parametersViewModel,
+                        )
+                    }
+                ),
+                AppRoute(
                     routeName = viewRoutineRoute,
                     name = stringResource(id = R.string.view_routine),
                     screen = {
@@ -246,31 +263,27 @@ fun AppNavGraph(
     )
 
     if (userState.isLoggedIn || bypassLogin) {
-        ModalNavigationDrawer(drawerContent = {
-            AppDrawer(
-                route = currentRoute,
-                closeDrawer = { coroutineScope.launch { drawerState.close() } },
-                appRoutes = appRoutes,
-                navController = navController,
-                modifier = Modifier,
-                userState = userState
-            )
-        }, drawerState = drawerState) {
+        ModalNavigationDrawer(
+            drawerContent = {
+                AppDrawer(
+                    route = currentRoute,
+                    closeDrawer = { coroutineScope.launch { drawerState.close() } },
+                    appRoutes = appRoutes,
+                    navController = navController,
+                    modifier = Modifier,
+                    userState = userState
+                )
+            }, gesturesEnabled = false,
+            drawerState = drawerState
+        ) {
             Scaffold(
                 topBar = {
                     TopAppBar(
                         title = navigationState.titleWidget,
                         modifier = Modifier.fillMaxWidth(),
                         navigationIcon = {
-                            if (navigationState.backButtonEnabled) {
-                                IconButton(onClick = {
-                                    navController.navigateUp()
-                                }, content = {
-                                    Icon(
-                                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                                        contentDescription = null
-                                    )
-                                })
+                            if (navigationState.customButtonEnabled) {
+                                navigationState.iconButton.invoke()
                             } else {
                                 IconButton(onClick = {
                                     coroutineScope.launch { drawerState.open() }
@@ -282,23 +295,6 @@ fun AppNavGraph(
                             }
                         },
                         actions = {
-//                            if (navigationState.searchButtonEnabled) {
-//                                SearchButton(
-//                                    navigationState = navigationState,
-//                                    navigationViewModel = navigationViewModel,
-//                                    exercisesState = exercisesState,
-//                                    exercisesViewModel = exercisesViewModel,
-//                                )
-//                            }
-//                            if (navigationState.addButtonEnabled) {
-//                                CreateButton(navigationState, exercisesViewModel)
-//                            }
-//                            if (navigationState.editButtonEnabled) {
-//                                EditButton(navigationState, exercisesViewModel)
-//                            }
-//                            if (navigationState.deleteButtonEnabled) {
-//                                DeleteButton(navigationState)
-//                            }
                             navigationState.topBarActions.forEach { action ->
                                 action()
                             }

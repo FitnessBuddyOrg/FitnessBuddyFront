@@ -45,7 +45,7 @@
     <string name="english">Английский</string>
     <string name="french">Французский</string>
     <string name="russian">Русский</string>
-    <string name="ok">Ок</string>
+    <string name="ok">ОК</string>
     <string name="last_performed">Last performed</string>
     <string name="add_edit_routine">Add Edit Routine</string>
     <string name="view_routine">View Routine</string>
@@ -58,4 +58,12 @@
     <string name="savednt_exercise">Could Not Save Exercise</string>
     <string name="saved_routine">Saved Routine</string>
     <string name="savednt_routine">Could Not Save Routine</string>
+    <string name="add_exercises">Add Exercises</string>
+    <string name="updated_exercise">Updated Exercise</string>
+    <string name="updatednt_exercise">Could Not Update Exercise</string>
+    <string name="updated_routine">Updated Routine</string>
+    <string name="updatednt_routine">Could Not Update Routine</string>
+    <string name="weight">Weight</string>
+    <string name="reps">Reps</string>
+    <string name="add_set">Add Set</string>
 </resources>

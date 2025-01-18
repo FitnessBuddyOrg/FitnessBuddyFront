@@ -6,6 +6,11 @@ import com.project.fitnessbuddy.database.dao.RoutineDao
 import com.project.fitnessbuddy.database.dao.RoutineExerciseDao
 import com.project.fitnessbuddy.database.dao.RoutineExerciseSetDao
 import com.project.fitnessbuddy.database.dto.RoutineDTO
+import com.project.fitnessbuddy.database.dto.RoutineExerciseDTO
+import com.project.fitnessbuddy.database.dto.RoutineExerciseSetDTO
+import com.project.fitnessbuddy.database.entity.RoutineExercise
+import com.project.fitnessbuddy.database.entity.RoutineExerciseSet
+import com.project.fitnessbuddy.navigation.EditType
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -27,7 +32,6 @@ class RoutinesViewModel(
         _searchValue
     ) { (searchValue) ->
         routineDao.getRoutineDTOs(searchValue)
-
     }
         .flatMapLatest { it }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), emptyList())
@@ -52,7 +56,7 @@ class RoutinesViewModel(
             is RoutinesEvent.SetSelectedRoutineDTO -> {
                 _state.update {
                     it.copy(
-                        selectedRoutineDTO = routinesEvent.selectedRoutineDTO
+                        selectedRoutineDTO = routinesEvent.routineDTO
                     )
                 }
             }
@@ -79,23 +83,39 @@ class RoutinesViewModel(
                 }
             }
 
-            is RoutinesEvent.SaveRoutine -> {
+            is RoutinesEvent.UpsertRoutine -> {
                 if (_state.value.selectedRoutineDTO.routine.name.isBlank()) {
                     return false
                 }
 
+                fun checkId(newId: Long, oldId: Long?): Long {
+                    return if (newId == -1L && oldId != null) {
+                        oldId
+                    } else {
+                        newId
+                    }
+                }
+
                 viewModelScope.launch {
+                    // DELETE EXISTING ROUTINE
+                    if (_state.value.editType == EditType.EDIT) {
+                        routineDao.delete(_state.value.selectedRoutineDTO.routine)
+                    }
 
                     // INSERT ROUTINE
                     _state.update {
                         it.copy(
                             selectedRoutineDTO = it.selectedRoutineDTO.copy(
                                 routine = it.selectedRoutineDTO.routine.copy(
-                                    routineId = routineDao.upsert(_state.value.selectedRoutineDTO.routine)
+                                    routineId = checkId(
+                                        routineDao.upsert(_state.value.selectedRoutineDTO.routine),
+                                        it.selectedRoutineDTO.routine.routineId
+                                    )
                                 )
                             )
                         )
                     }
+
 
                     // SET ROUTINE ID FOR EVERY ROUTINE EXERCISE
                     _state.update {
@@ -104,7 +124,7 @@ class RoutinesViewModel(
                                 routineExerciseDTOs = it.selectedRoutineDTO.routineExerciseDTOs.map { routineExerciseDTO ->
                                     routineExerciseDTO.copy(
                                         routineExercise = routineExerciseDTO.routineExercise.copy(
-                                            routineId = _state.value.selectedRoutineDTO.routine.routineId!!
+                                            routineId = _state.value.selectedRoutineDTO.routine.routineId
                                         )
                                     )
                                 }
@@ -119,8 +139,9 @@ class RoutinesViewModel(
                                 routineExerciseDTOs = it.selectedRoutineDTO.routineExerciseDTOs.map { routineExerciseDTO ->
                                     routineExerciseDTO.copy(
                                         routineExercise = routineExerciseDTO.routineExercise.copy(
-                                            routineExerciseId = routineExerciseDao.upsert(
-                                                routineExerciseDTO.routineExercise
+                                            routineExerciseId = checkId(
+                                                routineExerciseDao.upsert(routineExerciseDTO.routineExercise),
+                                                routineExerciseDTO.routineExercise.routineExerciseId
                                             )
                                         )
                                     )
@@ -135,9 +156,11 @@ class RoutinesViewModel(
                             selectedRoutineDTO = it.selectedRoutineDTO.copy(
                                 routineExerciseDTOs = it.selectedRoutineDTO.routineExerciseDTOs.map { routineExerciseDTO ->
                                     routineExerciseDTO.copy(
-                                        routineExerciseSets = routineExerciseDTO.routineExerciseSets.map { routineExerciseSet ->
-                                            routineExerciseSet.copy(
-                                                routineExerciseId = routineExerciseDTO.routineExercise.routineExerciseId!!
+                                        routineExerciseSetDTOs = routineExerciseDTO.routineExerciseSetDTOs.map { routineExerciseSetDTO ->
+                                            routineExerciseSetDTO.copy(
+                                                routineExerciseSet = routineExerciseSetDTO.routineExerciseSet.copy(
+                                                    routineExerciseId = routineExerciseDTO.routineExercise.routineExerciseId!!
+                                                )
                                             )
                                         }
                                     )
@@ -152,10 +175,15 @@ class RoutinesViewModel(
                             selectedRoutineDTO = it.selectedRoutineDTO.copy(
                                 routineExerciseDTOs = it.selectedRoutineDTO.routineExerciseDTOs.map { routineExerciseDTO ->
                                     routineExerciseDTO.copy(
-                                        routineExerciseSets = routineExerciseDTO.routineExerciseSets.map { routineExerciseSet ->
-                                            routineExerciseSet.copy(
-                                                routineExerciseSetId = routineExerciseSetDao.upsert(
-                                                    routineExerciseSet
+                                        routineExerciseSetDTOs = routineExerciseDTO.routineExerciseSetDTOs.map { routineExerciseSetDTO ->
+                                            routineExerciseSetDTO.copy(
+                                                routineExerciseSet = routineExerciseSetDTO.routineExerciseSet.copy(
+                                                    routineExerciseSetId = checkId(
+                                                        routineExerciseSetDao.upsert(
+                                                            routineExerciseSetDTO.routineExerciseSet
+                                                        ),
+                                                        routineExerciseSetDTO.routineExerciseSet.routineExerciseSetId
+                                                    )
                                                 )
                                             )
                                         }
@@ -164,18 +192,6 @@ class RoutinesViewModel(
                             )
                         )
                     }
-                }
-
-                RoutinesEvent.ResetSelectedRoutineDTO
-            }
-
-            is RoutinesEvent.UpdateRoutine -> {
-                if (_state.value.selectedRoutineDTO.routine.name.isBlank()) {
-                    return false
-                }
-
-                viewModelScope.launch {
-                    routineDao.upsert(_state.value.selectedRoutineDTO.routine)
                 }
             }
 
@@ -227,7 +243,173 @@ class RoutinesViewModel(
                 }
             }
 
+            is RoutinesEvent.HandleExercise -> {
+                val exerciseExistsInObject =
+                    _state.value.selectedRoutineDTO.routineExerciseDTOs.find {
+                        it.routineExercise.exerciseId == routinesEvent.exercise.exerciseId
+                    } != null
+
+                if (exerciseExistsInObject) {
+                    if (routinesEvent.selected) {
+                        _state.value.existingExercisesToRemove.remove(routinesEvent.exercise)
+
+                    } else {
+                        _state.value.existingExercisesToRemove.add(routinesEvent.exercise)
+                    }
+                } else {
+                    if (routinesEvent.selected) {
+                        _state.value.potentialExercisesToAdd.add(routinesEvent.exercise)
+                    } else {
+                        _state.value.potentialExercisesToAdd.remove(routinesEvent.exercise)
+                    }
+                }
+            }
+
+
+            is RoutinesEvent.ApplyExercises -> {
+                _state.update {
+                    it.copy(
+                        selectedRoutineDTO = it.selectedRoutineDTO.copy(
+                            routineExerciseDTOs = it.selectedRoutineDTO.routineExerciseDTOs + it.potentialExercisesToAdd.map { exercise ->
+                                RoutineExerciseDTO(
+                                    routineExercise = RoutineExercise(
+                                        routineId = it.selectedRoutineDTO.routine.routineId,
+                                        exerciseId = exercise.exerciseId!!
+                                    ),
+                                    exercise = exercise,
+                                    routineExerciseSetDTOs = listOf(
+                                        RoutineExerciseSetDTO(
+                                            routineExerciseSet = RoutineExerciseSet(
+                                                weight = 0,
+                                                reps = 0
+                                            )
+                                        )
+                                    )
+                                )
+                            }
+                        )
+                    )
+                }
+
+                for (exercise in _state.value.existingExercisesToRemove) {
+                    val routineExerciseDTO: RoutineExerciseDTO? =
+                        _state.value.selectedRoutineDTO.routineExerciseDTOs.find {
+                            it.routineExercise.exerciseId == exercise.exerciseId
+                        }
+                    if (routineExerciseDTO != null) {
+                        _state.update {
+                            it.copy(
+                                selectedRoutineDTO = it.selectedRoutineDTO.copy(
+                                    routineExerciseDTOs = it.selectedRoutineDTO.routineExerciseDTOs - routineExerciseDTO
+                                )
+                            )
+                        }
+                    }
+                }
+
+                onEvent(RoutinesEvent.ClearExercisesLists)
+            }
+
+            is RoutinesEvent.ClearExercisesLists -> {
+                _state.value.potentialExercisesToAdd.clear()
+                _state.value.existingExercisesToRemove.clear()
+            }
+
+            is RoutinesEvent.AddRoutineExerciseSet -> {
+                _state.update {
+                    it.copy(
+                        selectedRoutineDTO = it.selectedRoutineDTO.copy(
+                            routineExerciseDTOs = it.selectedRoutineDTO.routineExerciseDTOs.map { routineExerciseDTO ->
+                                if (routineExerciseDTO.routineExercise.exerciseId == routinesEvent.routineExercise.exerciseId) {
+                                    val newRoutineExerciseDTO = RoutineExerciseSetDTO(
+                                        routineExerciseSet = RoutineExerciseSet(
+                                            weight = 0,
+                                            reps = 0
+                                        )
+                                    )
+
+                                    println("created temp id: ${newRoutineExerciseDTO.tempId}")
+
+                                    routineExerciseDTO.copy(
+                                        routineExerciseSetDTOs = routineExerciseDTO.routineExerciseSetDTOs + newRoutineExerciseDTO
+                                    )
+                                } else {
+                                    routineExerciseDTO
+                                }
+                            }
+                        )
+                    )
+                }
+
+            }
+
+            is RoutinesEvent.RemoveRoutineExerciseDTO -> {
+                println("going to remove exercise: ${routinesEvent.routineExerciseDTO.exercise}")
+                println("going to remove sets: ${routinesEvent.routineExerciseDTO.routineExerciseSetDTOs}")
+                _state.update {
+                    it.copy(
+                        selectedRoutineDTO = it.selectedRoutineDTO.copy(
+                            routineExerciseDTOs = it.selectedRoutineDTO.routineExerciseDTOs - routinesEvent.routineExerciseDTO
+                        )
+                    )
+                }
+            }
+
+            is RoutinesEvent.RemoveRoutineExerciseSet -> {
+                _state.update {
+                    it.copy(
+                        selectedRoutineDTO = it.selectedRoutineDTO.copy(
+                            routineExerciseDTOs = it.selectedRoutineDTO.routineExerciseDTOs.map { routineExerciseDTO ->
+                                if (routineExerciseDTO.routineExercise.exerciseId == routinesEvent.routineExercise.exerciseId) {
+                                    routineExerciseDTO.copy(
+                                        routineExerciseSetDTOs = routineExerciseDTO.routineExerciseSetDTOs - routinesEvent.routineExerciseSetDTO
+                                    )
+                                } else {
+                                    routineExerciseDTO
+                                }
+                            }
+                        )
+                    )
+                }
+
+                val routineExerciseDTO = _state.value.selectedRoutineDTO.routineExerciseDTOs.find {
+                    it.routineExercise.exerciseId == routinesEvent.routineExercise.exerciseId
+                }
+
+                if (routineExerciseDTO?.routineExerciseSetDTOs.isNullOrEmpty()) {
+                    routineExerciseDTO?.let {
+                        onEvent(RoutinesEvent.RemoveRoutineExerciseDTO(it))
+                    }
+                }
+            }
+
+            is RoutinesEvent.UpdateRoutineExerciseSet -> {
+                _state.update {
+                    it.copy(
+                        selectedRoutineDTO = it.selectedRoutineDTO.copy(
+                            routineExerciseDTOs = it.selectedRoutineDTO.routineExerciseDTOs.map { routineExerciseDTO ->
+                                if (routineExerciseDTO.routineExercise.exerciseId == routinesEvent.routineExercise.exerciseId) {
+                                    routineExerciseDTO.copy(
+                                        routineExerciseSetDTOs = routineExerciseDTO.routineExerciseSetDTOs.map { routineExerciseSetDTO ->
+                                            if (routineExerciseSetDTO.tempId == routinesEvent.routineExerciseSetDTO.tempId) {
+                                                routinesEvent.routineExerciseSetDTO
+                                            } else {
+                                                routineExerciseSetDTO
+                                            }
+                                        }
+                                    )
+                                } else {
+                                    routineExerciseDTO
+                                }
+                            }
+                        )
+                    )
+                }
+            }
         }
         return true
+
     }
 }
+
+

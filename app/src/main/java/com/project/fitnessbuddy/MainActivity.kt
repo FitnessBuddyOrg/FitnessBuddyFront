@@ -125,7 +125,7 @@ class MainActivity : ComponentActivity() {
                     return RoutinesViewModel(
                         routineDao = db.routineDao,
                         routineExerciseDao = db.routineExerciseDao,
-                        routineExerciseSetDao = db.routineExerciseSetDao
+                        routineExerciseSetDao = db.routineExerciseSetDao,
                     ) as T
                 }
             }

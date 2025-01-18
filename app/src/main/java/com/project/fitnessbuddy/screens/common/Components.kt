@@ -1,24 +1,46 @@
 package com.project.fitnessbuddy.screens.common
 
+import android.content.Context
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Check
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.RadioButton
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -26,12 +48,24 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import com.project.fitnessbuddy.R
+import com.project.fitnessbuddy.database.entity.Exercise
+import com.project.fitnessbuddy.database.entity.abstracts.ListedEntity
+import com.project.fitnessbuddy.navigation.MediumTextWidget
+import com.project.fitnessbuddy.screens.exercises.SortType
+import androidx.compose.ui.text.TextStyle
 
 @Composable
 fun DefaultTextField(label: String, value: String, onValueChange: (String) -> Unit) {
@@ -43,6 +77,78 @@ fun DefaultTextField(label: String, value: String, onValueChange: (String) -> Un
             Text(text = label, style = MaterialTheme.typography.labelSmall)
         }
     )
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun CustomTextField(
+    value: String,
+    onValueChange: (String) -> Unit,
+    trailingIcon: @Composable (() -> Unit)? = null,
+    placeholder: @Composable (() -> Unit)? = null,
+    modifier: Modifier = Modifier,
+    keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
+    textStyle: TextStyle = TextStyle.Default,
+    insidePadding: PaddingValues
+) {
+    BasicTextField(
+        value = value,
+        onValueChange = onValueChange,
+        singleLine = true,
+        textStyle = textStyle,
+        keyboardOptions = keyboardOptions,
+        cursorBrush = SolidColor(MaterialTheme.colorScheme.tertiary),
+        modifier = modifier
+            .fillMaxWidth()
+            .fillMaxHeight(),
+        decorationBox = { innerTextField ->
+            TextFieldDefaults.DecorationBox(
+                value = value,
+                innerTextField = innerTextField,
+                enabled = true,
+                singleLine = true,
+                visualTransformation = VisualTransformation.None,
+                interactionSource = remember { MutableInteractionSource() },
+                contentPadding = insidePadding,
+                shape = RoundedCornerShape(8.dp),
+                colors = TextFieldDefaults.colors(
+                    focusedIndicatorColor = Color.Transparent,
+                    unfocusedIndicatorColor = Color.Transparent
+                ),
+                placeholder = placeholder,
+                trailingIcon = trailingIcon
+            )
+        }
+    )
+}
+
+@Composable
+fun CustomIntegerField(
+    value: String,
+    onValueChange: (Int?) -> Unit,
+    trailingIcon: @Composable (() -> Unit)? = null,
+    modifier: Modifier = Modifier,
+    textStyle: TextStyle = TextStyle.Default,
+    insidePadding: PaddingValues
+) {
+    CustomTextField(
+        value = value,
+        onValueChange = { newValue ->
+            if(newValue.isNotEmpty() && newValue.toIntOrNull() != null) {
+                onValueChange(newValue.toInt())
+            } else {
+                onValueChange(null)
+            }
+        },
+        keyboardOptions = KeyboardOptions.Default.copy(
+            keyboardType = KeyboardType.Number
+        ),
+        trailingIcon = trailingIcon,
+        modifier = modifier,
+        textStyle = textStyle,
+        insidePadding = insidePadding
+    )
+
 }
 
 @Composable
@@ -64,16 +170,79 @@ fun DefaultTextArea(label: String, value: String, onValueChange: (String) -> Uni
     )
 }
 
-fun countryCodeToFlag(countryCode: String): String {
-    if (countryCode.length != 2) return ""
-    val codePoints = countryCode.uppercase().map {
-        it.code + 0x1F1A5
+@Composable
+fun SleekButton(text: String, onClick: () -> Unit) {
+    Button(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(8.dp),
+        colors = ButtonDefaults.buttonColors(
+            containerColor = Color.Transparent,
+            contentColor = MaterialTheme.colorScheme.tertiary
+        ),
+        shape = RectangleShape,
+        onClick = onClick
+    ) {
+        MediumTextWidget(
+            text = text.uppercase()
+        )
     }
-    return String(codePoints.toIntArray(), 0, codePoints.size)
 }
 
 @Composable
+fun ValidationFloatingActionButton(
+    context: Context,
+    onClick: () -> Boolean = ({ false }),
+    onSuccess: () -> Unit = {},
+    successMessage: String = "",
+    onFailure: () -> Unit = {},
+    failureMessage: String = "",
+    toasting: Boolean = true,
+) {
+    fun successToast(context: Context, message: String) {
+        Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
+    }
+
+    fun failureToast(context: Context, message: String) {
+        Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
+    }
+
+    IconButton(
+        modifier = Modifier
+            .size(60.dp)
+            .clip(CircleShape)
+            .background(MaterialTheme.colorScheme.primary),
+        onClick = {
+            val succeeded = onClick()
+            if (succeeded && toasting) {
+                onSuccess()
+                successToast(context, successMessage)
+            } else if (toasting) {
+                onFailure()
+                failureToast(context, failureMessage)
+            }
+        },
+    ) {
+        Icon(
+            modifier = Modifier.size(30.dp),
+            imageVector = Icons.Default.Check,
+            contentDescription = "Save",
+            tint = MaterialTheme.colorScheme.onPrimary
+        )
+    }
+}
+
+
+@Composable
 fun CountryFlagComposable(localeString: String, displayValue: String) {
+    fun countryCodeToFlag(countryCode: String): String {
+        if (countryCode.length != 2) return ""
+        val codePoints = countryCode.uppercase().map {
+            it.code + 0x1F1A5
+        }
+        return String(codePoints.toIntArray(), 0, codePoints.size)
+    }
+
     Row(
         modifier = Modifier
             .padding(end = 8.dp)
@@ -132,8 +301,7 @@ fun <T, V : StoredValue<T>> DialogRadioButtonList(
         Text(
             modifier = Modifier
                 .align(Alignment.CenterVertically)
-                .weight(1f)
-                .padding(start = 8.dp),
+                .weight(1f),
             text = label,
             style = MaterialTheme.typography.labelMedium,
         )
@@ -207,3 +375,98 @@ class StoredLanguageValue<T>(
     override val displayValue: String,
     val localeString: String
 ) : StoredValue<T>(value, displayValue)
+
+@Composable
+fun <T : ListedEntity> AlphabeticallyGroupedWidgetList(
+    itemsList: List<T>,
+    widget: @Composable (T) -> Unit,
+    parametersState: ParametersState,
+
+    onClick: (StoredValue<SortType>) -> Unit = {},
+    sortingState: SortingState? = null,
+    floatingActionButton: @Composable () -> Unit = {},
+    verticalArrangement: Arrangement.Vertical = Arrangement.spacedBy(0.dp)
+) {
+    val context = LocalContext.current
+
+
+    Scaffold(
+        modifier = Modifier
+            .fillMaxSize(),
+        floatingActionButton = floatingActionButton
+    ) { padding ->
+        LazyColumn(
+            modifier = Modifier.fillMaxSize(),
+            contentPadding = padding,
+            verticalArrangement = verticalArrangement
+        ) {
+            if (sortingState != null) {
+                item {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .horizontalScroll(rememberScrollState()),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.SpaceEvenly
+                    ) {
+                        SortType.entries.map { StoredValue(it, stringResource(it.resourceId)) }
+                            .forEach { storedValue ->
+                                Row(
+                                    modifier = Modifier
+                                        .weight(0.5f)
+                                        .pointerInput(Unit) {
+                                            detectTapGestures(onPress = { onClick(storedValue) })
+                                        },
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    horizontalArrangement = Arrangement.Center
+                                ) {
+                                    RadioButton(
+                                        selected = sortingState.sortType == storedValue.value,
+                                        onClick = { onClick(storedValue) },
+                                    )
+                                    Text(
+                                        text = storedValue.displayValue.uppercase(),
+                                        style = MaterialTheme.typography.labelSmall,
+                                    )
+                                }
+                            }
+                    }
+                }
+            }
+
+            itemsList
+                .filter { (it.language.name == parametersState.languageParameter.value) || it.language.isCustom }
+                .groupBy {
+                    if (sortingState != null) {
+                        when (sortingState.sortType) {
+                            SortType.NAME -> it.name.first().uppercase()
+                            SortType.CATEGORY -> {
+                                if (it is Exercise) {
+                                    context.getString(it.category.resourceId)
+                                } else {
+                                    ""
+                                }
+                            }
+                        }
+                    } else {
+                        it.name.first().uppercase()
+                    }
+                }
+                .toSortedMap()
+                .forEach { (letter, exercisesInGroup) ->
+                    item {
+                        Text(
+                            text = letter.toString(),
+                            style = MaterialTheme.typography.labelSmall,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(start = 16.dp, top = 12.dp, bottom = 12.dp)
+                        )
+                    }
+                    items(exercisesInGroup) { exercise ->
+                        widget(exercise)
+                    }
+                }
+        }
+    }
+}

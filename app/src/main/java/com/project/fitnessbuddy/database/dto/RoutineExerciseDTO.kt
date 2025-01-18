@@ -18,7 +18,8 @@ data class RoutineExerciseDTO(
 
     @Relation(
         parentColumn = "routine_exercise_id",
-        entityColumn = "routine_exercise_id"
+        entityColumn = "routine_exercise_id",
+        entity = RoutineExerciseSet::class
     )
-    val routineExerciseSets: List<RoutineExerciseSet> = emptyList()
+    val routineExerciseSetDTOs: List<RoutineExerciseSetDTO> = emptyList()
 )

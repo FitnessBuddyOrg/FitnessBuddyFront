@@ -7,8 +7,7 @@ import com.project.fitnessbuddy.navigation.EditType
 import com.project.fitnessbuddy.database.entity.enums.Language
 
 sealed interface ExercisesEvent {
-    data object SaveExercise : ExercisesEvent
-    data object UpdateExercise : ExercisesEvent
+    data object UpsertExercise : ExercisesEvent
 
     data class SetName(val name: String) : ExercisesEvent
     data class SetInstructions(val instructions: String) : ExercisesEvent

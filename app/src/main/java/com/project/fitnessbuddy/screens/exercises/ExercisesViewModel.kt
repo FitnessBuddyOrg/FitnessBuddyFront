@@ -83,19 +83,7 @@ class ExercisesViewModel(
                 }
             }
 
-            is ExercisesEvent.SaveExercise -> {
-                if (_state.value.selectedExercise.name.isBlank()) {
-                    return false
-                }
-
-                viewModelScope.launch {
-                    exerciseDao.upsert(_state.value.selectedExercise)
-                }
-
-                ExercisesEvent.ResetSelectedExercise
-            }
-
-            is ExercisesEvent.UpdateExercise -> {
+            is ExercisesEvent.UpsertExercise -> {
                 if (_state.value.selectedExercise.name.isBlank()) {
                     return false
                 }
