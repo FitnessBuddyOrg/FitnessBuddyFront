@@ -3,7 +3,7 @@ MUST:
 - [ ] handle errors in login and registration
 - [ ] users statistics for admin
 - [x] user statistics for user (including screen time)
-- [ ] user profile page
+- [x] user profile page
 - [ ] sharing exercises with other users
 - [ ] changing languages
 - [ ] unit test
