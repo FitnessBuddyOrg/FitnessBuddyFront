@@ -16,10 +16,6 @@ data class RoutineDTO(
     )
     val routineExerciseDTOs: List<RoutineExerciseDTO> = emptyList()
 ) : ListedEntity {
-    fun getLastPerformed(): String {
-        return routine.lastPerformed?.toString() ?: ""
-    }
-
     override val name get() = routine.name
     override val language get() = routine.language
     override val shareType get() = routine.shareType

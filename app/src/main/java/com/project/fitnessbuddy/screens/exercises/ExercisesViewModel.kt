@@ -81,6 +81,7 @@ class ExercisesViewModel(
                 viewModelScope.launch {
                     exerciseDao.delete(exercisesEvent.exercise)
                 }
+                onEvent(ExercisesEvent.ResetSelectedExercise)
             }
 
             is ExercisesEvent.UpsertExercise -> {

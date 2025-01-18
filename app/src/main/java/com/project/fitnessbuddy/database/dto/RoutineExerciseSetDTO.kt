@@ -10,7 +10,10 @@ data class RoutineExerciseSetDTO @JvmOverloads constructor(
     val routineExerciseSet: RoutineExerciseSet,
 
     @Ignore
-    var tempId: Long = generateRandomLong()
+    var tempId: Long = generateRandomLong(),
+
+    @Ignore
+    var checked: Boolean = false
 ) {
     val weight get(): Int = routineExerciseSet.weight
     val reps get(): Int = routineExerciseSet.reps

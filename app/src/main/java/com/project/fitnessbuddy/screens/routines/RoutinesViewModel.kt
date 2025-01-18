@@ -19,6 +19,7 @@ import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import java.util.Date
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class RoutinesViewModel(
@@ -28,22 +29,28 @@ class RoutinesViewModel(
 ) : ViewModel() {
     private val _searchValue = MutableStateFlow("")
 
-    private val _routineDTOs = combine(
+    private val _templateRoutineDTOs = combine(
         _searchValue
     ) { (searchValue) ->
-        routineDao.getRoutineDTOs(searchValue)
+        routineDao.getTemplateRoutineDTOs(searchValue)
     }
         .flatMapLatest { it }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), emptyList())
+
+    private val _completedRoutineDTOs =
+        routineDao.getCompletedRoutineDTOs()
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), emptyList())
 
     private val _state = MutableStateFlow(RoutinesState())
     val state = combine(
         _state,
-        _routineDTOs,
+        _templateRoutineDTOs,
+        _completedRoutineDTOs,
         _searchValue
-    ) { state, routineDTOs, searchValue ->
+    ) { state, templateRoutineDTOs, completedRoutineDTOs, searchValue ->
         state.copy(
-            routineDTOs = routineDTOs,
+            templateRoutineDTOs = templateRoutineDTOs,
+            completedRoutineDTOs = completedRoutineDTOs,
             searchValue = searchValue
         )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), RoutinesState())
@@ -77,14 +84,17 @@ class RoutinesViewModel(
                 }
             }
 
-            is RoutinesEvent.DeleteRoutineDTO -> {
+            is RoutinesEvent.DeleteRoutine -> {
                 viewModelScope.launch {
-                    routineDao.delete(routinesEvent.routineDTO)
+                    routineDao.delete(routinesEvent.routine)
                 }
+                onEvent(RoutinesEvent.ResetSelectedRoutineDTO)
             }
 
-            is RoutinesEvent.UpsertRoutine -> {
-                if (_state.value.selectedRoutineDTO.routine.name.isBlank()) {
+            is RoutinesEvent.UpsertSelectedRoutineDTO -> {
+                if (_state.value.selectedRoutineDTO.routine.name.isBlank() ||
+                    _state.value.selectedRoutineDTO.routineExerciseDTOs.isEmpty()
+                ) {
                     return false
                 }
 
@@ -192,6 +202,98 @@ class RoutinesViewModel(
                             )
                         )
                     }
+                }
+            }
+
+            is RoutinesEvent.UpsertRoutineDTO -> {
+                var routineDTO = routinesEvent.routineDTO
+
+                if (routineDTO.routine.name.isBlank() ||
+                    routineDTO.routineExerciseDTOs.isEmpty()
+                ) {
+                    return false
+                }
+
+                fun checkId(newId: Long, oldId: Long?): Long {
+                    return if (newId == -1L && oldId != null) {
+                        oldId
+                    } else {
+                        newId
+                    }
+                }
+
+                viewModelScope.launch {
+                    routineDao.delete(routineDTO.routine)
+
+                    // INSERT ROUTINE
+                    routineDTO = routineDTO.copy(
+                        routine = routineDTO.routine.copy(
+                            routineId = checkId(
+                                routineDao.upsert(routineDTO.routine),
+                                routineDTO.routine.routineId
+                            )
+                        )
+                    )
+
+                    // SET ROUTINE ID FOR EVERY ROUTINE EXERCISE
+                    routineDTO = routineDTO.copy(
+                        routineExerciseDTOs = routineDTO.routineExerciseDTOs.map { routineExerciseDTO ->
+                            routineExerciseDTO.copy(
+                                routineExercise = routineExerciseDTO.routineExercise.copy(
+                                    routineId = routineDTO.routine.routineId
+                                )
+                            )
+                        }
+                    )
+
+                    // INSERT ROUTINE EXERCISES
+                    routineDTO = routineDTO.copy(
+                        routineExerciseDTOs = routineDTO.routineExerciseDTOs.map { routineExerciseDTO ->
+                            routineExerciseDTO.copy(
+                                routineExercise = routineExerciseDTO.routineExercise.copy(
+                                    routineExerciseId = checkId(
+                                        routineExerciseDao.upsert(routineExerciseDTO.routineExercise),
+                                        routineExerciseDTO.routineExercise.routineExerciseId
+                                    )
+                                )
+                            )
+                        }
+                    )
+
+                    // SET ROUTINE EXERCISE ID FOR EVERY ROUTINE EXERCISE SET
+                    routineDTO = routineDTO.copy(
+                        routineExerciseDTOs = routineDTO.routineExerciseDTOs.map { routineExerciseDTO ->
+                            routineExerciseDTO.copy(
+                                routineExerciseSetDTOs = routineExerciseDTO.routineExerciseSetDTOs.map { routineExerciseSetDTO ->
+                                    routineExerciseSetDTO.copy(
+                                        routineExerciseSet = routineExerciseSetDTO.routineExerciseSet.copy(
+                                            routineExerciseId = routineExerciseDTO.routineExercise.routineExerciseId!!
+                                        )
+                                    )
+                                }
+                            )
+                        }
+                    )
+
+                    // INSERT ROUTINE EXERCISE SETS
+                    routineDTO = routineDTO.copy(
+                        routineExerciseDTOs = routineDTO.routineExerciseDTOs.map { routineExerciseDTO ->
+                            routineExerciseDTO.copy(
+                                routineExerciseSetDTOs = routineExerciseDTO.routineExerciseSetDTOs.map { routineExerciseSetDTO ->
+                                    routineExerciseSetDTO.copy(
+                                        routineExerciseSet = routineExerciseSetDTO.routineExerciseSet.copy(
+                                            routineExerciseSetId = checkId(
+                                                routineExerciseSetDao.upsert(
+                                                    routineExerciseSetDTO.routineExerciseSet
+                                                ),
+                                                routineExerciseSetDTO.routineExerciseSet.routineExerciseSetId
+                                            )
+                                        )
+                                    )
+                                }
+                            )
+                        }
+                    )
                 }
             }
 
@@ -401,6 +503,48 @@ class RoutinesViewModel(
                         )
                     )
                 }
+            }
+
+            is RoutinesEvent.CompleteRoutine -> {
+                _state.update {
+                    it.copy(
+                        selectedRoutineDTO = it.selectedRoutineDTO.copy(
+                            routine = it.selectedRoutineDTO.routine.copy(
+                                lastPerformed = Date()
+                            )
+                        )
+                    )
+                }
+                onEvent(RoutinesEvent.UpsertSelectedRoutineDTO)
+
+
+                val completedRoutineDTO = _state.value.selectedRoutineDTO.copy(
+                    routine = _state.value.selectedRoutineDTO.routine.copy(
+                        routineId = null,
+                        startDate = routinesEvent.startDate,
+                        endDate = Date(),
+                        lastPerformed = null,
+                        isCompleted = true
+                    ),
+                    routineExerciseDTOs = _state.value.selectedRoutineDTO.routineExerciseDTOs.map { routineExerciseDTO ->
+                        routineExerciseDTO.copy(
+                            routineExercise = routineExerciseDTO.routineExercise.copy(
+                                routineExerciseId = null,
+                                routineId = null
+                            ),
+                            routineExerciseSetDTOs = routineExerciseDTO.routineExerciseSetDTOs.map { routineExerciseSetDTO ->
+                                routineExerciseSetDTO.copy(
+                                    routineExerciseSet = routineExerciseSetDTO.routineExerciseSet.copy(
+                                        routineExerciseSetId = null,
+                                        routineExerciseId = null
+                                    )
+                                )
+                            }
+                        )
+                    }
+                )
+
+                onEvent(RoutinesEvent.UpsertRoutineDTO(completedRoutineDTO))
             }
         }
         return true

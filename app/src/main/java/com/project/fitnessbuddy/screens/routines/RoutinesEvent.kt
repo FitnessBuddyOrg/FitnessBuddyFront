@@ -10,9 +10,11 @@ import com.project.fitnessbuddy.database.entity.enums.Frequency
 import com.project.fitnessbuddy.database.entity.enums.Language
 import com.project.fitnessbuddy.database.entity.enums.ShareType
 import com.project.fitnessbuddy.navigation.EditType
+import java.util.Date
 
 sealed interface RoutinesEvent {
-    data object UpsertRoutine : RoutinesEvent
+    data object UpsertSelectedRoutineDTO : RoutinesEvent
+    data class UpsertRoutineDTO(val routineDTO: RoutineDTO) : RoutinesEvent
 
     data class SetName(val name: String) : RoutinesEvent
     data class SetFrequency(val frequency: Frequency) : RoutinesEvent
@@ -40,7 +42,8 @@ sealed interface RoutinesEvent {
         val routineExercise: RoutineExercise
     ) : RoutinesEvent
 
-    data class DeleteRoutineDTO(val routineDTO: Routine) : RoutinesEvent
+    data class DeleteRoutine(val routine: Routine) : RoutinesEvent
+    data class CompleteRoutine(val startDate: Date) : RoutinesEvent
 
     data class SetSearchValue(val searchValue: String) : RoutinesEvent
     data class SetEditType(val editType: EditType) : RoutinesEvent

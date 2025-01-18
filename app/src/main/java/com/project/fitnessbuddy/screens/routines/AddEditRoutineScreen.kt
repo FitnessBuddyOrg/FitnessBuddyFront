@@ -1,6 +1,9 @@
 package com.project.fitnessbuddy.screens.routines
 
+import android.content.Context
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -13,6 +16,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
@@ -20,6 +24,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -129,7 +134,7 @@ fun InputInformation(
 
             ValidationFloatingActionButton(
                 context = context,
-                onClick = ({ routinesViewModel.onEvent(RoutinesEvent.UpsertRoutine) }),
+                onClick = ({ routinesViewModel.onEvent(RoutinesEvent.UpsertSelectedRoutineDTO) }),
                 onSuccess = {
                     navigationState.navController?.navigateUp()
                 },
@@ -139,12 +144,20 @@ fun InputInformation(
             )
         }
     ) { padding ->
-        LazyColumn(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(padding),
-        ) {
-            item {
+
+        AllExercisesWidget(
+            routinesState = routinesState,
+            routinesViewModel = routinesViewModel,
+            navigationViewModel = navigationViewModel,
+            navigationState = navigationState,
+
+            padding = padding,
+            context = context,
+
+            editingEnabled = true,
+            checkboxEnabled = false,
+
+            headerItem = {
                 DefaultTextField(
                     label = stringResource(R.string.name),
                     value = routinesState.selectedRoutineDTO.routine.name,
@@ -188,31 +201,84 @@ fun InputInformation(
                 )
                 Spacer(modifier = Modifier.height(20.dp))
             }
+        )
+    }
+}
 
-            itemsIndexed(routinesState.selectedRoutineDTO.routineExerciseDTOs) { routineExerciseDTOIndex, routineExerciseDTO ->
-                NewExerciseWidget(
-                    routinesViewModel = routinesViewModel,
-                    routinesState = routinesState,
+@Composable
+fun AllExercisesWidget(
+    routinesState: RoutinesState,
+    routinesViewModel: RoutinesViewModel,
 
-                    routinesExerciseDTOIndex = routineExerciseDTOIndex,
+    navigationViewModel: NavigationViewModel,
+    navigationState: NavigationState,
 
-                    checkBoxEnabled = false,
-                    deleteButtonEnabled = true
-                )
-                Spacer(modifier = Modifier.height(20.dp))
-            }
+    context: Context,
+    padding: PaddingValues,
 
-            item {
-                SleekButton(
-                    text = stringResource(R.string.add_exercises),
-                    onClick = {
-                        navigationState.navController?.navigate(context.getString(R.string.add_exercises_route))
-                    }
-                )
-            }
+    headerItem: @Composable () -> Unit = {},
+    footerItem: @Composable () -> Unit = {},
+
+    editingEnabled: Boolean,
+    checkboxEnabled: Boolean,
+
+    onAllCheckedChange: (Boolean) -> Unit = {}
+) {
+
+    var allChecked =
+        routinesState.selectedRoutineDTO.routineExerciseDTOs.all{ it.routineExerciseSetDTOs.all{ it2 -> it2.checked}}
+
+    LaunchedEffect(allChecked) {
+        onAllCheckedChange(allChecked)
+    }
+
+    LazyColumn(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(padding),
+    ) {
+        item {
+            headerItem()
         }
 
+        itemsIndexed(routinesState.selectedRoutineDTO.routineExerciseDTOs) { routineExerciseDTOIndex, routineExerciseDTO ->
+            NewExerciseWidget(
+                routinesViewModel = routinesViewModel,
+                routinesState = routinesState,
 
+                routinesExerciseDTOIndex = routineExerciseDTOIndex,
+
+                editingEnabled = editingEnabled,
+                checkboxEnabled = checkboxEnabled,
+            )
+            Spacer(modifier = Modifier.height(20.dp))
+        }
+
+        item {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .border(1.dp, MaterialTheme.colorScheme.tertiary, RoundedCornerShape(8.dp)),
+                contentAlignment = Alignment.Center
+            ) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth(),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    SleekButton(
+                        text = stringResource(R.string.add_exercises),
+                        onClick = {
+                            navigationState.navController?.navigate(context.getString(R.string.add_exercises_route))
+                        }
+                    )
+
+                    footerItem()
+                }
+
+            }
+
+        }
     }
 }
 
@@ -222,11 +288,14 @@ fun NewExerciseWidget(
     routinesState: RoutinesState,
     routinesExerciseDTOIndex: Int,
 
-    checkBoxEnabled: Boolean,
-    deleteButtonEnabled: Boolean
+    editingEnabled: Boolean,
+    checkboxEnabled: Boolean,
 ) {
     val routineExerciseDTO =
         routinesState.selectedRoutineDTO.routineExerciseDTOs[routinesExerciseDTOIndex]
+
+    var allChecked =
+        routinesState.selectedRoutineDTO.routineExerciseDTOs[routinesExerciseDTOIndex].routineExerciseSetDTOs.all { it.checked }
 
     Column(
         modifier = Modifier
@@ -246,18 +315,20 @@ fun NewExerciseWidget(
                     color = MaterialTheme.colorScheme.tertiary
                 )
             )
-            DeleteButton(
-                onClick = {
-                    routinesViewModel.onEvent(
-                        RoutinesEvent.RemoveRoutineExerciseDTO(
-                            routineExerciseDTO
+            if (editingEnabled) {
+                DeleteButton(
+                    onClick = {
+                        routinesViewModel.onEvent(
+                            RoutinesEvent.RemoveRoutineExerciseDTO(
+                                routineExerciseDTO
+                            )
                         )
+                    },
+                    colors = IconButtonDefaults.iconButtonColors(
+                        contentColor = MaterialTheme.colorScheme.tertiary
                     )
-                },
-                colors = IconButtonDefaults.iconButtonColors(
-                    contentColor = MaterialTheme.colorScheme.tertiary
                 )
-            )
+            }
         }
 
         val firstColumnWidth = 0.1f
@@ -270,6 +341,10 @@ fun NewExerciseWidget(
                 .fillMaxWidth(),
             verticalArrangement = Arrangement.spacedBy(10.dp)
         ) {
+//            Text(
+//                text = if (allChecked) "All items are checked!" else "Some items are unchecked",
+//                style = MaterialTheme.typography.bodyLarge
+//            )
             Row(
                 modifier = Modifier
                     .height(20.dp)
@@ -294,14 +369,14 @@ fun NewExerciseWidget(
                     modifier = Modifier.weight(thirdColumnWidth),
                     textAlign = TextAlign.Center
                 )
-                if (deleteButtonEnabled) {
+                if (editingEnabled) {
                     Spacer(modifier = Modifier.width(extraColumnWidth))
                 }
-                if (checkBoxEnabled) {
+                if (checkboxEnabled) {
                     Spacer(modifier = Modifier.width(extraColumnWidth))
                 }
             }
-            routineExerciseDTO.routineExerciseSetDTOs.forEachIndexed { routineExerciseSetIndex, routineExerciseSet ->
+            routineExerciseDTO.routineExerciseSetDTOs.forEachIndexed { routineExerciseSetIndex, routineExerciseSetDTO ->
                 RoutineExerciseSetWidget(
                     routinesViewModel = routinesViewModel,
                     routinesState = routinesState,
@@ -309,21 +384,27 @@ fun NewExerciseWidget(
                     routinesExerciseDTOIndex = routinesExerciseDTOIndex,
                     routineExerciseSetIndex = routineExerciseSetIndex,
 
-                    checkBoxEnabled = checkBoxEnabled,
-                    deleteButtonEnabled = deleteButtonEnabled,
+                    editingEnabled = editingEnabled,
+                    checkboxEnabled = checkboxEnabled,
 
                     firstColumnWidth = firstColumnWidth,
                     secondColumnWidth = secondColumnWidth,
                     thirdColumnWidth = thirdColumnWidth,
-                    extraColumnWidth = extraColumnWidth
+                    extraColumnWidth = extraColumnWidth,
                 )
             }
-            SleekButton(
-                text = stringResource(R.string.add_set),
-                onClick = {
-                    routinesViewModel.onEvent(RoutinesEvent.AddRoutineExerciseSet(routineExerciseDTO.routineExercise))
-                }
-            )
+            if (editingEnabled) {
+                SleekButton(
+                    text = stringResource(R.string.add_set),
+                    onClick = {
+                        routinesViewModel.onEvent(
+                            RoutinesEvent.AddRoutineExerciseSet(
+                                routineExerciseDTO.routineExercise
+                            )
+                        )
+                    }
+                )
+            }
         }
     }
 }
@@ -336,22 +417,35 @@ fun RoutineExerciseSetWidget(
     routinesExerciseDTOIndex: Int,
     routineExerciseSetIndex: Int,
 
-    checkBoxEnabled: Boolean,
-    deleteButtonEnabled: Boolean,
+    editingEnabled: Boolean,
+    checkboxEnabled: Boolean,
 
     firstColumnWidth: Float,
     secondColumnWidth: Float,
     thirdColumnWidth: Float,
-    extraColumnWidth: Dp
+    extraColumnWidth: Dp,
 ) {
-    var checked by remember { mutableStateOf(false) }
 
     val routineExerciseDTO =
         routinesState.selectedRoutineDTO.routineExerciseDTOs[routinesExerciseDTOIndex]
     val routineExerciseSetDTO = routineExerciseDTO.routineExerciseSetDTOs[routineExerciseSetIndex]
 
-    var reps by remember(routineExerciseDTO) { mutableStateOf(routineExerciseSetDTO.reps.toString()) }
-    var weight by remember(routineExerciseDTO) { mutableStateOf(routineExerciseSetDTO.weight.toString()) }
+    var reps by remember(routineExerciseSetDTO) { mutableStateOf(routineExerciseSetDTO.reps.toString()) }
+    var weight by remember(routineExerciseSetDTO) { mutableStateOf(routineExerciseSetDTO.weight.toString()) }
+
+    var checked by remember(routineExerciseSetDTO) { mutableStateOf(routineExerciseSetDTO.checked) }
+
+    var checkBoxEnabled by remember(routineExerciseSetDTO) { mutableStateOf(true) }
+    var inputsEnabled by remember(routineExerciseSetDTO) { mutableStateOf(true) }
+
+    LaunchedEffect(reps, weight) {
+        checkBoxEnabled = reps.isNotEmpty() && reps != "0"
+                && weight.isNotEmpty() && weight != "0"
+    }
+
+    LaunchedEffect(checked) {
+        inputsEnabled = !checked
+    }
 
     Row(
         modifier = Modifier
@@ -395,7 +489,8 @@ fun RoutineExerciseSetWidget(
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 textAlign = TextAlign.Center
             ),
-            insidePadding = PaddingValues(4.dp)
+            insidePadding = PaddingValues(4.dp),
+            enabled = inputsEnabled
         )
         CustomIntegerField(
             value = reps,
@@ -406,7 +501,8 @@ fun RoutineExerciseSetWidget(
                             routineExerciseSetDTO = routineExerciseSetDTO.copy(
                                 routineExerciseSet = routineExerciseSetDTO.routineExerciseSet.copy(
                                     reps = it
-                                )
+                                ),
+                                tempId = routineExerciseSetDTO.tempId
                             ),
                             routineExercise = routineExerciseDTO.routineExercise
                         )
@@ -422,10 +518,11 @@ fun RoutineExerciseSetWidget(
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 textAlign = TextAlign.Center
             ),
-            insidePadding = PaddingValues(4.dp)
+            insidePadding = PaddingValues(4.dp),
+            enabled = inputsEnabled
         )
 
-        if (deleteButtonEnabled) {
+        if (editingEnabled) {
             DeleteButton(
                 onClick = {
                     routinesViewModel.onEvent(
@@ -440,13 +537,24 @@ fun RoutineExerciseSetWidget(
                     .width(extraColumnWidth),
             )
         }
-
-        if (checkBoxEnabled) {
+        if (checkboxEnabled) {
             Checkbox(
                 checked = checked,
-                onCheckedChange = { checked = it },
+                onCheckedChange = {
+                    routinesViewModel.onEvent(
+                        RoutinesEvent.UpdateRoutineExerciseSet(
+                            routineExerciseSetDTO = routineExerciseSetDTO.copy(
+                                checked = it,
+                                tempId = routineExerciseSetDTO.tempId
+                            ),
+                            routineExercise = routineExerciseDTO.routineExercise
+                        )
+                    )
+                    checked = it
+                },
                 modifier = Modifier
-                    .width(extraColumnWidth)
+                    .width(extraColumnWidth),
+                enabled = checkBoxEnabled
             )
         }
     }

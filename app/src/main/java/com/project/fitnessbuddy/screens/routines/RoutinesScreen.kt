@@ -5,7 +5,9 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -36,6 +38,7 @@ import com.project.fitnessbuddy.navigation.SearchButton
 import com.project.fitnessbuddy.screens.common.AlphabeticallyGroupedWidgetList
 import com.project.fitnessbuddy.screens.common.ParametersState
 import com.project.fitnessbuddy.screens.common.ParametersViewModel
+import com.project.fitnessbuddy.screens.common.timeAgo
 import kotlinx.coroutines.launch
 
 @Composable
@@ -91,7 +94,7 @@ fun RoutinesScreen(
     }
 
     AlphabeticallyGroupedWidgetList(
-        itemsList = routinesState.routineDTOs,
+        itemsList = routinesState.templateRoutineDTOs,
         widget = @Composable {
             RoutineWidget(
                 routineDTO = it,
@@ -119,7 +122,8 @@ fun RoutineWidget(
             .border(1.dp, MaterialTheme.colorScheme.onSurfaceVariant, RoundedCornerShape(8.dp))
             .clickable(
                 onClick = {
-
+                    routinesViewModel.onEvent(RoutinesEvent.SetSelectedRoutineDTO(routineDTO))
+                    navigationState.navController?.navigate(context.getString(R.string.view_routine_route))
                 }
             ),
         contentAlignment = Alignment.Center
@@ -145,13 +149,15 @@ fun RoutineWidget(
                 style = MaterialTheme.typography.labelMedium
             )
 
-            if (routineDTO.getLastPerformed().isNotEmpty()) {
+            if (routineDTO.routine.lastPerformed != null) {
                 Text(
-                    text = "${stringResource(R.string.last_performed)}: ${routineDTO.routine.lastPerformed}",
+                    text = "${stringResource(R.string.last_performed)}: ${routineDTO.routine.lastPerformed?.timeAgo(context)}",
                     style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
+
+            Spacer(modifier = Modifier.height(10.dp))
 
             routineDTO.routineExerciseDTOs.forEach { routineExerciseDTO ->
                 Text(
@@ -163,3 +169,5 @@ fun RoutineWidget(
         }
     }
 }
+
+

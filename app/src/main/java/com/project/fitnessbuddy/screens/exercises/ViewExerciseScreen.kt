@@ -108,14 +108,13 @@ fun onDeleteExercise(
         navigationState.navController?.navigateUp()
         Toast.makeText(
             context,
-            "Deleted ${exercisesState.selectedExercise.name}",
+            "${context.getString(R.string.deleted)} ${exercisesState.selectedExercise.name}",
             Toast.LENGTH_SHORT
         ).show()
-        exercisesViewModel.onEvent(ExercisesEvent.ResetSelectedExercise)
     } else {
         Toast.makeText(
             context,
-            "Failed to delete ${exercisesState.selectedExercise.name}",
+            "${context.getString(R.string.failed_to_delete)} ${exercisesState.selectedExercise.name}",
             Toast.LENGTH_SHORT
         ).show()
     }

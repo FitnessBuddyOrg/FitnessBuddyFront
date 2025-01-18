@@ -24,6 +24,15 @@ data class Routine(
     @ColumnInfo(name = "last_performed")
     val lastPerformed: Date? = null,
 
+    @ColumnInfo(name = "is_completed", defaultValue = "0")
+    val isCompleted: Boolean = false,
+
+    @ColumnInfo(name = "start_date")
+    val startDate: Date? = null,
+
+    @ColumnInfo(name = "end_date")
+    val endDate: Date? = null,
+
     @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = "routine_id")
     val routineId: Long? = null

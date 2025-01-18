@@ -55,6 +55,8 @@ import com.project.fitnessbuddy.screens.routines.AddExercisesScreen
 import com.project.fitnessbuddy.screens.routines.RoutinesScreen
 import com.project.fitnessbuddy.screens.routines.RoutinesState
 import com.project.fitnessbuddy.screens.routines.RoutinesViewModel
+import com.project.fitnessbuddy.screens.routines.StartRoutineScreen
+import com.project.fitnessbuddy.screens.routines.ViewRoutineScreen
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
@@ -104,6 +106,7 @@ fun AppNavGraph(
     val addEditRoutineRoute = stringResource(id = R.string.add_edit_routine_route)
     val addExercisesRoute = stringResource(id = R.string.add_exercises_route)
     val viewRoutineRoute = stringResource(id = R.string.view_routine_route)
+    val startRoutineRoute = stringResource(id = R.string.start_routine_route)
 
     val progressCalendarRoute = stringResource(id = R.string.progress_calendar_route)
     val statisticsRoute = stringResource(id = R.string.statistics_route)
@@ -220,7 +223,7 @@ fun AppNavGraph(
                 ),
                 AppRoute(
                     routeName = addExercisesRoute,
-                    name = stringResource(id = R.string.add_exercises_route),
+                    name = stringResource(id = R.string.add_exercises),
                     screen = {
                         AddExercisesScreen(
                             navigationState = navigationState,
@@ -238,7 +241,29 @@ fun AppNavGraph(
                     routeName = viewRoutineRoute,
                     name = stringResource(id = R.string.view_routine),
                     screen = {
+                        ViewRoutineScreen(
+                            navigationState = navigationState,
+                            navigationViewModel = navigationViewModel,
 
+                            exercisesState = exercisesState,
+                            exercisesViewModel = exercisesViewModel,
+
+                            routinesState = routinesState,
+                            routinesViewModel = routinesViewModel,
+                        )
+                    }
+                ),
+                AppRoute(
+                    routeName = startRoutineRoute,
+                    name = stringResource(id = R.string.start_routine),
+                    screen = {
+                        StartRoutineScreen(
+                            navigationState = navigationState,
+                            navigationViewModel = navigationViewModel,
+
+                            routinesState = routinesState,
+                            routinesViewModel = routinesViewModel,
+                        )
                     }
                 )
             )

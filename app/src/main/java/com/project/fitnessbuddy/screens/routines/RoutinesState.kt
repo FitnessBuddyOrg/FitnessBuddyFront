@@ -7,7 +7,8 @@ import com.project.fitnessbuddy.navigation.EditType
 data class RoutinesState(
     val editType: EditType = EditType.ADD,
 
-    val routineDTOs: List<RoutineDTO> = emptyList(),
+    val templateRoutineDTOs: List<RoutineDTO> = emptyList(),
+    val completedRoutineDTOs: List<RoutineDTO> = emptyList(),
 
     val potentialExercisesToAdd: MutableList<Exercise> = mutableListOf(),
     val existingExercisesToRemove: MutableList<Exercise> = mutableListOf(),

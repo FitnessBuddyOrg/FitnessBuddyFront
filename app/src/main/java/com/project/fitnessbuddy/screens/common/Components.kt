@@ -29,6 +29,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -89,7 +90,8 @@ fun CustomTextField(
     modifier: Modifier = Modifier,
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
     textStyle: TextStyle = TextStyle.Default,
-    insidePadding: PaddingValues
+    insidePadding: PaddingValues,
+    enabled: Boolean = true,
 ) {
     BasicTextField(
         value = value,
@@ -118,7 +120,9 @@ fun CustomTextField(
                 placeholder = placeholder,
                 trailingIcon = trailingIcon
             )
-        }
+        },
+        enabled = enabled,
+
     )
 }
 
@@ -129,7 +133,8 @@ fun CustomIntegerField(
     trailingIcon: @Composable (() -> Unit)? = null,
     modifier: Modifier = Modifier,
     textStyle: TextStyle = TextStyle.Default,
-    insidePadding: PaddingValues
+    insidePadding: PaddingValues,
+    enabled: Boolean = true
 ) {
     CustomTextField(
         value = value,
@@ -146,7 +151,8 @@ fun CustomIntegerField(
         trailingIcon = trailingIcon,
         modifier = modifier,
         textStyle = textStyle,
-        insidePadding = insidePadding
+        insidePadding = insidePadding,
+        enabled = enabled
     )
 
 }
@@ -171,16 +177,53 @@ fun DefaultTextArea(label: String, value: String, onValueChange: (String) -> Uni
 }
 
 @Composable
-fun SleekButton(text: String, onClick: () -> Unit) {
+fun SleekButton(text: String, onClick: () -> Unit, modifier: Modifier = Modifier) {
+    Button(
+        modifier = modifier
+            .fillMaxWidth(),
+        colors = ButtonDefaults.buttonColors(
+            containerColor = Color.Transparent,
+            contentColor = MaterialTheme.colorScheme.tertiary
+        ),
+        shape = RectangleShape,
+        onClick = onClick
+    ) {
+        MediumTextWidget(
+            text = text.uppercase()
+        )
+    }
+}
+
+@Composable
+fun SleekErrorButton(text: String, onClick: () -> Unit) {
     Button(
         modifier = Modifier
             .fillMaxWidth()
             .padding(8.dp),
         colors = ButtonDefaults.buttonColors(
             containerColor = Color.Transparent,
-            contentColor = MaterialTheme.colorScheme.tertiary
+            contentColor = MaterialTheme.colorScheme.errorContainer
         ),
         shape = RectangleShape,
+        onClick = onClick
+    ) {
+        MediumTextWidget(
+            text = text.uppercase()
+        )
+    }
+}
+
+@Composable
+fun BetterButton(text: String, onClick: () -> Unit) {
+    Button(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(8.dp),
+        colors = ButtonDefaults.buttonColors(
+            containerColor = MaterialTheme.colorScheme.tertiary,
+            contentColor = MaterialTheme.colorScheme.onTertiary
+        ),
+        shape = RoundedCornerShape(8.dp),
         onClick = onClick
     ) {
         MediumTextWidget(
@@ -467,6 +510,64 @@ fun <T : ListedEntity> AlphabeticallyGroupedWidgetList(
                         widget(exercise)
                     }
                 }
+        }
+    }
+}
+
+@Composable
+fun SelectedExerciseWidget(
+    exercise: Exercise,
+    onClick: (Exercise, Boolean) -> Unit,
+    initialSelected: Boolean = false,
+    selectionEnabled: Boolean = false,
+    titleText : String = exercise.name
+) {
+    val colorScheme = MaterialTheme.colorScheme
+    var selected by remember { mutableStateOf(initialSelected) }
+    fun setBackgroundColor(): Color {
+        return if (selected && selectionEnabled) {
+            colorScheme.onPrimary
+        } else {
+            Color.Transparent
+        }
+    }
+    var backgroundColor by remember { mutableStateOf(setBackgroundColor()) }
+
+
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(80.dp)
+            .background(backgroundColor)
+            .clickable(
+                onClick = {
+                    selected = !selected
+                    backgroundColor = setBackgroundColor()
+                    onClick(exercise, selected)
+                }
+            ),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        WidgetLetterImage(
+            letter = exercise.name.first(),
+            padding = PaddingValues(start = 16.dp)
+        )
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(start = 8.dp)
+        ) {
+            Text(
+                modifier = Modifier.fillMaxWidth(),
+                text = titleText,
+                style = MaterialTheme.typography.labelMedium
+            )
+            Text(
+                modifier = Modifier.fillMaxWidth(),
+                text = stringResource(exercise.category.resourceId),
+                style = MaterialTheme.typography.labelSmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
         }
     }
 }

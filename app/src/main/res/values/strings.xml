@@ -35,6 +35,7 @@
     <string name="routines_overview_route" translatable="false">routines_overview_route</string>
     <string name="view_exercise_route" translatable="false">view_exercise_route</string>
     <string name="view_routine_route" translatable="false">view_routine_route</string>
+    <string name="start_routine_route" translatable="false">start_routine_route</string>
     <string name="login_route" translatable="false">login_route</string>
     <string name="register_route" translatable="false">register_route</string>
     <string name="an_exercise">an exercise</string>
@@ -83,4 +84,19 @@
     <string name="weight">Weight</string>
     <string name="reps">Reps</string>
     <string name="add_set">Add Set</string>
+    <string name="deleted">Deleted</string>
+    <string name="failed_to_delete">Failed To Delete</string>
+    <string name="start_routine">Start Routine</string>
+    <string name="cancel_routine">Cancel Routine</string>
+    <string name="started_routine">Started Routine</string>
+    <string name="finish">Finish</string>
+    <string name="complete_all_sets_toast">All sets must be checked to finish routine</string>
+    <string name="seconds_ago">seconds ago</string>
+    <string name="yesterday">Yesterday</string>
+    <string name="years_ago">years ago</string>
+    <string name="minutes_ago">minute(s) ago</string>
+    <string name="hours_ago">hour(s) ago</string>
+    <string name="days_ago">day(s) ago</string>
+    <string name="months_ago">month(s) ago</string>
+    <string name="weeks_ago">weeks ago</string>
 </resources>
