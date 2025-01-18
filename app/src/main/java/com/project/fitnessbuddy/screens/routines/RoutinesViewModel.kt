@@ -328,8 +328,6 @@ class RoutinesViewModel(
                                         )
                                     )
 
-                                    println("created temp id: ${newRoutineExerciseDTO.tempId}")
-
                                     routineExerciseDTO.copy(
                                         routineExerciseSetDTOs = routineExerciseDTO.routineExerciseSetDTOs + newRoutineExerciseDTO
                                     )
@@ -344,8 +342,6 @@ class RoutinesViewModel(
             }
 
             is RoutinesEvent.RemoveRoutineExerciseDTO -> {
-                println("going to remove exercise: ${routinesEvent.routineExerciseDTO.exercise}")
-                println("going to remove sets: ${routinesEvent.routineExerciseDTO.routineExerciseSetDTOs}")
                 _state.update {
                     it.copy(
                         selectedRoutineDTO = it.selectedRoutineDTO.copy(

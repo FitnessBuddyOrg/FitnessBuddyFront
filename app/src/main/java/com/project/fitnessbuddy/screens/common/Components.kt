@@ -336,7 +336,7 @@ fun <T, V : StoredValue<T>> DialogRadioButtonList(
                                     }
                             ) {
                                 RadioButton(
-                                    selected = selectedStoredValue == option,
+                                    selected = selectedStoredValue.displayValue == option.displayValue,
                                     onClick = {
                                         selectedStoredValue = option
                                         onValueChange(option)

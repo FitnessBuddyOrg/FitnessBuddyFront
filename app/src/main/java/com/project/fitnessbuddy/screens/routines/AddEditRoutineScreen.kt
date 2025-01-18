@@ -34,8 +34,6 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import com.project.fitnessbuddy.R
-import com.project.fitnessbuddy.database.dto.RoutineExerciseDTO
-import com.project.fitnessbuddy.database.dto.RoutineExerciseSetDTO
 import com.project.fitnessbuddy.database.entity.enums.Frequency
 import com.project.fitnessbuddy.database.entity.enums.ShareType
 import com.project.fitnessbuddy.navigation.DeleteButton
@@ -227,7 +225,8 @@ fun NewExerciseWidget(
     checkBoxEnabled: Boolean,
     deleteButtonEnabled: Boolean
 ) {
-    val routineExerciseDTO = routinesState.selectedRoutineDTO.routineExerciseDTOs[routinesExerciseDTOIndex]
+    val routineExerciseDTO =
+        routinesState.selectedRoutineDTO.routineExerciseDTOs[routinesExerciseDTOIndex]
 
     Column(
         modifier = Modifier
@@ -249,7 +248,11 @@ fun NewExerciseWidget(
             )
             DeleteButton(
                 onClick = {
-                    routinesViewModel.onEvent(RoutinesEvent.RemoveRoutineExerciseDTO(routineExerciseDTO))
+                    routinesViewModel.onEvent(
+                        RoutinesEvent.RemoveRoutineExerciseDTO(
+                            routineExerciseDTO
+                        )
+                    )
                 },
                 colors = IconButtonDefaults.iconButtonColors(
                     contentColor = MaterialTheme.colorScheme.tertiary
@@ -343,14 +346,12 @@ fun RoutineExerciseSetWidget(
 ) {
     var checked by remember { mutableStateOf(false) }
 
-    val routineExerciseDTO = routinesState.selectedRoutineDTO.routineExerciseDTOs[routinesExerciseDTOIndex]
+    val routineExerciseDTO =
+        routinesState.selectedRoutineDTO.routineExerciseDTOs[routinesExerciseDTOIndex]
     val routineExerciseSetDTO = routineExerciseDTO.routineExerciseSetDTOs[routineExerciseSetIndex]
-    
-//    var reps by remember { mutableStateOf(routineExerciseSetDTO.reps.toString()) }
-//    var weight by remember { mutableStateOf(routineExerciseSetDTO.weight.toString()) }
 
-    var reps by remember { mutableStateOf(routinesState.selectedRoutineDTO.routineExerciseDTOs[routinesExerciseDTOIndex].routineExerciseSetDTOs[routineExerciseSetIndex].reps.toString()) }
-    var weight by remember { mutableStateOf(routinesState.selectedRoutineDTO.routineExerciseDTOs[routinesExerciseDTOIndex].routineExerciseSetDTOs[routineExerciseSetIndex].weight.toString()) }
+    var reps by remember(routineExerciseDTO) { mutableStateOf(routineExerciseSetDTO.reps.toString()) }
+    var weight by remember(routineExerciseDTO) { mutableStateOf(routineExerciseSetDTO.weight.toString()) }
 
     Row(
         modifier = Modifier
