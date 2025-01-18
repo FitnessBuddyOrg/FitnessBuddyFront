@@ -7,7 +7,8 @@ data class UserState(
     val accessToken: String? = null,
     val isLoggedIn: Boolean = false,
     val email: String? = null,
-    val name: String? = null
+    val name: String? = null,
+    val id: Long? = null
 
 )
 

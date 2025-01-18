@@ -9,7 +9,8 @@ data class RegisterRequest(val email: String, val password: String, val confirmP
 data class GoogleLoginRequest(val idToken: String)
 data class UserResponse(
     @SerializedName("accessToken") val accessToken: String,
-    val email: String
+    val email: String,
+    val id : Long
 )
 data class GitHubTokenRequestDTO(val code: String)
 

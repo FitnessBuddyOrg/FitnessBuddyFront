@@ -15,15 +15,15 @@ import androidx.lifecycle.lifecycleScope
 import androidx.room.Room
 import com.project.fitnessbuddy.api.auth.AuthViewModel
 import com.project.fitnessbuddy.api.auth.GitHubTokenRequestDTO
+import com.project.fitnessbuddy.api.statistics.StatisticsViewModel
 import com.project.fitnessbuddy.database.FitnessBuddyDatabase
 import com.project.fitnessbuddy.navigation.AppNavGraph
 import com.project.fitnessbuddy.navigation.NavigationViewModel
 import com.project.fitnessbuddy.screens.exercises.ExercisesViewModel
 import com.project.fitnessbuddy.ui.theme.FitnessBuddyTheme
 import kotlinx.coroutines.launch
+import com.github.mikephil.charting.utils.Utils
 
-import com.project.fitnessbuddy.api.user.UserApi
-import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
     private val authViewModel by viewModels<AuthViewModel> {
@@ -64,12 +64,12 @@ class MainActivity : ComponentActivity() {
                     }
                 }
 
-                // Handle custom scheme redirection (fitnessbuddy://auth)
                 data.toString().startsWith("fitnessbuddy://auth") -> {
                     val token = data.getQueryParameter("token")
                     val email = data.getQueryParameter("email")
-                    if (token != null && email != null) {
-                        authViewModel.handleSuccessfulLogin(token, email)
+                    val id = data.getQueryParameter("id")
+                    if (token != null && email != null && id != null) {
+                        authViewModel.handleSuccessfulLogin(token, email, id.toLong())
                         Log.d("GitHubAuth", "Token received: $token, Email: $email")
                     } else {
                         Log.e("GitHubAuth", "Missing token or email in custom scheme redirect.")
@@ -83,7 +83,7 @@ class MainActivity : ComponentActivity() {
         lifecycleScope.launch {
             try {
                 val response = RetrofitInstance.authService.githubLogin(GitHubTokenRequestDTO(code))
-                authViewModel.handleSuccessfulLogin(response.accessToken, response.email)
+                authViewModel.handleSuccessfulLogin(response.accessToken, response.email, response.id)
             } catch (e: Exception) {
                 Log.e("GitHubAuth", "Failed to exchange code for token: ${e.localizedMessage}", e)
             }
@@ -110,8 +110,18 @@ class MainActivity : ComponentActivity() {
         }
     )
 
+    private val statisticsViewModel by viewModels<StatisticsViewModel> {
+        object : ViewModelProvider.Factory {
+            override fun <T : ViewModel> create(modelClass: Class<T>): T {
+                @Suppress("UNCHECKED_CAST")
+                return StatisticsViewModel(RetrofitInstance.userService) as T
+            }
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        Utils.init(this)
         authViewModel.loadToken()
         RetrofitInstance.initialize {
             authViewModel.userState.value.accessToken
@@ -127,7 +137,8 @@ class MainActivity : ComponentActivity() {
                     exercisesState = exerciseState,
                     userState = userState,
                     authViewModel = authViewModel,
-                    exercisesViewModel = exercisesViewModel
+                    exercisesViewModel = exercisesViewModel,
+                    statisticsViewModel = statisticsViewModel
                 )
             }
         }

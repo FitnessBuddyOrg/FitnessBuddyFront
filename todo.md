@@ -2,7 +2,7 @@ MUST:
 - [ ] notification 
 - [ ] handle errors in login and registration
 - [ ] users statistics for admin
-- [ ] user statistics for user (including screen time)
+- [x] user statistics for user (including screen time)
 - [ ] user profile page
 - [ ] sharing exercises with other users
 - [ ] changing languages

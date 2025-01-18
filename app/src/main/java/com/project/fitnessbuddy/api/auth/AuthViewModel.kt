@@ -37,10 +37,11 @@ class AuthViewModel(application: Application) : AndroidViewModel(application) {
                 _userState.value = UserState(
                     accessToken = response.accessToken,
                     isLoggedIn = true,
-                    email = email
+                    email = email,
+                    id = response.id
                 )
                 _error.value = null
-                saveToken(response.accessToken, email)
+                saveToken(response.accessToken, email, response.id)
             } catch (e: Exception) {
                 _error.value = "Login failed: ${e.localizedMessage}"
                 Toast.makeText(appContext, "Login failed: ${e.localizedMessage}", Toast.LENGTH_LONG).show()
@@ -57,7 +58,9 @@ class AuthViewModel(application: Application) : AndroidViewModel(application) {
                 _userState.value = UserState(
                     accessToken = response.accessToken,
                     isLoggedIn = true,
-                    email = email
+                    email = email,
+                    id = response.id
+
                 )
                 Toast.makeText(appContext, "Registration successful", Toast.LENGTH_LONG).show()
             } catch (e: Exception) {
@@ -120,9 +123,10 @@ class AuthViewModel(application: Application) : AndroidViewModel(application) {
                             accessToken = userResponse.accessToken,
                             isLoggedIn = true,
                             name = credential.data.getString("com.google.android.libraries.identity.googleid.BUNDLE_KEY_DISPLAY_NAME"),
-                            email = userResponse.email
+                            email = userResponse.email,
+                            id = userResponse.id
                         )
-                        saveToken(userResponse.accessToken, userResponse.email)
+                        saveToken(userResponse.accessToken, userResponse.email, userResponse.id)
                         Log.d("AuthViewModel", "Google Sign-In successful, UserResponse: $userResponse")
                     } catch (e: Exception) {
                         Log.e("AuthViewModel", "Google Sign-In failed: ${e.localizedMessage}", e)
@@ -147,32 +151,35 @@ class AuthViewModel(application: Application) : AndroidViewModel(application) {
         activity.startActivity(intent)
     }
 
-    fun handleSuccessfulLogin(accessToken: String, email: String) {
+    fun handleSuccessfulLogin(accessToken: String, email: String, id: Long) {
         _userState.value = UserState(
             accessToken = accessToken,
             isLoggedIn = true,
-            email = email
+            email = email,
+            id = id
         )
-        saveToken(accessToken, email)
+        saveToken(accessToken, email, id)
     }
 
-    private fun saveToken(token: String, email: String) {
+    private fun saveToken(token: String, email: String, id: Long) {
         val sharedPreferences: SharedPreferences = appContext.getSharedPreferences("FitnessBuddyPrefs", Context.MODE_PRIVATE)
         val editor = sharedPreferences.edit()
         editor.putString("accessToken", token)
         editor.putString("email", email)
+        editor.putLong("id", id)
         editor.apply()
     }
     fun loadToken() {
         val sharedPreferences: SharedPreferences = appContext.getSharedPreferences("FitnessBuddyPrefs", Context.MODE_PRIVATE)
         val token = sharedPreferences.getString("accessToken", null)
         val email = sharedPreferences.getString("email", null)
-
+        val id = sharedPreferences.getLong("id", 0)
         if (token != null && email != null) {
             _userState.value = UserState(
                 accessToken = token,
                 isLoggedIn = true,
-                email = email
+                email = email,
+                id = id
             )
         }
     }

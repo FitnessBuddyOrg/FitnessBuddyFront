@@ -38,6 +38,7 @@ import androidx.navigation.compose.rememberNavController
 import com.project.fitnessbuddy.R
 import com.project.fitnessbuddy.api.auth.AuthViewModel
 import com.project.fitnessbuddy.api.auth.UserState
+import com.project.fitnessbuddy.api.statistics.StatisticsViewModel
 import com.project.fitnessbuddy.screens.HomeScreen
 import com.project.fitnessbuddy.screens.ProfileScreen
 import com.project.fitnessbuddy.screens.ProgressCalendarScreen
@@ -62,6 +63,7 @@ fun AppNavGraph(
     navigationViewModel: NavigationViewModel,
     exercisesViewModel: ExercisesViewModel,
     authViewModel: AuthViewModel,
+    statisticsViewModel: StatisticsViewModel,
     userState: UserState,
     navController: NavHostController = rememberNavController(),
     coroutineScope: CoroutineScope = rememberCoroutineScope(),
@@ -159,7 +161,10 @@ fun AppNavGraph(
                     contentDescription = null
                 )
             },
-            screen = { StatisticsScreen() }
+            screen = { StatisticsScreen(
+                statisticsViewModel = statisticsViewModel,
+                userState = userState
+            ) }
         ),
     )
 
