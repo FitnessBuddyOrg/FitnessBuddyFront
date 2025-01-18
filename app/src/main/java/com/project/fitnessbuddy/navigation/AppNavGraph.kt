@@ -36,8 +36,8 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.navigation
 import androidx.navigation.compose.rememberNavController
 import com.project.fitnessbuddy.R
-import com.project.fitnessbuddy.auth.AuthViewModel
-import com.project.fitnessbuddy.auth.UserState
+import com.project.fitnessbuddy.api.auth.AuthViewModel
+import com.project.fitnessbuddy.api.auth.UserState
 import com.project.fitnessbuddy.screens.HomeScreen
 import com.project.fitnessbuddy.screens.ProfileScreen
 import com.project.fitnessbuddy.screens.ProgressCalendarScreen

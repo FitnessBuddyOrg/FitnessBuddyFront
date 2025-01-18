@@ -13,7 +13,7 @@ import androidx.navigation.NavController
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import com.project.fitnessbuddy.R
-import com.project.fitnessbuddy.auth.AuthViewModel
+import com.project.fitnessbuddy.api.auth.AuthViewModel
 
 @Composable
 fun LoginScreen(

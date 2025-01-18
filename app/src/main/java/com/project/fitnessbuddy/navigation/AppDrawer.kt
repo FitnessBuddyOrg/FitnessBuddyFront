@@ -24,7 +24,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.navigation.NavController
 import com.project.fitnessbuddy.R
-import com.project.fitnessbuddy.auth.UserState
+import com.project.fitnessbuddy.api.auth.UserState
 
 @Composable
 fun AppDrawer(

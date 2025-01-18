@@ -1,4 +1,4 @@
-package com.project.fitnessbuddy.auth
+package com.project.fitnessbuddy.api.auth
 
 import com.google.gson.annotations.SerializedName
 import retrofit2.http.Body

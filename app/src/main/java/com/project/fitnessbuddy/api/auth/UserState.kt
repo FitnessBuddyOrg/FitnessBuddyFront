@@ -1,4 +1,4 @@
-package com.project.fitnessbuddy.auth
+package com.project.fitnessbuddy.api.auth
 
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.staticCompositionLocalOf

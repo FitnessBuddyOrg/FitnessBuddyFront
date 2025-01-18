@@ -1,4 +1,4 @@
-package com.project.fitnessbuddy.auth
+package com.project.fitnessbuddy.api.auth
 
 import android.app.Activity
 import android.app.Application
@@ -112,7 +112,9 @@ class AuthViewModel(application: Application) : AndroidViewModel(application) {
                 viewModelScope.launch {
                     try {
                         Log.d("AuthViewModel", "Google Sign-In successful, ID Token: $idToken")
-                        val userResponse = RetrofitInstance.authService.googleLogin(GoogleLoginRequest(idToken))
+                        val userResponse = RetrofitInstance.authService.googleLogin(
+                            GoogleLoginRequest(idToken)
+                        )
                         Log.d("AuthViewModel", "UserResponse from googleLogin: $userResponse")
                         _userState.value = UserState(
                             accessToken = userResponse.accessToken,

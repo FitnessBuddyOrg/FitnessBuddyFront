@@ -13,14 +13,16 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.room.Room
-import com.project.fitnessbuddy.auth.AuthViewModel
-import com.project.fitnessbuddy.auth.GitHubTokenRequestDTO
-import com.project.fitnessbuddy.auth.RetrofitInstance
+import com.project.fitnessbuddy.api.auth.AuthViewModel
+import com.project.fitnessbuddy.api.auth.GitHubTokenRequestDTO
 import com.project.fitnessbuddy.database.FitnessBuddyDatabase
 import com.project.fitnessbuddy.navigation.AppNavGraph
 import com.project.fitnessbuddy.navigation.NavigationViewModel
 import com.project.fitnessbuddy.screens.exercises.ExercisesViewModel
 import com.project.fitnessbuddy.ui.theme.FitnessBuddyTheme
+import kotlinx.coroutines.launch
+
+import com.project.fitnessbuddy.api.user.UserApi
 import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
@@ -77,7 +79,6 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-
     private fun exchangeCodeForToken(code: String) {
         lifecycleScope.launch {
             try {
@@ -88,11 +89,6 @@ class MainActivity : ComponentActivity() {
             }
         }
     }
-
-
-//    private val navigationViewModel: NavigationViewModel by lazy {
-//        ViewModelProvider(this)[NavigationViewModel::class.java]
-//    }
 
     private val exercisesViewModel by viewModels<ExercisesViewModel>(
         factoryProducer = {
@@ -117,6 +113,9 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         authViewModel.loadToken()
+        RetrofitInstance.initialize {
+            authViewModel.userState.value.accessToken
+        }
         setContent {
             FitnessBuddyTheme {
                 val navigationState by navigationViewModel.state.collectAsState()
@@ -132,9 +131,14 @@ class MainActivity : ComponentActivity() {
                 )
             }
         }
+        if (authViewModel.userState.value.isLoggedIn) {
+            lifecycleScope.launch {
+                try {
+                    RetrofitInstance.userService.incrementAppOpen()
+                } catch (e: Exception) {
+                    Log.e("MainActivity", "Failed to increment app open count: ${e.localizedMessage}", e)
+                }
+            }
+        }
     }
-
-
 }
-
-

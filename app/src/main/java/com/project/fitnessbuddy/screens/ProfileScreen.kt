@@ -17,8 +17,8 @@ import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavHostController
 import com.project.fitnessbuddy.R
-import com.project.fitnessbuddy.auth.AuthViewModel
-import com.project.fitnessbuddy.auth.UserState
+import com.project.fitnessbuddy.api.auth.AuthViewModel
+import com.project.fitnessbuddy.api.auth.UserState
 import com.project.fitnessbuddy.navigation.DefaultTitleWidget
 import com.project.fitnessbuddy.navigation.NavigationEvent
 import com.project.fitnessbuddy.navigation.NavigationViewModel
