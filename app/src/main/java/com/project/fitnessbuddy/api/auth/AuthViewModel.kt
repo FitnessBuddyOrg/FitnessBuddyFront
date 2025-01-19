@@ -89,36 +89,27 @@ class AuthViewModel(application: Application) : AndroidViewModel(application) {
 
         viewModelScope.launch {
             try {
-                Log.d("AuthViewModel", "Starting Google Sign-In")
                 val response = credentialManager.getCredential(activity, getRequest)
-                Log.d("AuthViewModel", "Google Sign-In response received: $response")
                 handleGoogleLoginSuccess(response)
             } catch (e: GetCredentialException) {
-                Log.e("AuthViewModel", "Google Sign-In failed: ${e.localizedMessage}", e)
                 _error.value = "Google Sign-In failed: ${e.localizedMessage}"
-                Toast.makeText(appContext, "Google Sign-In failed: ${e.localizedMessage}", Toast.LENGTH_LONG).show()
             } catch (e: Exception) {
                 Log.e("AuthViewModel", "An unexpected error occurred: ${e.localizedMessage}", e)
-                _error.value = "An unexpected error occurred: ${e.localizedMessage}"
                 Toast.makeText(appContext, "An unexpected error occurred: ${e.localizedMessage}", Toast.LENGTH_LONG).show()
             }
         }
     }
 
     private fun handleGoogleLoginSuccess(response: GetCredentialResponse) {
-        Log.d("AuthViewModel", "Processing Google Sign-In response: $response")
         val credential = response.credential
         if (credential is CustomCredential) {
-            Log.d("AuthViewModel", "CustomCredential received: ${credential.data}")
             val idToken = credential.data.getString("com.google.android.libraries.identity.googleid.BUNDLE_KEY_ID_TOKEN")
             if (idToken != null) {
                 viewModelScope.launch {
                     try {
-                        Log.d("AuthViewModel", "Google Sign-In successful, ID Token: $idToken")
                         val userResponse = RetrofitInstance.authService.googleLogin(
                             GoogleLoginRequest(idToken)
                         )
-                        Log.d("AuthViewModel", "UserResponse from googleLogin: $userResponse")
                         _userState.value = UserState(
                             accessToken = userResponse.accessToken,
                             isLoggedIn = true,
@@ -127,18 +118,14 @@ class AuthViewModel(application: Application) : AndroidViewModel(application) {
                             id = userResponse.id
                         )
                         saveToken(userResponse.accessToken, userResponse.email, userResponse.id)
-                        Log.d("AuthViewModel", "Google Sign-In successful, UserResponse: $userResponse")
                     } catch (e: Exception) {
                         Log.e("AuthViewModel", "Google Sign-In failed: ${e.localizedMessage}", e)
-                        _error.value = "Google Sign-In failed: ${e.localizedMessage}"
                     }
                 }
             } else {
-                Log.e("AuthViewModel", "Google Sign-In failed: ID Token is null")
                 _error.value = "Google Sign-In failed: ID Token is null"
             }
         } else {
-            Log.e("AuthViewModel", "Google Sign-In failed: Credential is not a GoogleIdTokenCredential, actual type: ${credential?.javaClass?.name}")
             _error.value = "Google Sign-In failed: Credential is not a GoogleIdTokenCredential"
         }
     }

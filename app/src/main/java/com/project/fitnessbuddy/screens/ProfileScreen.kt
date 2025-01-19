@@ -13,12 +13,15 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
+import com.project.fitnessbuddy.R
+import com.project.fitnessbuddy.api.auth.AuthViewModel
 import com.project.fitnessbuddy.api.auth.UserState
 import com.project.fitnessbuddy.api.user.ProfileViewModel
 import com.project.fitnessbuddy.navigation.NavigationEvent
@@ -29,12 +32,21 @@ fun ProfileScreen(
     userState: UserState,
     navController: NavHostController,
     navigationViewModel: NavigationViewModel,
+    authViewModel: AuthViewModel,
     profileViewModel: ProfileViewModel = viewModel()
 ) {
     var isEditing by remember { mutableStateOf(false) }
-    var name by remember { mutableStateOf(userState.name ?: "") }
+    var name by remember { mutableStateOf("") }
 
     val user = profileViewModel.user.collectAsState()
+    val isLoggedIn = userState.isLoggedIn
+
+    LaunchedEffect(isLoggedIn) {
+        if (isLoggedIn) {
+            profileViewModel.fetchUser()
+            name = user.value?.name ?: ""
+        }
+    }
 
     LaunchedEffect(Unit) {
         navigationViewModel.onEvent(NavigationEvent.SetTitle("Profile"))
@@ -47,6 +59,7 @@ fun ProfileScreen(
         verticalArrangement = Arrangement.Top,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
+        // User Info Section
         Card(
             modifier = Modifier
                 .fillMaxWidth()
@@ -75,7 +88,7 @@ fun ProfileScreen(
                         modifier = Modifier.weight(1f)
                     )
                     Text(
-                        text = user.value?.email ?: "Loading...",
+                        text = user.value?.email ?: stringResource(id = R.string.no_data),
                         style = MaterialTheme.typography.bodyLarge
                     )
                 }
@@ -117,7 +130,7 @@ fun ProfileScreen(
                         }
                     } else {
                         Text(
-                            text = user.value?.name ?: "Loading...",
+                            text = user.value?.name ?: stringResource(id = R.string.no_data),
                             style = MaterialTheme.typography.bodyLarge
                         )
                         Spacer(modifier = Modifier.width(8.dp))
@@ -136,9 +149,11 @@ fun ProfileScreen(
         Spacer(modifier = Modifier.height(24.dp))
 
         IconButtonWithText(
-            text = "Logout",
+            text = stringResource(id = R.string.logout),
             icon = Icons.Default.ExitToApp,
             onClick = {
+                authViewModel.logout()
+                profileViewModel.clearUserData()
                 navController.navigate("login") {
                     popUpTo(0) { inclusive = true }
                 }
@@ -165,3 +180,4 @@ fun IconButtonWithText(text: String, icon: ImageVector, onClick: () -> Unit) {
         Text(text = text, color = Color.White)
     }
 }
+

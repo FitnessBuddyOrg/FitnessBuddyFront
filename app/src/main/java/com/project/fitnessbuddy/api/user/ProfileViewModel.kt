@@ -1,7 +1,5 @@
 package com.project.fitnessbuddy.api.user
 
-import android.content.Context
-import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -12,10 +10,6 @@ class ProfileViewModel(private val userApi: UserApi) : ViewModel() {
 
     private val _user = MutableStateFlow<UserDTO?>(null)
     val user: StateFlow<UserDTO?> = _user
-
-    init {
-        fetchUser()
-    }
 
     fun fetchUser() {
         viewModelScope.launch {
@@ -37,5 +31,8 @@ class ProfileViewModel(private val userApi: UserApi) : ViewModel() {
             }
         }
     }
-}
 
+    fun clearUserData() {
+        _user.value = null
+    }
+}

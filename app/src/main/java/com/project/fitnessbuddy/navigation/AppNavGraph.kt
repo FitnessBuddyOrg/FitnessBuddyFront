@@ -103,6 +103,7 @@ fun AppNavGraph(
                 navController = navController,
                 navigationViewModel = navigationViewModel,
                 profileViewModel = profileViewModel,
+                authViewModel = authViewModel
             ) }
         ),
         AppRoute(
