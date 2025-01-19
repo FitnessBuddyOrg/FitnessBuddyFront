@@ -91,8 +91,7 @@ fun AppNavGraph(
             mainName = home,
             icon = { Icon(imageVector = Icons.Default.Home, contentDescription = null) },
             screen = { HomeScreen(
-                navigationState = navigationState,
-                navigationViewModel = navigationViewModel,
+                navController = navController
             ) }
         ),
         AppRoute(
@@ -261,10 +260,14 @@ fun AppNavGraph(
 
                     composable("home") {
                         HomeScreen(
-                            navigationState = navigationState,
-                            navigationViewModel = navigationViewModel
+                            navController = navController
                         )
                     }
+
+                    composable("progressCalendar") {
+                        ProgressCalendarScreen()
+                    }
+
                     appRoutes.forEach { appRoute ->
                         if (appRoute.subRoutes.isNotEmpty()) {
                             navigation(
