@@ -20,4 +20,7 @@
     <string name="welcome">Welcome, %1$s</string>
     <string name="logout">Logout</string>
     <string name="no_data">No data</string>
+    <string name="google_sign_in">Sign in with Google</string>
+    <string name="github_sign_in">Sign in with GitHub</string>
+
 </resources>

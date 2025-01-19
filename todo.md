@@ -1,6 +1,6 @@
 MUST:
 - [ ] notification 
-- [ ] handle errors in login and registration
+- [x] handle errors in login and registration
 - [ ] users statistics for admin
 - [x] user statistics for user (including screen time)
 - [x] user profile page

@@ -20,4 +20,6 @@
     <string name="welcome">Bienvenue, %1$s</string>
     <string name="logout">Déconnexion</string>
     <string name="no_data">Pas de données</string>
+    <string name="google_sign_in">Se connecter avec Google</string>
+    <string name="github_sign_in">Se connecter avec Github</string>
 </resources>

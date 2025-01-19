@@ -28,10 +28,14 @@ class AuthViewModel(application: Application) : AndroidViewModel(application) {
     private val _error = MutableStateFlow<String?>(null)
     val error: StateFlow<String?> = _error
 
+    private val _loading = MutableStateFlow(false)
+    val loading: StateFlow<Boolean> = _loading
+
     private val appContext: Context = application.applicationContext
 
     fun login(email: String, password: String) {
         viewModelScope.launch {
+            _loading.value = true
             try {
                 val response = RetrofitInstance.authService.login(LoginRequest(email, password))
                 _userState.value = UserState(
@@ -45,6 +49,8 @@ class AuthViewModel(application: Application) : AndroidViewModel(application) {
             } catch (e: Exception) {
                 _error.value = "Login failed: ${e.localizedMessage}"
                 Toast.makeText(appContext, "Login failed: ${e.localizedMessage}", Toast.LENGTH_LONG).show()
+            } finally {
+                _loading.value = false
             }
         }
     }
@@ -52,6 +58,8 @@ class AuthViewModel(application: Application) : AndroidViewModel(application) {
 
     //TODO handle errors
     fun register(email: String, password: String, confirmPassword: String) {
+        _loading.value = true
+
         viewModelScope.launch {
             try {
                 val response = RetrofitInstance.authService.register(RegisterRequest(email, password, confirmPassword))
@@ -66,6 +74,9 @@ class AuthViewModel(application: Application) : AndroidViewModel(application) {
             } catch (e: Exception) {
                 _error.value = "Registration failed: ${e.localizedMessage}"
                 Toast.makeText(appContext, "Registration failed: ${e.localizedMessage}", Toast.LENGTH_LONG).show()
+            }
+            finally {
+                _loading.value = false
             }
         }
     }
@@ -107,6 +118,7 @@ class AuthViewModel(application: Application) : AndroidViewModel(application) {
             if (idToken != null) {
                 viewModelScope.launch {
                     try {
+                        _loading.value = true
                         val userResponse = RetrofitInstance.authService.googleLogin(
                             GoogleLoginRequest(idToken)
                         )
@@ -120,6 +132,9 @@ class AuthViewModel(application: Application) : AndroidViewModel(application) {
                         saveToken(userResponse.accessToken, userResponse.email, userResponse.id)
                     } catch (e: Exception) {
                         Log.e("AuthViewModel", "Google Sign-In failed: ${e.localizedMessage}", e)
+                    }
+                    finally {
+                        _loading.value = false
                     }
                 }
             } else {

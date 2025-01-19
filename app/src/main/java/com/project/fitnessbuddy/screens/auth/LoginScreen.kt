@@ -27,6 +27,8 @@ fun LoginScreen(
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     val userState by authViewModel.userState.collectAsState()
+    val isLoading by authViewModel.loading.collectAsState()
+
 
     Box(
         modifier = Modifier
@@ -35,88 +37,102 @@ fun LoginScreen(
             .padding(16.dp),
         contentAlignment = Alignment.Center
     ) {
-        Card(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
-            elevation = CardDefaults.cardElevation(8.dp),
-        ) {
-            Column(
+        if (isLoading) {
+            CircularProgressIndicator(
+                color = MaterialTheme.colorScheme.primary,
+                modifier = Modifier.size(48.dp)
+            )
+        }
+        else {
+            Card(
                 modifier = Modifier
+                    .fillMaxWidth()
                     .padding(16.dp),
-                verticalArrangement = Arrangement.spacedBy(16.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
+                elevation = CardDefaults.cardElevation(8.dp),
             ) {
-                Text(
-                    text = stringResource(id = R.string.login),
-                    style = MaterialTheme.typography.headlineMedium,
-                    color = MaterialTheme.colorScheme.primary
-                )
-
-                OutlinedTextField(
-                    value = email,
-                    onValueChange = { email = it },
-                    label = { Text(stringResource(id = R.string.email)) },
-                    modifier = Modifier.fillMaxWidth()
-                )
-
-                OutlinedTextField(
-                    value = password,
-                    onValueChange = { password = it },
-                    label = { Text(stringResource(id = R.string.password)) },
-                    visualTransformation = PasswordVisualTransformation(),
-                    modifier = Modifier.fillMaxWidth()
-                )
-
-                Button(
-                    onClick = { authViewModel.login(email, password) },
-                    modifier = Modifier.fillMaxWidth()
+                Column(
+                    modifier = Modifier
+                        .padding(16.dp),
+                    verticalArrangement = Arrangement.spacedBy(16.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    Text(stringResource(id = R.string.login))
-                }
-
-                TextButton(
-                    onClick = { navController.navigate("register") },
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Text(stringResource(id = R.string.dont_have_account))
-                }
-
-                HorizontalDivider()
-
-                Button(
-                    onClick = { authViewModel.loginWithGoogle(context as Activity) },
-                    modifier = Modifier.fillMaxWidth(),
-                    colors = ButtonDefaults.buttonColors(MaterialTheme.colorScheme.secondary)
-                ) {
-                    Icon(
-                        painter = painterResource(id = R.drawable.google),
-                        contentDescription = "Google Icon",
-                        tint = Color.White,
-                        modifier = Modifier.size(24.dp)
+                    Text(
+                        text = stringResource(id = R.string.login),
+                        style = MaterialTheme.typography.headlineMedium,
+                        color = MaterialTheme.colorScheme.primary
                     )
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Text(text = "Sign in with Google", color = Color.White)
-                }
 
-                Button(
-                    onClick = { authViewModel.loginWithGitHub(context as Activity) },
-                    modifier = Modifier.fillMaxWidth(),
-                    colors = ButtonDefaults.buttonColors(MaterialTheme.colorScheme.tertiary)
-                ) {
-                    Icon(
-                        painter = painterResource(id = R.drawable.github),
-                        contentDescription = "GitHub Icon",
-                        tint = Color.White,
-                        modifier = Modifier.size(24.dp)
-
+                    OutlinedTextField(
+                        value = email,
+                        onValueChange = { email = it },
+                        label = { Text(stringResource(id = R.string.email)) },
+                        modifier = Modifier.fillMaxWidth()
                     )
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Text(text = "Sign in with GitHub", color = Color.White)
-                }
 
-                if (userState.isLoggedIn) {
-                    onLoginSuccess()
+                    OutlinedTextField(
+                        value = password,
+                        onValueChange = { password = it },
+                        label = { Text(stringResource(id = R.string.password)) },
+                        visualTransformation = PasswordVisualTransformation(),
+                        modifier = Modifier.fillMaxWidth()
+                    )
+
+                    Button(
+                        onClick = { authViewModel.login(email, password) },
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Text(stringResource(id = R.string.login))
+                    }
+
+                    TextButton(
+                        onClick = { navController.navigate("register") },
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Text(stringResource(id = R.string.dont_have_account))
+                    }
+
+                    HorizontalDivider()
+
+                    Button(
+                        onClick = { authViewModel.loginWithGoogle(context as Activity) },
+                        modifier = Modifier.fillMaxWidth(),
+                        colors = ButtonDefaults.buttonColors(MaterialTheme.colorScheme.secondary)
+                    ) {
+                        Icon(
+                            painter = painterResource(id = R.drawable.google),
+                            contentDescription = "Google Icon",
+                            tint = Color.White,
+                            modifier = Modifier.size(24.dp)
+                        )
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text(
+                            text = (stringResource(id = R.string.google_sign_in)),
+                            color = Color.White
+                        )
+                    }
+
+                    Button(
+                        onClick = { authViewModel.loginWithGitHub(context as Activity) },
+                        modifier = Modifier.fillMaxWidth(),
+                        colors = ButtonDefaults.buttonColors(MaterialTheme.colorScheme.tertiary)
+                    ) {
+                        Icon(
+                            painter = painterResource(id = R.drawable.github),
+                            contentDescription = "GitHub Icon",
+                            tint = Color.White,
+                            modifier = Modifier.size(24.dp)
+
+                        )
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text(
+                            text = (stringResource(id = R.string.github_sign_in)),
+                            color = Color.White
+                        )
+                    }
+
+                    if (userState.isLoggedIn) {
+                        onLoginSuccess()
+                    }
                 }
             }
         }
