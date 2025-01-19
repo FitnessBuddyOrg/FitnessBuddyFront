@@ -27,6 +27,11 @@ data class UpdateUser (
     val name: String,
 )
 
+data class ProfilePictureDTO (
+    val url: String
+)
+
+
 interface UserApi {
 
     @POST("user/increment-app-open")
@@ -40,5 +45,15 @@ interface UserApi {
 
     @PATCH("user/patch")
     suspend fun updateMe(@Body updateUserDTO: UpdateUser): UserDTO
+
+    @GET("user/profile-picture")
+    suspend fun getProfilePicture(): ProfilePictureDTO
+
+    @Multipart
+    @PATCH("user/profile-picture")
+    suspend fun updateProfilePicture(
+        @Part file: MultipartBody.Part
+    ): ProfilePictureDTO
+
 
 }
