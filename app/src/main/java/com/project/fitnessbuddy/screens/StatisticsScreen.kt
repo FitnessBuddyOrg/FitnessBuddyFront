@@ -9,27 +9,56 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
+import androidx.lifecycle.compose.LocalLifecycleOwner
+import androidx.lifecycle.lifecycleScope
 import com.github.mikephil.charting.charts.LineChart
 import com.github.mikephil.charting.components.XAxis
 import com.github.mikephil.charting.data.Entry
 import com.github.mikephil.charting.data.LineData
 import com.github.mikephil.charting.data.LineDataSet
 import com.github.mikephil.charting.formatter.IndexAxisValueFormatter
+import com.project.fitnessbuddy.R
 import com.project.fitnessbuddy.api.auth.UserState
 import com.project.fitnessbuddy.api.statistics.StatisticsViewModel
+import com.project.fitnessbuddy.navigation.DefaultTitleWidget
+import com.project.fitnessbuddy.navigation.NavigationEvent
+import com.project.fitnessbuddy.navigation.NavigationViewModel
+import kotlinx.coroutines.launch
 import java.time.LocalDate
 
 @Composable
 fun StatisticsScreen(
     statisticsViewModel: StatisticsViewModel,
+    navigationViewModel: NavigationViewModel,
     userState: UserState,
 ) {
     val appOpenData by statisticsViewModel.appOpenData.collectAsState()
     val userId = userState.id ?: return
+
+    val context = LocalContext.current
+    val lifecycleOwner = LocalLifecycleOwner.current
+    val coroutineScope = remember {
+        lifecycleOwner.lifecycleScope
+    }
+
+    DisposableEffect(Unit) {
+        val job = coroutineScope.launch {
+            navigationViewModel.onEvent(NavigationEvent.DisableAllButtons)
+
+            navigationViewModel.onEvent(NavigationEvent.UpdateTitleWidget {
+                DefaultTitleWidget(context.getString(R.string.statistics))
+            })
+        }
+
+        onDispose {
+            job.cancel()
+        }
+    }
 
     LaunchedEffect(userId) {
         statisticsViewModel.fetchAppOpenData(userId)

@@ -11,22 +11,54 @@ import androidx.compose.material.icons.filled.FitnessCenter
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.LocalLifecycleOwner
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavController
 import com.project.fitnessbuddy.R
+import com.project.fitnessbuddy.navigation.DefaultTitleWidget
+import com.project.fitnessbuddy.navigation.NavigationEvent
+import com.project.fitnessbuddy.navigation.NavigationState
+import com.project.fitnessbuddy.navigation.NavigationViewModel
+import kotlinx.coroutines.launch
 
 @Composable
 fun HomeScreen(
     navController: NavController,
-
+    navigationState: NavigationState,
+    navigationViewModel: NavigationViewModel,
 ) {
+
+    val context = LocalContext.current
+    val lifecycleOwner = LocalLifecycleOwner.current
+    val coroutineScope = remember {
+        lifecycleOwner.lifecycleScope
+    }
+
+    DisposableEffect(Unit) {
+        val job = coroutineScope.launch {
+            navigationViewModel.onEvent(NavigationEvent.DisableAllButtons)
+
+            navigationViewModel.onEvent(NavigationEvent.UpdateTitleWidget {
+                DefaultTitleWidget(context.getString(R.string.home))
+            })
+        }
+
+        onDispose {
+            job.cancel()
+        }
+    }
+
     Column(
         modifier = Modifier
             .fillMaxSize()

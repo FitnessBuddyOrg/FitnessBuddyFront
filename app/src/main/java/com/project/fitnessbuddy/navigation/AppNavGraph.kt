@@ -91,7 +91,9 @@ fun AppNavGraph(
             mainName = home,
             icon = { Icon(imageVector = Icons.Default.Home, contentDescription = null) },
             screen = { HomeScreen(
-                navController = navController
+                navController = navController,
+                navigationState = navigationState,
+                navigationViewModel = navigationViewModel
             ) }
         ),
         AppRoute(
@@ -165,7 +167,8 @@ fun AppNavGraph(
             },
             screen = { StatisticsScreen(
                 statisticsViewModel = statisticsViewModel,
-                userState = userState
+                userState = userState,
+                navigationViewModel = navigationViewModel
             ) }
         ),
     )
@@ -260,7 +263,9 @@ fun AppNavGraph(
 
                     composable("home") {
                         HomeScreen(
-                            navController = navController
+                            navController = navController,
+                            navigationState = navigationState,
+                            navigationViewModel = navigationViewModel
                         )
                     }
 

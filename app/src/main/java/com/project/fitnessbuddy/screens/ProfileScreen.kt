@@ -13,19 +13,24 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.LocalLifecycleOwner
+import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.project.fitnessbuddy.R
 import com.project.fitnessbuddy.api.auth.AuthViewModel
 import com.project.fitnessbuddy.api.auth.UserState
 import com.project.fitnessbuddy.api.user.ProfileViewModel
+import com.project.fitnessbuddy.navigation.DefaultTitleWidget
 import com.project.fitnessbuddy.navigation.NavigationEvent
 import com.project.fitnessbuddy.navigation.NavigationViewModel
+import kotlinx.coroutines.launch
 
 @Composable
 fun ProfileScreen(
@@ -40,6 +45,27 @@ fun ProfileScreen(
 
     val user = profileViewModel.user.collectAsState()
     val isLoggedIn = userState.isLoggedIn
+
+
+    val context = LocalContext.current
+    val lifecycleOwner = LocalLifecycleOwner.current
+    val coroutineScope = remember {
+        lifecycleOwner.lifecycleScope
+    }
+
+    DisposableEffect(Unit) {
+        val job = coroutineScope.launch {
+            navigationViewModel.onEvent(NavigationEvent.DisableAllButtons)
+
+            navigationViewModel.onEvent(NavigationEvent.UpdateTitleWidget {
+                DefaultTitleWidget(context.getString(R.string.profile))
+            })
+        }
+
+        onDispose {
+            job.cancel()
+        }
+    }
 
     LaunchedEffect(isLoggedIn) {
         if (isLoggedIn) {
@@ -59,7 +85,7 @@ fun ProfileScreen(
         verticalArrangement = Arrangement.Top,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        // User Info Section
+
         Card(
             modifier = Modifier
                 .fillMaxWidth()
