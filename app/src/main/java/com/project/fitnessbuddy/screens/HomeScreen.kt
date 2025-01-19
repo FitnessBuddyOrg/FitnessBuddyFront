@@ -26,7 +26,7 @@ import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavController
 import com.project.fitnessbuddy.R
-import com.project.fitnessbuddy.navigation.DefaultTitleWidget
+import com.project.fitnessbuddy.navigation.MediumTextWidget
 import com.project.fitnessbuddy.navigation.NavigationEvent
 import com.project.fitnessbuddy.navigation.NavigationViewModel
 import kotlinx.coroutines.launch
@@ -48,7 +48,7 @@ fun HomeScreen(
             navigationViewModel.onEvent(NavigationEvent.DisableAllButtons)
 
             navigationViewModel.onEvent(NavigationEvent.UpdateTitleWidget {
-                DefaultTitleWidget(context.getString(R.string.home))
+                MediumTextWidget(context.getString(R.string.home))
             })
         }
 

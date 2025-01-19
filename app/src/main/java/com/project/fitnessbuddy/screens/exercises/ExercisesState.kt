@@ -11,7 +11,7 @@ data class ExercisesState(
 
     val exercises: List<Exercise> = emptyList(),
 
-    val editingExercise: Exercise = Exercise(
+    val selectedExercise: Exercise = Exercise(
         "",
         "",
         "",
@@ -19,13 +19,6 @@ data class ExercisesState(
         ShareType.PUBLIC,
         Language.ENGLISH
     ),
-
-//    val name: String = "",
-//    val instructions: String = "",
-//    val videoLink: String = "",
-//    val category: Category = Category.ARMS,
-//    val shareType: ShareType = ShareType.PUBLIC,
-//    val language: Language = Language.ENGLISH,
 
     val sortType: SortType = SortType.NAME,
     val searchValue: String = "",

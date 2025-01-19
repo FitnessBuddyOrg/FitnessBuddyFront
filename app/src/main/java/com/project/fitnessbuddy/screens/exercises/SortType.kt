@@ -1,7 +1,8 @@
 package com.project.fitnessbuddy.screens.exercises
 
-enum class SortType {
-    NAME,
-    CATEGORY
+import com.project.fitnessbuddy.R
 
+enum class SortType(val resourceId: Int) {
+    NAME(R.string.name),
+    CATEGORY(R.string.category),
 }

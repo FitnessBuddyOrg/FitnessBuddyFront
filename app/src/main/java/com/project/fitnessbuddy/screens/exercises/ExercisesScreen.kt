@@ -25,15 +25,17 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import com.project.fitnessbuddy.R
 import com.project.fitnessbuddy.database.entity.Exercise
-import com.project.fitnessbuddy.navigation.DefaultTitleWidget
+import com.project.fitnessbuddy.navigation.MediumTextWidget
 import com.project.fitnessbuddy.navigation.NavigationEvent
 import com.project.fitnessbuddy.navigation.NavigationState
 import com.project.fitnessbuddy.navigation.NavigationViewModel
+import com.project.fitnessbuddy.screens.common.StoredValue
 import com.project.fitnessbuddy.screens.common.WidgetLetterImage
 import kotlinx.coroutines.launch
 
@@ -55,11 +57,11 @@ fun ExercisesScreen(
             navigationViewModel.onEvent(NavigationEvent.DisableAllButtons)
             navigationViewModel.onEvent(NavigationEvent.EnableSearchButton)
             navigationViewModel.onEvent(NavigationEvent.EnableAddButton)
-            navigationViewModel.onEvent(NavigationEvent.SetAddButtonRoute(context.getString(R.string.add_edit_exercise)))
+            navigationViewModel.onEvent(NavigationEvent.SetAddButtonRoute(context.getString(R.string.add_edit_exercise_route)))
 
             navigationViewModel.onEvent(NavigationEvent.SetTitle(context.getString(R.string.exercises)))
             navigationViewModel.onEvent(NavigationEvent.UpdateTitleWidget {
-                DefaultTitleWidget(context.getString(R.string.exercises))
+                MediumTextWidget(context.getString(R.string.exercises))
             })
         }
 
@@ -81,6 +83,8 @@ fun AlphabeticallyGroupedWidgetList(
     exercisesViewModel: ExercisesViewModel,
     navigationState: NavigationState
 ) {
+    val context = LocalContext.current
+
 
     Scaffold(
         modifier = Modifier
@@ -99,7 +103,7 @@ fun AlphabeticallyGroupedWidgetList(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.SpaceEvenly
                 ) {
-                    SortType.entries.forEach { sortType ->
+                    SortType.entries.map { StoredValue(it, stringResource(it.resourceId)) }.forEach { storedValue ->
                         Row(
                             modifier = Modifier
                                 .weight(0.5f)
@@ -107,7 +111,7 @@ fun AlphabeticallyGroupedWidgetList(
                                     detectTapGestures(onPress = {
                                         exercisesViewModel.onEvent(
                                             ExercisesEvent.SortExercises(
-                                                sortType
+                                                storedValue.value
                                             )
                                         )
                                     })
@@ -116,24 +120,25 @@ fun AlphabeticallyGroupedWidgetList(
                             horizontalArrangement = Arrangement.Center
                         ) {
                             RadioButton(
-                                selected = exercisesState.sortType == sortType,
+                                selected = exercisesState.sortType == storedValue.value,
                                 onClick = {
-                                    exercisesViewModel.onEvent(ExercisesEvent.SortExercises(sortType))
+                                    exercisesViewModel.onEvent(ExercisesEvent.SortExercises(storedValue.value))
                                 },
                             )
                             Text(
-                                text = sortType.name,
+                                text = storedValue.displayValue.uppercase(),
                                 style = MaterialTheme.typography.labelSmall,
                             )
                         }
                     }
                 }
             }
+
             exercisesState.exercises
                 .groupBy {
                     when (exercisesState.sortType) {
                         SortType.NAME -> it.name.first().uppercase()
-                        SortType.CATEGORY -> it.category.toString()
+                        SortType.CATEGORY -> context.getString(it.category.resourceId)
                     }
                 }
                 .toSortedMap()
@@ -175,7 +180,7 @@ fun ExerciseWidget(
             .clickable(
                 onClick = {
                     exercisesViewModel.onEvent(ExercisesEvent.SetEditingExercise(exercise))
-                    navigationState.navController?.navigate(context.getString(R.string.view_exercise))
+                    navigationState.navController?.navigate(context.getString(R.string.view_exercise_route))
                 }
             ),
         verticalAlignment = Alignment.CenterVertically
@@ -196,7 +201,7 @@ fun ExerciseWidget(
             )
             Text(
                 modifier = Modifier.fillMaxWidth(),
-                text = exercise.category.toString(),
+                text = stringResource(exercise.category.resourceId),
                 style = MaterialTheme.typography.labelSmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )

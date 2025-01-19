@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">FitnessBuddy</string>
     <string name="home">Accueil</string>
@@ -7,9 +8,6 @@
     <string name="statistics">Statistiques</string>
     <string name="username_placeholder">Pseudo</string>
     <string name="routines">Routines</string>
-    <string name="add_edit_exercise">add_edit_exercise</string>
-    <string name="exercises_overview">Exercises Overview</string>
-    <string name="view_exercise">View Exercise</string>
     <string name="register">S\'inscrire</string>
     <string name="email">Email</string>
     <string name="password">Mot de passe</string>
@@ -19,6 +17,36 @@
     <string name="dont_have_account">Vous n\'avez pas de compte? S\'inscrire</string>
     <string name="welcome">Bienvenue</string>
     <string name="logout">Déconnexion</string>
+    <string name="add_edit_exercise">Rajouter Editer Un Exercice</string>
+    <string name="exercises_overview">Aperçu des exercices</string>
+    <string name="view_exercise">Voir Exercice</string>
+    <string name="instructions">Instructions</string>
+    <string name="no_vid_available">Aucune vidéo n\'est disponible pour cet exercice</string>
+    <string name="exercise">un exercice</string>
+    <string name="add">Ajouter</string>
+    <string name="edit">Modifier</string>
+    <string name="public_res">Public</string>
+    <string name="private_res">Privé</string>
+    <string name="shared_res">Partagé</string>
+    <string name="arms">Bras</string>
+    <string name="back">Dos</string>
+    <string name="chest">Poitrine</string>
+    <string name="legs">Jambes</string>
+    <string name="shoulders">Épaules</string>
+    <string name="abs">Abdos</string>
+    <string name="name">Nom</string>
+    <string name="video_link">Lien Vidéo</string>
+    <string name="category">Catégorie</string>
+    <string name="share_type">Type de Partage</string>
+    <string name="about">À propos</string>
+    <string name="history">Historique</string>
+    <string name="charts">Graphiques</string>
+    <string name="search">Rechercher</string>
+    <string name="language">Langue</string>
+    <string name="english">Anglais</string>
+    <string name="french">Français</string>
+    <string name="russian">Russe</string>
+    <string name="ok">Ok</string>
     <string name="no_data">Pas de données</string>
     <string name="google_sign_in">Se connecter avec Google</string>
     <string name="github_sign_in">Se connecter avec Github</string>
