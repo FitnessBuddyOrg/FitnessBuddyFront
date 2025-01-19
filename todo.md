@@ -11,9 +11,9 @@ MUST:
 SHOULD:
 
 - [ ] password reset
-- [ ] pfp
+- [x] pfp
 - [ ] sharing routines with other users
-- [ ] design a cool home page with links to other pages
+- [x] design a cool home page with links to other pages
 
 COULD:
 

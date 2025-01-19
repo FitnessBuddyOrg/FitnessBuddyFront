@@ -1,5 +1,6 @@
 package com.project.fitnessbuddy.api.user
 
+import okhttp3.MultipartBody
 import retrofit2.http.*
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter

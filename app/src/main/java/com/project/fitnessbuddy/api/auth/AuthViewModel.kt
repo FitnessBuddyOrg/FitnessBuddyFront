@@ -6,6 +6,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
 import android.net.Uri
+import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
 import androidx.credentials.CredentialManager
@@ -19,6 +20,7 @@ import com.google.android.libraries.identity.googleid.GetGoogleIdOption
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import org.json.JSONObject
 
 class AuthViewModel(application: Application) : AndroidViewModel(application) {
 
@@ -101,6 +103,7 @@ class AuthViewModel(application: Application) : AndroidViewModel(application) {
         viewModelScope.launch {
             try {
                 val response = credentialManager.getCredential(activity, getRequest)
+                Log.d("AuthViewModel", "Google Sign-In successful: ${bundleToJson(response.credential.data)}")
                 handleGoogleLoginSuccess(response)
             } catch (e: GetCredentialException) {
                 _error.value = "Google Sign-In failed: ${e.localizedMessage}"
@@ -115,12 +118,13 @@ class AuthViewModel(application: Application) : AndroidViewModel(application) {
         val credential = response.credential
         if (credential is CustomCredential) {
             val idToken = credential.data.getString("com.google.android.libraries.identity.googleid.BUNDLE_KEY_ID_TOKEN")
-            if (idToken != null) {
+            val profilePictureUrl = credential.data.getParcelable<Uri>("com.google.android.libraries.identity.googleid.BUNDLE_KEY_PROFILE_PICTURE_URI")?.toString()
+            if (idToken != null && profilePictureUrl != null) {
                 viewModelScope.launch {
                     try {
                         _loading.value = true
                         val userResponse = RetrofitInstance.authService.googleLogin(
-                            GoogleLoginRequest(idToken)
+                            GoogleLoginRequest(idToken, profilePictureUrl)
                         )
                         _userState.value = UserState(
                             accessToken = userResponse.accessToken,
@@ -192,6 +196,14 @@ class AuthViewModel(application: Application) : AndroidViewModel(application) {
         editor.clear()
         editor.apply()
         _userState.value = UserState()
+    }
+
+    private fun bundleToJson(bundle: Bundle): String {
+        val json = JSONObject()
+        for (key in bundle.keySet()) {
+            json.put(key, bundle.get(key))
+        }
+        return json.toString()
     }
 }
 

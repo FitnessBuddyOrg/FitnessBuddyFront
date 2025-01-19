@@ -93,7 +93,12 @@ dependencies {
 
     implementation(libs.mpandroidchart)
 
-    
+    implementation(libs.coil.compose)
+
+    implementation (libs.ucrop)
+
+
+
     ksp(libs.hilt.android.compiler)
     ksp(libs.androidx.hilt.compiler)
     ksp(libs.androidx.room.compiler)

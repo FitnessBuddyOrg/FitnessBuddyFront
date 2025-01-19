@@ -115,7 +115,7 @@ class MainActivity : ComponentActivity() {
         object : ViewModelProvider.Factory {
             override fun <T : ViewModel> create(modelClass: Class<T>): T {
                 @Suppress("UNCHECKED_CAST")
-                return StatisticsViewModel(RetrofitInstance.userService) as T
+                return StatisticsViewModel(RetrofitInstance.userApi) as T
             }
         }
     }
@@ -124,7 +124,7 @@ class MainActivity : ComponentActivity() {
         object : ViewModelProvider.Factory {
             override fun <T : ViewModel> create(modelClass: Class<T>): T {
                 @Suppress("UNCHECKED_CAST")
-                return ProfileViewModel(RetrofitInstance.userService) as T
+                return ProfileViewModel(RetrofitInstance.userApi) as T
             }
         }
     }
@@ -157,7 +157,7 @@ class MainActivity : ComponentActivity() {
         if (authViewModel.userState.value.isLoggedIn) {
             lifecycleScope.launch {
                 try {
-                    RetrofitInstance.userService.incrementAppOpen()
+                    RetrofitInstance.userApi.incrementAppOpen()
                 } catch (e: Exception) {
                     Log.e("MainActivity", "Failed to increment app open count: ${e.localizedMessage}", e)
                 }

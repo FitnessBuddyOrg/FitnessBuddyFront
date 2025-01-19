@@ -41,7 +41,7 @@ import com.project.fitnessbuddy.api.auth.UserState
 import com.project.fitnessbuddy.api.statistics.StatisticsViewModel
 import com.project.fitnessbuddy.api.user.ProfileViewModel
 import com.project.fitnessbuddy.screens.HomeScreen
-import com.project.fitnessbuddy.screens.ProfileScreen
+import com.project.fitnessbuddy.screens.profile.ProfileScreen
 import com.project.fitnessbuddy.screens.ProgressCalendarScreen
 import com.project.fitnessbuddy.screens.routines.RoutinesScreen
 import com.project.fitnessbuddy.screens.StatisticsScreen
@@ -180,7 +180,8 @@ fun AppNavGraph(
                 appRoutes = appRoutes,
                 navController = navController,
                 modifier = Modifier,
-                userState = userState
+                userState = userState,
+                authViewModel = authViewModel,
             )
         }, drawerState = drawerState) {
             Scaffold(

@@ -36,7 +36,7 @@ object RetrofitInstance {
             .create(AuthService::class.java)
     }
 
-    val userService: UserApi by lazy {
+    val userApi: UserApi by lazy {
         Retrofit.Builder()
             .baseUrl(BASE_URL)
             .client(client)
