@@ -3,8 +3,6 @@ package com.project.fitnessbuddy.screens.auth
 import android.app.Activity
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -18,7 +16,6 @@ import androidx.compose.ui.res.stringResource
 import com.project.fitnessbuddy.R
 import com.project.fitnessbuddy.api.auth.AuthViewModel
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.graphics.painter.Painter
 
 @Composable
 fun LoginScreen(
@@ -85,7 +82,7 @@ fun LoginScreen(
                     Text(stringResource(id = R.string.dont_have_account))
                 }
 
-                Divider()
+                HorizontalDivider()
 
                 Button(
                     onClick = { authViewModel.loginWithGoogle(context as Activity) },
@@ -93,7 +90,7 @@ fun LoginScreen(
                     colors = ButtonDefaults.buttonColors(MaterialTheme.colorScheme.secondary)
                 ) {
                     Icon(
-                        painter = painterResource(id = R.drawable.google), // Replace with Google icon if available
+                        painter = painterResource(id = R.drawable.google),
                         contentDescription = "Google Icon",
                         tint = Color.White,
                         modifier = Modifier.size(24.dp)
@@ -108,7 +105,7 @@ fun LoginScreen(
                     colors = ButtonDefaults.buttonColors(MaterialTheme.colorScheme.tertiary)
                 ) {
                     Icon(
-                        painter = painterResource(id = R.drawable.github), // Replace with GitHub icon if available
+                        painter = painterResource(id = R.drawable.github),
                         contentDescription = "GitHub Icon",
                         tint = Color.White,
                         modifier = Modifier.size(24.dp)

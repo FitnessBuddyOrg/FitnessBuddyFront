@@ -3,6 +3,7 @@ package com.project.fitnessbuddy.ui.theme
 import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Typography
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.dynamicDarkColorScheme
 import androidx.compose.material3.dynamicLightColorScheme
@@ -10,6 +11,12 @@ import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.sp
+import com.project.fitnessbuddy.R
 
 private val DarkColorScheme = darkColorScheme(
 //    primary = Purple80,
@@ -33,6 +40,36 @@ private val LightColorScheme = lightColorScheme(
     onSurface = Color(0xFF1C1B1F),
 )
 
+val customTypography = Typography(
+    headlineMedium = TextStyle(
+        fontFamily = FontFamily(Font(R.font.roboto_bold)),
+        fontWeight = FontWeight.Bold,
+        fontSize = 24.sp
+    ),
+    titleLarge = TextStyle(
+        fontFamily = FontFamily(Font(R.font.roboto_black)),
+        fontWeight = FontWeight.Black,
+        fontSize = 20.sp
+    ),
+    bodyLarge = TextStyle(
+        fontFamily = FontFamily(Font(R.font.roboto_regular)),
+        fontWeight = FontWeight.Normal,
+        fontSize = 16.sp
+    ),
+    bodyMedium = TextStyle(
+        fontFamily = FontFamily(Font(R.font.roboto_light)),
+        fontWeight = FontWeight.Light,
+        fontSize = 14.sp
+    ),
+    labelSmall = TextStyle(
+        fontFamily = FontFamily(Font(R.font.roboto_italic)),
+        fontWeight = FontWeight.Normal,
+        fontSize = 12.sp
+    ),
+
+)
+
+
 @Composable
 fun FitnessBuddyTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
@@ -51,7 +88,8 @@ fun FitnessBuddyTheme(
 
     MaterialTheme(
         colorScheme = colorScheme,
-        typography = Typography,
+        typography = customTypography,
         content = content
     )
 }
+
