@@ -31,7 +31,7 @@ fun LoginScreen(
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(MaterialTheme.colorScheme.background)
+            .background(Color(0xFF4D368E))
             .padding(16.dp),
         contentAlignment = Alignment.Center
     ) {
