@@ -88,6 +88,7 @@ dependencies {
 
     implementation(libs.youtubePlayer)
     implementation(libs.androidx.appcompat)
+    implementation(libs.androidx.lifecycle.process)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

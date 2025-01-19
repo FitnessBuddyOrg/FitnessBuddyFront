@@ -1,17 +1,28 @@
 package com.project.fitnessbuddy
 
+import android.Manifest
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
+import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.platform.LocalContext
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.compose.rememberNavController
 import androidx.room.Room
 import com.project.fitnessbuddy.auth.AuthViewModel
 import com.project.fitnessbuddy.auth.GitHubTokenRequestDTO
@@ -145,6 +156,7 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         authViewModel.loadToken()
+
         setContent {
             FitnessBuddyTheme {
                 val navigationState by navigationViewModel.state.collectAsState()
@@ -153,6 +165,21 @@ class MainActivity : ComponentActivity() {
 
                 val userState by authViewModel.userState.collectAsState()
                 val parametersState by parametersViewModel.state.collectAsState()
+
+                val context = LocalContext.current
+                var hasNotificationPermission by remember {
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                        mutableStateOf(
+                            ContextCompat.checkSelfPermission(
+                                context,
+                                Manifest.permission.POST_NOTIFICATIONS
+                            ) == PackageManager.PERMISSION_GRANTED
+                        )
+                    } else {
+                        mutableStateOf(true)
+                    }
+
+                }
 
                 AppNavGraph(
                     navigationState = navigationState,

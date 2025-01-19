@@ -15,12 +15,13 @@ import com.project.fitnessbuddy.navigation.NavigationEvent
 import com.project.fitnessbuddy.navigation.NavigationState
 import com.project.fitnessbuddy.navigation.NavigationViewModel
 import com.project.fitnessbuddy.navigation.SearchButton
-import com.project.fitnessbuddy.screens.common.AlphabeticallyGroupedWidgetList
+import com.project.fitnessbuddy.screens.common.GroupedWidgetList
 import com.project.fitnessbuddy.screens.common.ParametersState
 import com.project.fitnessbuddy.screens.common.ParametersViewModel
 import com.project.fitnessbuddy.screens.common.SelectedExerciseWidget
 import com.project.fitnessbuddy.screens.common.ValidationFloatingActionButton
 import com.project.fitnessbuddy.screens.exercises.ExercisesEvent
+import com.project.fitnessbuddy.screens.exercises.ExercisesGroupedList
 import com.project.fitnessbuddy.screens.exercises.ExercisesState
 import com.project.fitnessbuddy.screens.exercises.ExercisesViewModel
 import kotlinx.coroutines.launch
@@ -54,6 +55,7 @@ fun AddExercisesScreen(
             navigationViewModel.onEvent(NavigationEvent.SetBackButton(
                 navController = navigationState.navController,
                 onClick = {
+                    navigationState.navController?.navigateUp()
                     routinesViewModel.onEvent(RoutinesEvent.ClearExercisesLists)
                 }
             ))
@@ -95,27 +97,12 @@ fun AddExercisesScreen(
         return routineExerciseDTO != null
     }
 
-
-    AlphabeticallyGroupedWidgetList(
-        sortingState = exercisesState,
-        itemsList = exercisesState.exercises,
-        onClick = {
-            exercisesViewModel.onEvent(
-                ExercisesEvent.SortExercises(
-                    it.value
-                )
-            )
-        },
-        widget = @Composable {
-            SelectedExerciseWidget(
-                exercise = it,
-                onClick = { exercise, selected ->
-                    routinesViewModel.onEvent(RoutinesEvent.HandleExercise(exercise, selected))
-                },
-                initialSelected = isSelected(it),
-                selectionEnabled = true
-            )
-        },
+    ExercisesGroupedList(
+        parametersState = parametersState,
+        exercisesViewModel = exercisesViewModel,
+        exercisesState = exercisesState,
+        navigationState = navigationState,
+        context = context,
         floatingActionButton = {
             ValidationFloatingActionButton(
                 context = context,
@@ -127,7 +114,11 @@ fun AddExercisesScreen(
                 toasting = false
             )
         },
-        parametersState = parametersState
+        initialSelected = ::isSelected,
+        selectionEnabled = true,
+        onWidgetClick = { exercise, selected ->
+            routinesViewModel.onEvent(RoutinesEvent.HandleExercise(exercise, selected))
+        }
     )
 }
 

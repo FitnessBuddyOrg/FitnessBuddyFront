@@ -52,6 +52,18 @@ class NavigationViewModel : ViewModel() {
                 }
             }
 
+            is NavigationEvent.SetCloseButton -> {
+                _state.update {
+                    it.copy(
+                        iconButton = {
+                            CloseButton(
+                                navigationEvent.onClick
+                            )
+                        }
+                    )
+                }
+            }
+
             is NavigationEvent.DisableCustomButton -> {
                 _state.update {
                     it.copy(

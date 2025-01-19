@@ -31,6 +31,7 @@ okhttp = "5.0.0-alpha.14"
 serialization = "1.6.3"
 browser = "1.8.0"
 appcompat = "1.7.0"
+lifecycleProcess = "2.8.7"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -69,6 +70,7 @@ retrofit-converter-gson = { module = "com.squareup.retrofit2:converter-gson", ve
 okhttp = { group = "com.squareup.okhttp3", name = "okhttp", version.ref = "okhttp" }
 kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "serialization"}
 androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
+androidx-lifecycle-process = { group = "androidx.lifecycle", name = "lifecycle-process", version.ref = "lifecycleProcess" }
 
 
 [plugins]

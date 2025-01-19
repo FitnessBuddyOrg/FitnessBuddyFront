@@ -20,6 +20,7 @@ sealed interface RoutinesEvent {
     data class SetFrequency(val frequency: Frequency) : RoutinesEvent
     data class SetShareType(val shareType: ShareType) : RoutinesEvent
     data class SetLanguage(val language: Language) : RoutinesEvent
+    data class SetStartDate(val startDate: Date) : RoutinesEvent
 
     data class SetSelectedRoutineDTO(val routineDTO: RoutineDTO) : RoutinesEvent
     data object ResetSelectedRoutineDTO : RoutinesEvent
@@ -43,7 +44,7 @@ sealed interface RoutinesEvent {
     ) : RoutinesEvent
 
     data class DeleteRoutine(val routine: Routine) : RoutinesEvent
-    data class CompleteRoutine(val startDate: Date) : RoutinesEvent
+    data object CompleteRoutine : RoutinesEvent
 
     data class SetSearchValue(val searchValue: String) : RoutinesEvent
     data class SetEditType(val editType: EditType) : RoutinesEvent

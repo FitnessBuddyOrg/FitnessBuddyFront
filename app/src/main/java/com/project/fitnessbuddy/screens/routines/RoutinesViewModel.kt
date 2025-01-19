@@ -1,7 +1,10 @@
 package com.project.fitnessbuddy.screens.routines
 
+import android.content.Context
+import android.content.Intent
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.google.gson.Gson
 import com.project.fitnessbuddy.database.dao.RoutineDao
 import com.project.fitnessbuddy.database.dao.RoutineExerciseDao
 import com.project.fitnessbuddy.database.dao.RoutineExerciseSetDao
@@ -39,7 +42,7 @@ class RoutinesViewModel(
 
     private val _completedRoutineDTOs =
         routineDao.getCompletedRoutineDTOs()
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), emptyList())
+            .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), emptyList())
 
     private val _state = MutableStateFlow(RoutinesState())
     val state = combine(
@@ -51,7 +54,7 @@ class RoutinesViewModel(
         state.copy(
             templateRoutineDTOs = templateRoutineDTOs,
             completedRoutineDTOs = completedRoutineDTOs,
-            searchValue = searchValue
+            searchValue = searchValue,
         )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), RoutinesState())
 
@@ -333,6 +336,18 @@ class RoutinesViewModel(
                 }
             }
 
+            is RoutinesEvent.SetStartDate -> {
+                _state.update {
+                    it.copy(
+                        selectedRoutineDTO = it.selectedRoutineDTO.copy(
+                            routine = it.selectedRoutineDTO.routine.copy(
+                                startDate = routinesEvent.startDate
+                            )
+                        )
+                    )
+                }
+            }
+
             is RoutinesEvent.SetLanguage -> {
                 _state.update {
                     it.copy(
@@ -521,7 +536,6 @@ class RoutinesViewModel(
                 val completedRoutineDTO = _state.value.selectedRoutineDTO.copy(
                     routine = _state.value.selectedRoutineDTO.routine.copy(
                         routineId = null,
-                        startDate = routinesEvent.startDate,
                         endDate = Date(),
                         lastPerformed = null,
                         isCompleted = true
@@ -549,6 +563,19 @@ class RoutinesViewModel(
         }
         return true
 
+    }
+
+    fun sendRoutineUpdate(context: Context) {
+        val routineDTOJson = Gson().toJson(_state.value.selectedRoutineDTO)
+
+        val intent = Intent(context, StartRoutineServiceNotification::class.java).apply {
+            putExtra(SELECTED_ROUTINE_DTO, routineDTOJson)
+            action = ROUTINE_UPDATE
+        }
+
+        println("sending routine: " + _state.value.selectedRoutineDTO)
+
+        context.startForegroundService(intent)
     }
 }
 

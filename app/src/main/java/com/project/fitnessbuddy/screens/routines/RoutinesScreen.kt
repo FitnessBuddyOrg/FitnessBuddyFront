@@ -35,7 +35,7 @@ import com.project.fitnessbuddy.navigation.NavigationEvent
 import com.project.fitnessbuddy.navigation.NavigationState
 import com.project.fitnessbuddy.navigation.NavigationViewModel
 import com.project.fitnessbuddy.navigation.SearchButton
-import com.project.fitnessbuddy.screens.common.AlphabeticallyGroupedWidgetList
+import com.project.fitnessbuddy.screens.common.GroupedWidgetList
 import com.project.fitnessbuddy.screens.common.ParametersState
 import com.project.fitnessbuddy.screens.common.ParametersViewModel
 import com.project.fitnessbuddy.screens.common.timeAgo
@@ -93,7 +93,7 @@ fun RoutinesScreen(
         }
     }
 
-    AlphabeticallyGroupedWidgetList(
+    GroupedWidgetList(
         itemsList = routinesState.templateRoutineDTOs,
         widget = @Composable {
             RoutineWidget(
@@ -103,7 +103,9 @@ fun RoutinesScreen(
             )
         },
         parametersState = parametersState,
-        verticalArrangement = Arrangement.spacedBy(8.dp)
+        verticalArrangement = Arrangement.spacedBy(8.dp),
+
+        keySelector = { it.name.first().uppercase() }
     )
 }
 
@@ -161,7 +163,7 @@ fun RoutineWidget(
 
             routineDTO.routineExerciseDTOs.forEach { routineExerciseDTO ->
                 Text(
-                    text = "${routineExerciseDTO.routineExerciseSetDTOs.size} x ${routineExerciseDTO.exercise.name}",
+                    text = "${routineExerciseDTO.routineExerciseSetDTOs.size} × ${routineExerciseDTO.exercise.name}",
                     style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )

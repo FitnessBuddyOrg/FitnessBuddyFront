@@ -225,7 +225,7 @@ fun AllExercisesWidget(
     onAllCheckedChange: (Boolean) -> Unit = {}
 ) {
 
-    var allChecked =
+    val allChecked =
         routinesState.selectedRoutineDTO.routineExerciseDTOs.all{ it.routineExerciseSetDTOs.all{ it2 -> it2.checked}}
 
     LaunchedEffect(allChecked) {
@@ -360,13 +360,13 @@ fun NewExerciseWidget(
                     )
                 )
                 SmallTextWidget(
-                    text = stringResource(R.string.weight),
-                    modifier = Modifier.weight(secondColumnWidth),
+                    text = stringResource(R.string.reps),
+                    modifier = Modifier.weight(thirdColumnWidth),
                     textAlign = TextAlign.Center
                 )
                 SmallTextWidget(
-                    text = stringResource(R.string.reps),
-                    modifier = Modifier.weight(thirdColumnWidth),
+                    text = stringResource(R.string.weight),
+                    modifier = Modifier.weight(secondColumnWidth),
                     textAlign = TextAlign.Center
                 )
                 if (editingEnabled) {
@@ -464,35 +464,6 @@ fun RoutineExerciseSetWidget(
             )
         )
         CustomIntegerField(
-            value = weight,
-            onValueChange = {
-                if (it != null) {
-                    routinesViewModel.onEvent(
-                        RoutinesEvent.UpdateRoutineExerciseSet(
-                            routineExerciseSetDTO = routineExerciseSetDTO.copy(
-                                routineExerciseSet = routineExerciseSetDTO.routineExerciseSet.copy(
-                                    weight = it
-                                ),
-                                tempId = routineExerciseSetDTO.tempId
-                            ),
-                            routineExercise = routineExerciseDTO.routineExercise
-                        )
-                    )
-                    weight = it.toString()
-                } else {
-                    weight = ""
-                }
-            },
-            modifier = Modifier
-                .weight(secondColumnWidth),
-            textStyle = MaterialTheme.typography.labelMedium.copy(
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                textAlign = TextAlign.Center
-            ),
-            insidePadding = PaddingValues(4.dp),
-            enabled = inputsEnabled
-        )
-        CustomIntegerField(
             value = reps,
             onValueChange = {
                 if (it != null) {
@@ -514,6 +485,35 @@ fun RoutineExerciseSetWidget(
             },
             modifier = Modifier
                 .weight(thirdColumnWidth),
+            textStyle = MaterialTheme.typography.labelMedium.copy(
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                textAlign = TextAlign.Center
+            ),
+            insidePadding = PaddingValues(4.dp),
+            enabled = inputsEnabled
+        )
+        CustomIntegerField(
+            value = weight,
+            onValueChange = {
+                if (it != null) {
+                    routinesViewModel.onEvent(
+                        RoutinesEvent.UpdateRoutineExerciseSet(
+                            routineExerciseSetDTO = routineExerciseSetDTO.copy(
+                                routineExerciseSet = routineExerciseSetDTO.routineExerciseSet.copy(
+                                    weight = it
+                                ),
+                                tempId = routineExerciseSetDTO.tempId
+                            ),
+                            routineExercise = routineExerciseDTO.routineExercise
+                        )
+                    )
+                    weight = it.toString()
+                } else {
+                    weight = ""
+                }
+            },
+            modifier = Modifier
+                .weight(secondColumnWidth),
             textStyle = MaterialTheme.typography.labelMedium.copy(
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 textAlign = TextAlign.Center

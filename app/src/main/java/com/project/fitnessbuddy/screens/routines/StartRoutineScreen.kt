@@ -1,6 +1,7 @@
 package com.project.fitnessbuddy.screens.routines
 
 import android.content.Context
+import android.content.Intent
 import android.widget.Toast
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -16,14 +17,18 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.ProcessLifecycleOwner
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import com.project.fitnessbuddy.R
@@ -33,10 +38,10 @@ import com.project.fitnessbuddy.navigation.NavigationState
 import com.project.fitnessbuddy.navigation.NavigationViewModel
 import com.project.fitnessbuddy.screens.common.SleekButton
 import com.project.fitnessbuddy.screens.common.SleekErrorButton
+import com.project.fitnessbuddy.screens.common.formatElapsedSeconds
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.util.Date
-import java.util.Locale
 
 @Composable
 fun StartRoutineScreen(
@@ -57,14 +62,15 @@ fun StartRoutineScreen(
             navigationViewModel.onEvent(NavigationEvent.DisableCustomButton)
 
             navigationViewModel.onEvent(NavigationEvent.EnableCustomButton)
-            navigationViewModel.onEvent(NavigationEvent.SetBackButton(navigationState.navController))
+            navigationViewModel.onEvent(NavigationEvent.SetBackButton(
+                navController = navigationState.navController,
+                onClick = {
+                    navigationState.navController?.navigate(context.getString(R.string.view_routine_route))
+                }
+            ))
 
             navigationViewModel.onEvent(NavigationEvent.UpdateTitleWidget {
                 routinesState.selectedRoutineDTO.name.let { MediumTextWidget("${stringResource(R.string.started_routine)} $it") }
-            })
-
-            navigationViewModel.onEvent(NavigationEvent.AddTopBarActions {
-
             })
         }
 
@@ -93,7 +99,19 @@ fun MainTab(
     context: Context
 ) {
     val allChecked = remember { mutableStateOf(false) }
-    val startDate = Date()
+    ObserveAppLifecycle(routinesViewModel)
+
+    var elapsedSeconds by remember { mutableLongStateOf(0) }
+    val startDate by remember { mutableStateOf(routinesState.selectedRoutineDTO.routine.startDate) }
+
+    LaunchedEffect(Unit) {
+        while (true) {
+            delay(1000L)
+            elapsedSeconds = startDate?.let {
+                ((Date().time - it.time) / 1000)
+            } ?: 0
+        }
+    }
 
     Scaffold(
         modifier = Modifier
@@ -105,12 +123,10 @@ fun MainTab(
             modifier = Modifier
                 .fillMaxSize()
         ) {
-            TimerScreen(
+            TimerText(
                 modifier = Modifier
                     .fillMaxWidth(),
-                onValueChange = {
-//                    routinesViewModel.onEvent(RoutinesEvent.SetElapsedSeconds(it))
-                }
+                elapsedSeconds = elapsedSeconds
             )
             Spacer(modifier = Modifier.height(16.dp))
 
@@ -134,15 +150,16 @@ fun MainTab(
                     SleekErrorButton(
                         text = stringResource(R.string.cancel_routine),
                         onClick = {
-                            navigationState.navController?.navigateUp()
+                            navigationState.navController?.navigate(context.getString(R.string.view_routine_route))
                         }
                     )
                     SleekButton(
                         text = stringResource(R.string.finish),
                         onClick = {
                             if (allChecked.value) {
-                                routinesViewModel.onEvent(RoutinesEvent.CompleteRoutine(startDate))
-                                navigationState.navController?.navigateUp()
+                                routinesViewModel.onEvent(RoutinesEvent.CompleteRoutine)
+
+                                navigationState.navController?.navigate(context.getString(R.string.completed_routine_route))
                             } else {
                                 Toast.makeText(
                                     context,
@@ -160,22 +177,11 @@ fun MainTab(
 }
 
 @Composable
-fun TimerScreen(
-    onValueChange: (Int) -> Unit = {},
-    modifier: Modifier = Modifier
+fun TimerText(
+    modifier: Modifier = Modifier,
+    elapsedSeconds: Long
 ) {
-    var elapsedSeconds by remember { mutableIntStateOf(0) }
-
-    LaunchedEffect(Unit) {
-        while (true) {
-            delay(1000L)
-            elapsedSeconds++
-            onValueChange(elapsedSeconds)
-        }
-    }
-
-    val formattedTime =
-        String.format(Locale.getDefault(), "%02d:%02d", elapsedSeconds / 60, elapsedSeconds % 60)
+    val formattedTime = elapsedSeconds.formatElapsedSeconds()
 
     Text(
         modifier = modifier,
@@ -184,4 +190,40 @@ fun TimerScreen(
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
     )
+}
+
+@Composable
+fun ObserveAppLifecycle(
+    routinesViewModel: RoutinesViewModel
+) {
+    val context = LocalContext.current
+
+    val lifecycleOwner = rememberUpdatedState(ProcessLifecycleOwner.get())
+
+    DisposableEffect(lifecycleOwner.value) {
+        val observer = LifecycleEventObserver { _, event ->
+            when (event) {
+                Lifecycle.Event.ON_STOP -> {
+                    routinesViewModel.sendRoutineUpdate(context)
+                }
+
+                Lifecycle.Event.ON_START -> {
+                    context.stopService(
+                        Intent(
+                            context,
+                            StartRoutineServiceNotification::class.java
+                        )
+                    )
+                }
+
+                else -> {}
+            }
+        }
+
+        lifecycleOwner.value.lifecycle.addObserver(observer)
+
+        onDispose {
+            lifecycleOwner.value.lifecycle.removeObserver(observer)
+        }
+    }
 }

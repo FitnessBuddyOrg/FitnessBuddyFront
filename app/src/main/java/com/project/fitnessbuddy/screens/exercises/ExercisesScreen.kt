@@ -1,8 +1,21 @@
 package com.project.fitnessbuddy.screens.exercises
 
+import android.content.Context
+import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.RadioButton
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.compose.LocalLifecycleOwner
@@ -15,10 +28,11 @@ import com.project.fitnessbuddy.navigation.NavigationEvent
 import com.project.fitnessbuddy.navigation.NavigationState
 import com.project.fitnessbuddy.navigation.NavigationViewModel
 import com.project.fitnessbuddy.navigation.SearchButton
-import com.project.fitnessbuddy.screens.common.AlphabeticallyGroupedWidgetList
+import com.project.fitnessbuddy.screens.common.GroupedWidgetList
 import com.project.fitnessbuddy.screens.common.ParametersState
 import com.project.fitnessbuddy.screens.common.ParametersViewModel
 import com.project.fitnessbuddy.screens.common.SelectedExerciseWidget
+import com.project.fitnessbuddy.screens.common.StoredValue
 import kotlinx.coroutines.launch
 
 @Composable
@@ -72,25 +86,107 @@ fun ExercisesScreen(
         }
     }
 
-    AlphabeticallyGroupedWidgetList(
-        sortingState = exercisesState,
+//    GroupedWidgetList(
+//        sortingState = exercisesState,
+//        itemsList = exercisesState.exercises,
+//        widget = @Composable {
+//            SelectedExerciseWidget(
+//                exercise = it,
+//                onClick = { exercise, _ ->
+//                    exercisesViewModel.onEvent(ExercisesEvent.SetSelectedExercise(exercise))
+//                    navigationState.navController?.navigate(context.getString(R.string.view_exercise_route))
+//                }
+//            )
+//        },
+//        parametersState = parametersState
+//    )
+
+    ExercisesGroupedList(
+        parametersState = parametersState,
+        exercisesViewModel = exercisesViewModel,
+        exercisesState = exercisesState,
+        navigationState = navigationState,
+        context = context
+    )
+}
+
+@Composable
+fun ExercisesGroupedList(
+    parametersState: ParametersState,
+    exercisesViewModel: ExercisesViewModel,
+    exercisesState: ExercisesState,
+    navigationState: NavigationState,
+    context: Context,
+
+    floatingActionButton: @Composable () -> Unit = {},
+    initialSelected: (Exercise) -> Boolean = { false },
+    selectionEnabled: Boolean = false,
+
+    onWidgetClick: (Exercise, Boolean) -> Unit = { exercise, _ ->
+        exercisesViewModel.onEvent(ExercisesEvent.SetSelectedExercise(exercise))
+        navigationState.navController?.navigate(context.getString(R.string.view_exercise_route))
+    }
+) {
+    GroupedWidgetList(
         itemsList = exercisesState.exercises,
-        onClick = {
-            exercisesViewModel.onEvent(
-                ExercisesEvent.SortExercises(
-                    it.value
-                )
-            )
-        },
         widget = @Composable {
             SelectedExerciseWidget(
                 exercise = it,
-                onClick = { exercise, _ ->
-                    exercisesViewModel.onEvent(ExercisesEvent.SetSelectedExercise(exercise))
-                    navigationState.navController?.navigate(context.getString(R.string.view_exercise_route))
-                }
+                onClick = onWidgetClick,
+                initialSelected = initialSelected(it),
+                selectionEnabled = selectionEnabled
             )
         },
-        parametersState = parametersState
+        parametersState = parametersState,
+        header = {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .horizontalScroll(rememberScrollState()),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceEvenly
+            ) {
+                SortType.entries.map { StoredValue(it, stringResource(it.resourceId)) }
+                    .forEach { storedValue ->
+                        Row(
+                            modifier = Modifier
+                                .weight(0.5f)
+                                .pointerInput(Unit) {
+                                    detectTapGestures(onPress = {
+                                        exercisesViewModel.onEvent(
+                                            ExercisesEvent.SortExercises(
+                                                storedValue.value
+                                            )
+                                        )
+                                    })
+                                },
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.Center
+                        ) {
+                            RadioButton(
+                                selected = exercisesState.sortType == storedValue.value,
+                                onClick = {
+                                    exercisesViewModel.onEvent(
+                                        ExercisesEvent.SortExercises(
+                                            storedValue.value
+                                        )
+                                    )
+                                },
+                            )
+                            Text(
+                                text = storedValue.displayValue.uppercase(),
+                                style = MaterialTheme.typography.labelSmall,
+                            )
+                        }
+                    }
+            }
+        },
+        keySelector = {
+            when (exercisesState.sortType) {
+                SortType.NAME -> it.name.first().uppercase()
+                SortType.CATEGORY -> context.getString(it.category.resourceId)
+            }
+        },
+        floatingActionButton = floatingActionButton
     )
 }

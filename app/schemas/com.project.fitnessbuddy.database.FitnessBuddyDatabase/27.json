@@ -1,8 +1,8 @@
 {
   "formatVersion": 1,
   "database": {
-    "version": 25,
-    "identityHash": "2d9031ea81d28bd3450371ff03a5faf9",
+    "version": 27,
+    "identityHash": "f68a0cc73206c6455eb980e1543d25de",
     "entities": [
       {
         "tableName": "exercise",
@@ -196,7 +196,7 @@
       },
       {
         "tableName": "routine",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`name` TEXT NOT NULL, `frequency` TEXT NOT NULL, `share_type` TEXT NOT NULL, `language` TEXT NOT NULL, `last_performed` INTEGER, `is_completed` INTEGER NOT NULL DEFAULT 0, `start_date` INTEGER NOT NULL, `end_date` INTEGER, `routine_id` INTEGER PRIMARY KEY AUTOINCREMENT)",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`name` TEXT NOT NULL, `frequency` TEXT NOT NULL, `share_type` TEXT NOT NULL, `language` TEXT NOT NULL, `last_performed` INTEGER, `is_completed` INTEGER NOT NULL DEFAULT 0, `start_date` INTEGER, `end_date` INTEGER, `routine_id` INTEGER PRIMARY KEY AUTOINCREMENT)",
         "fields": [
           {
             "fieldPath": "name",
@@ -239,7 +239,7 @@
             "fieldPath": "startDate",
             "columnName": "start_date",
             "affinity": "INTEGER",
-            "notNull": true
+            "notNull": false
           },
           {
             "fieldPath": "endDate",
@@ -293,7 +293,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '2d9031ea81d28bd3450371ff03a5faf9')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'f68a0cc73206c6455eb980e1543d25de')"
     ]
   }
 }

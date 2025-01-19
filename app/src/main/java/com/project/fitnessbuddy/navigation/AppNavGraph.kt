@@ -1,5 +1,7 @@
 package com.project.fitnessbuddy.navigation
 
+import android.app.Activity
+import android.content.Intent
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
@@ -21,10 +23,12 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.navigation.NavHostController
@@ -33,9 +37,11 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.navigation
 import androidx.navigation.compose.rememberNavController
+import com.google.gson.Gson
 import com.project.fitnessbuddy.R
 import com.project.fitnessbuddy.auth.AuthViewModel
 import com.project.fitnessbuddy.auth.UserState
+import com.project.fitnessbuddy.database.dto.RoutineDTO
 import com.project.fitnessbuddy.screens.HomeScreen
 import com.project.fitnessbuddy.screens.ProgressCalendarScreen
 import com.project.fitnessbuddy.screens.StatisticsScreen
@@ -52,10 +58,15 @@ import com.project.fitnessbuddy.screens.exercises.ViewExerciseScreen
 import com.project.fitnessbuddy.screens.profile.ProfileScreen
 import com.project.fitnessbuddy.screens.routines.AddEditRoutineScreen
 import com.project.fitnessbuddy.screens.routines.AddExercisesScreen
+import com.project.fitnessbuddy.screens.routines.CompletedRoutineScreen
+import com.project.fitnessbuddy.screens.routines.DESTINATION
+import com.project.fitnessbuddy.screens.routines.RoutinesEvent
 import com.project.fitnessbuddy.screens.routines.RoutinesScreen
 import com.project.fitnessbuddy.screens.routines.RoutinesState
 import com.project.fitnessbuddy.screens.routines.RoutinesViewModel
+import com.project.fitnessbuddy.screens.routines.SELECTED_ROUTINE_DTO
 import com.project.fitnessbuddy.screens.routines.StartRoutineScreen
+import com.project.fitnessbuddy.screens.routines.StartRoutineServiceNotification
 import com.project.fitnessbuddy.screens.routines.ViewRoutineScreen
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -107,12 +118,37 @@ fun AppNavGraph(
     val addExercisesRoute = stringResource(id = R.string.add_exercises_route)
     val viewRoutineRoute = stringResource(id = R.string.view_routine_route)
     val startRoutineRoute = stringResource(id = R.string.start_routine_route)
+    val completedRoutineRoute = stringResource(id = R.string.completed_routine_route)
 
     val progressCalendarRoute = stringResource(id = R.string.progress_calendar_route)
     val statisticsRoute = stringResource(id = R.string.statistics_route)
 
     val currentNavBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = currentNavBackStackEntry?.destination?.route ?: homeRoute
+    val context = LocalContext.current
+
+    LaunchedEffect(Unit) {
+        val activity = context as? Activity
+        val intent = activity?.intent
+        val destination = intent?.getStringExtra(DESTINATION)
+
+        context.stopService(
+            Intent(
+                context,
+                StartRoutineServiceNotification::class.java
+            )
+        )
+
+        if (destination != null) {
+            navController.navigate(destination)
+        }
+
+        val routineDTOJson = intent?.getStringExtra(SELECTED_ROUTINE_DTO)
+        if (routineDTOJson != null) {
+            val routineDTO = Gson().fromJson(routineDTOJson, RoutineDTO::class.java)
+            routinesViewModel.onEvent(RoutinesEvent.SetSelectedRoutineDTO(routineDTO))
+        }
+    }
 
     val appRoutes: List<AppRoute> = listOf(
         AppRoute(
@@ -258,6 +294,19 @@ fun AppNavGraph(
                     name = stringResource(id = R.string.start_routine),
                     screen = {
                         StartRoutineScreen(
+                            navigationState = navigationState,
+                            navigationViewModel = navigationViewModel,
+
+                            routinesState = routinesState,
+                            routinesViewModel = routinesViewModel,
+                        )
+                    }
+                ),
+                AppRoute(
+                    routeName = completedRoutineRoute,
+                    name = stringResource(id = R.string.completed_routine),
+                    screen = {
+                        CompletedRoutineScreen(
                             navigationState = navigationState,
                             navigationViewModel = navigationViewModel,
 

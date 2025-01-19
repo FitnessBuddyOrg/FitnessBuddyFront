@@ -9,10 +9,17 @@ sealed interface NavigationEvent {
 
     data class UpdateTitleWidget(val titleWidget: @Composable () -> Unit) : NavigationEvent
 
-    data class AddTopBarActions(val topBarActions: @Composable RowScope.() -> Unit) : NavigationEvent
+    data class AddTopBarActions(val topBarActions: @Composable RowScope.() -> Unit) :
+        NavigationEvent
+
     data object ClearTopBarActions : NavigationEvent
 
-    data class SetBackButton(val navController: NavController?, val onClick: () -> Unit = {}) : NavigationEvent
+    data class SetBackButton(
+        val navController: NavController?,
+        val onClick: () -> Unit = { navController?.navigateUp() }
+    ) : NavigationEvent
+
+    data class SetCloseButton(val onClick: () -> Unit = {}) : NavigationEvent
 
     data object DisableCustomButton : NavigationEvent
 

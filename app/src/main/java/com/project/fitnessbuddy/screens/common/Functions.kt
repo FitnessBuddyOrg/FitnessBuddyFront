@@ -40,7 +40,31 @@ fun Date.timeAgo(context: Context): String {
     }
 }
 
-fun Date.format(): String {
-    val sdf = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
+fun Date.format(pattern: String = "yyyy-MM-dd HH:mm:ss"): String {
+    val sdf = SimpleDateFormat(pattern, Locale.getDefault())
     return sdf.format(this)
+}
+
+fun Long.formatElapsedSeconds(): String {
+    return String.format(Locale.getDefault(), "%02d:%02d", this / 60, this % 60)
+}
+
+fun Date.timeInLetters(context: Context) : String {
+    val now = Date()
+    val diffInMillis = now.time - this.time
+
+    val seconds = TimeUnit.MILLISECONDS.toSeconds(diffInMillis)
+    val minutes = TimeUnit.MILLISECONDS.toMinutes(diffInMillis)
+    val hours = TimeUnit.MILLISECONDS.toHours(diffInMillis)
+    val days = TimeUnit.MILLISECONDS.toDays(diffInMillis)
+
+    return when {
+        seconds < 60 -> "$seconds ${context.getString(R.string.seconds)}"
+        minutes < 60 -> "$minutes ${context.getString(R.string.minutes)}"
+        hours < 24 -> "$hours ${context.getString(R.string.hours)}"
+        days < 7 -> "$days ${context.getString(R.string.days)}"
+        days < 30 -> "${days / 7} ${context.getString(R.string.weeks)}"
+        days < 365 -> "${days / 30} ${context.getString(R.string.months)}"
+        else -> "${days / 365} ${context.getString(R.string.years)}"
+    }
 }

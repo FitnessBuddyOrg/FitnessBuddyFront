@@ -43,13 +43,27 @@ import com.project.fitnessbuddy.R
 
 
 @Composable
-fun BackButton(navController: NavController?, onClick: () -> Unit = {}) {
+fun BackButton(
+    navController: NavController?,
+    onClick: () -> Unit
+) {
+    IconButton(onClick = onClick) {
+        Icon(
+            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+            contentDescription = null
+        )
+    }
+}
+
+@Composable
+fun CloseButton(
+    onClick: () -> Unit = {}
+) {
     IconButton(onClick = {
-        navController?.navigateUp()
         onClick()
     }) {
         Icon(
-            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+            imageVector = Icons.Default.Close,
             contentDescription = null
         )
     }
@@ -165,7 +179,7 @@ fun DeleteButton(
     onClick: () -> Unit,
     colors: IconButtonColors = IconButtonDefaults.iconButtonColors(),
     modifier: Modifier = Modifier,
-    enabled : Boolean = true
+    enabled: Boolean = true
 ) {
     IconButton(
         onClick = onClick,

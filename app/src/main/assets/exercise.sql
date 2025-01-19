@@ -19,18 +19,12 @@ VALUES
 
 
 INSERT INTO routine (name, frequency, share_type, language) VALUES
-('Routine 1', 'DAILY', 'PRIVATE', 'ENGLISH'),
-('Routine 2', 'WEEKLY', 'PRIVATE', 'ENGLISH'),
-('Routine 3', 'MONTHLY', 'PRIVATE', 'ENGLISH');
+('Routine 1', 'DAILY', 'PRIVATE', 'ENGLISH');
 
 INSERT INTO routine_exercise (routine_id, exercise_id) VALUES
 (1, 1),
 (1, 2),
 (1, 3),
-
-(2, 1),
-(2, 2),
-(2, 3);
 
 INSERT INTO routine_exercise_set (weight, reps, routine_exercise_id) VALUES
 (10, 10, 1),

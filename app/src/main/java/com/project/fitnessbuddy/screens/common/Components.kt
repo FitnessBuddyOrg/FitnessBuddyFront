@@ -29,7 +29,6 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -420,19 +419,17 @@ class StoredLanguageValue<T>(
 ) : StoredValue<T>(value, displayValue)
 
 @Composable
-fun <T : ListedEntity> AlphabeticallyGroupedWidgetList(
+fun <T : ListedEntity> GroupedWidgetList(
     itemsList: List<T>,
     widget: @Composable (T) -> Unit,
     parametersState: ParametersState,
 
-    onClick: (StoredValue<SortType>) -> Unit = {},
-    sortingState: SortingState? = null,
+    header : @Composable () -> Unit = {},
     floatingActionButton: @Composable () -> Unit = {},
-    verticalArrangement: Arrangement.Vertical = Arrangement.spacedBy(0.dp)
+    verticalArrangement: Arrangement.Vertical = Arrangement.spacedBy(0.dp),
+
+    keySelector: (T) -> String = { it.name.first().uppercase() }
 ) {
-    val context = LocalContext.current
-
-
     Scaffold(
         modifier = Modifier
             .fillMaxSize(),
@@ -443,71 +440,26 @@ fun <T : ListedEntity> AlphabeticallyGroupedWidgetList(
             contentPadding = padding,
             verticalArrangement = verticalArrangement
         ) {
-            if (sortingState != null) {
-                item {
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .horizontalScroll(rememberScrollState()),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.SpaceEvenly
-                    ) {
-                        SortType.entries.map { StoredValue(it, stringResource(it.resourceId)) }
-                            .forEach { storedValue ->
-                                Row(
-                                    modifier = Modifier
-                                        .weight(0.5f)
-                                        .pointerInput(Unit) {
-                                            detectTapGestures(onPress = { onClick(storedValue) })
-                                        },
-                                    verticalAlignment = Alignment.CenterVertically,
-                                    horizontalArrangement = Arrangement.Center
-                                ) {
-                                    RadioButton(
-                                        selected = sortingState.sortType == storedValue.value,
-                                        onClick = { onClick(storedValue) },
-                                    )
-                                    Text(
-                                        text = storedValue.displayValue.uppercase(),
-                                        style = MaterialTheme.typography.labelSmall,
-                                    )
-                                }
-                            }
-                    }
-                }
+            item {
+                header()
             }
 
             itemsList
                 .filter { (it.language.name == parametersState.languageParameter.value) || it.language.isCustom }
-                .groupBy {
-                    if (sortingState != null) {
-                        when (sortingState.sortType) {
-                            SortType.NAME -> it.name.first().uppercase()
-                            SortType.CATEGORY -> {
-                                if (it is Exercise) {
-                                    context.getString(it.category.resourceId)
-                                } else {
-                                    ""
-                                }
-                            }
-                        }
-                    } else {
-                        it.name.first().uppercase()
-                    }
-                }
+                .groupBy (keySelector)
                 .toSortedMap()
-                .forEach { (letter, exercisesInGroup) ->
+                .forEach { (header, items) ->
                     item {
                         Text(
-                            text = letter.toString(),
+                            text = header.toString(),
                             style = MaterialTheme.typography.labelSmall,
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .padding(start = 16.dp, top = 12.dp, bottom = 12.dp)
                         )
                     }
-                    items(exercisesInGroup) { exercise ->
-                        widget(exercise)
+                    items(items) { item ->
+                        widget(item)
                     }
                 }
         }
