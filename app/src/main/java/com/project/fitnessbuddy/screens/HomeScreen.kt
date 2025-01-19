@@ -28,14 +28,12 @@ import androidx.navigation.NavController
 import com.project.fitnessbuddy.R
 import com.project.fitnessbuddy.navigation.DefaultTitleWidget
 import com.project.fitnessbuddy.navigation.NavigationEvent
-import com.project.fitnessbuddy.navigation.NavigationState
 import com.project.fitnessbuddy.navigation.NavigationViewModel
 import kotlinx.coroutines.launch
 
 @Composable
 fun HomeScreen(
     navController: NavController,
-    navigationState: NavigationState,
     navigationViewModel: NavigationViewModel,
 ) {
 
