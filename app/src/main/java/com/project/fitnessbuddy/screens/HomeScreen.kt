@@ -66,7 +66,7 @@ fun HomeScreen(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(
-            text = stringResource(R.string.welcome) +",",
+            text = stringResource(R.string.welcome) ,
             style = MaterialTheme.typography.headlineMedium.copy(fontSize = 28.sp),
             color = MaterialTheme.colorScheme.primary,
             modifier = Modifier.padding(vertical = 16.dp).align(Alignment.Start)
@@ -109,7 +109,7 @@ fun NavigationGrid(navController: NavController) {
 fun NavigationCard(item: NavigationItem, navController: NavController) {
     Card(
         modifier = Modifier
-            .size(200.dp)
+            .size(175.dp)
             .clickable { navController.navigate(item.route) },
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
@@ -131,7 +131,7 @@ fun NavigationCard(item: NavigationItem, navController: NavController) {
             Spacer(modifier = Modifier.height(8.dp))
             Text(
                 text = item.label,
-                style = MaterialTheme.typography.bodyLarge.copy(fontSize = 20.sp),
+                style = MaterialTheme.typography.bodyLarge.copy(fontSize = 16.sp),
                 color = MaterialTheme.colorScheme.onSurface
             )
         }
