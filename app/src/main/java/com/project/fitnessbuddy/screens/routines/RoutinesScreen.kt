@@ -27,7 +27,9 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import com.project.fitnessbuddy.R
+import com.project.fitnessbuddy.api.auth.UserState
 import com.project.fitnessbuddy.database.dto.RoutineDTO
+import com.project.fitnessbuddy.database.entity.Routine
 import com.project.fitnessbuddy.navigation.CreateButton
 import com.project.fitnessbuddy.navigation.EditType
 import com.project.fitnessbuddy.navigation.MediumTextWidget
@@ -50,7 +52,9 @@ fun RoutinesScreen(
     routinesViewModel: RoutinesViewModel,
 
     parametersState: ParametersState,
-    parametersViewModel: ParametersViewModel
+    parametersViewModel: ParametersViewModel,
+
+    userState: UserState
 ) {
     val context = LocalContext.current
     val lifecycleOwner = LocalLifecycleOwner.current
@@ -81,7 +85,9 @@ fun RoutinesScreen(
                 CreateButton(
                     onClick = {
                         routinesViewModel.onEvent(RoutinesEvent.SetEditType(EditType.ADD))
-                        routinesViewModel.onEvent(RoutinesEvent.SetSelectedRoutineDTO(RoutineDTO()))
+                        routinesViewModel.onEvent(
+                            RoutinesEvent.SetSelectedRoutineDTO(RoutineDTO(routine = Routine(userId = userState.user.userId)))
+                        )
                         navigationState.navController?.navigate(context.getString(R.string.add_edit_routine_route))
                     }
                 )
@@ -155,7 +161,11 @@ fun RoutineWidget(
 
             if (routineDTO.routine.lastPerformed != null) {
                 Text(
-                    text = "${stringResource(R.string.last_performed)}: ${routineDTO.routine.lastPerformed?.timeAgo(context)}",
+                    text = "${stringResource(R.string.last_performed)}: ${
+                        routineDTO.routine.lastPerformed?.timeAgo(
+                            context
+                        )
+                    }",
                     style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )

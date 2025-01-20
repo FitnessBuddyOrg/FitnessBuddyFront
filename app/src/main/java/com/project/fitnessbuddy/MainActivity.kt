@@ -165,7 +165,7 @@ class MainActivity : ComponentActivity() {
         Utils.init(this)
         authViewModel.loadToken()
         RetrofitInstance.initialize {
-            authViewModel.userState.value.accessToken
+            authViewModel.userState.value.user.accessToken
         }
         setContent {
             FitnessBuddyTheme {

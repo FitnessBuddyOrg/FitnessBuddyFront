@@ -61,14 +61,6 @@ class ExercisesViewModel(
                 }
             }
 
-            is ExercisesEvent.ResetSelectedExercise -> {
-                _state.update {
-                    it.copy(
-                        selectedExercise = Exercise()
-                    )
-                }
-            }
-
             is ExercisesEvent.SetEditType -> {
                 _state.update {
                     it.copy(
@@ -81,13 +73,14 @@ class ExercisesViewModel(
                 viewModelScope.launch {
                     exerciseDao.delete(exercisesEvent.exercise)
                 }
-                onEvent(ExercisesEvent.ResetSelectedExercise)
             }
 
             is ExercisesEvent.UpsertExercise -> {
                 if (_state.value.selectedExercise.name.isBlank()) {
                     return false
                 }
+
+                println(_state.value.selectedExercise)
 
                 viewModelScope.launch {
                     exerciseDao.upsert(_state.value.selectedExercise)

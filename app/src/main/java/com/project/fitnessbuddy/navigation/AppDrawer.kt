@@ -130,7 +130,7 @@ fun DrawerHeader(modifier: Modifier, userState: UserState, authViewModel: AuthVi
         Spacer(modifier = Modifier.padding(dimensionResource(id = R.dimen.spacer_padding)))
 
         Text(
-            text = userState.email ?: stringResource(id = R.string.username_placeholder),
+            text = userState.user.email ?: stringResource(id = R.string.username_placeholder),
             textAlign = TextAlign.Center,
             style = MaterialTheme.typography.bodyLarge,
             color = MaterialTheme.colorScheme.onPrimary,

@@ -2,6 +2,7 @@ package com.project.fitnessbuddy.database.entity
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity
+import androidx.room.ForeignKey
 import androidx.room.PrimaryKey
 import com.project.fitnessbuddy.database.entity.enums.Frequency
 import com.project.fitnessbuddy.database.entity.enums.Language
@@ -9,7 +10,15 @@ import com.project.fitnessbuddy.database.entity.enums.ShareType
 import java.util.Date
 
 @Entity(
-    tableName = "routine"
+    tableName = "routine",
+    foreignKeys = [
+        ForeignKey(
+            entity = User::class,
+            parentColumns = ["user_id"],
+            childColumns = ["user_id"],
+            onDelete = ForeignKey.CASCADE
+        )
+    ]
 )
 data class Routine(
     val name: String = "",
@@ -32,6 +41,9 @@ data class Routine(
 
     @ColumnInfo(name = "end_date")
     val endDate: Date? = null,
+
+    @ColumnInfo(name = "user_id")
+    val userId: Long? = null,
 
     @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = "routine_id")

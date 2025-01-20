@@ -8,6 +8,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import com.project.fitnessbuddy.R
+import com.project.fitnessbuddy.api.auth.UserState
 import com.project.fitnessbuddy.database.entity.Exercise
 import com.project.fitnessbuddy.navigation.CreateButton
 import com.project.fitnessbuddy.navigation.MediumTextWidget
@@ -38,7 +39,9 @@ fun AddExercisesScreen(
     routinesViewModel: RoutinesViewModel,
 
     parametersState: ParametersState,
-    parametersViewModel: ParametersViewModel
+    parametersViewModel: ParametersViewModel,
+
+    userState: UserState
 ) {
     val context = LocalContext.current
     val lifecycleOwner = LocalLifecycleOwner.current
@@ -77,7 +80,7 @@ fun AddExercisesScreen(
                 )
                 CreateButton(
                     onClick = {
-                        exercisesViewModel.onEvent(ExercisesEvent.SetSelectedExercise(Exercise()))
+                        exercisesViewModel.onEvent(ExercisesEvent.SetSelectedExercise(Exercise(userId = userState.user.userId)))
                         navigationState.navController?.navigate(context.getString(R.string.add_edit_exercise_route))
                     }
                 )

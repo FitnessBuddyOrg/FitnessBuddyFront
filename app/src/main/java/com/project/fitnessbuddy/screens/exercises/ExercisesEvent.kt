@@ -19,7 +19,6 @@ sealed interface ExercisesEvent {
     data class SortExercises(val sortType: SortType) : ExercisesEvent
 
     data class SetSelectedExercise(val selectedExercise: Exercise) : ExercisesEvent
-    data object ResetSelectedExercise : ExercisesEvent
 
     data class DeleteExercise(val exercise: Exercise) : ExercisesEvent
 

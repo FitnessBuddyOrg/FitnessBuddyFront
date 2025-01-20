@@ -23,7 +23,6 @@ sealed interface RoutinesEvent {
     data class SetStartDate(val startDate: Date) : RoutinesEvent
 
     data class SetSelectedRoutineDTO(val routineDTO: RoutineDTO) : RoutinesEvent
-    data object ResetSelectedRoutineDTO : RoutinesEvent
 
     data class HandleExercise(val exercise: Exercise, val selected: Boolean) : RoutinesEvent
     data object ClearExercisesLists : RoutinesEvent

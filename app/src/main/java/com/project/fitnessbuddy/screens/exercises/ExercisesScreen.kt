@@ -21,6 +21,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import com.project.fitnessbuddy.R
+import com.project.fitnessbuddy.api.auth.UserState
 import com.project.fitnessbuddy.database.entity.Exercise
 import com.project.fitnessbuddy.navigation.CreateButton
 import com.project.fitnessbuddy.navigation.MediumTextWidget
@@ -44,7 +45,9 @@ fun ExercisesScreen(
     exercisesViewModel: ExercisesViewModel,
 
     parametersState: ParametersState,
-    parametersViewModel: ParametersViewModel
+    parametersViewModel: ParametersViewModel,
+
+    userState: UserState,
 ) {
     val context = LocalContext.current
     val lifecycleOwner = LocalLifecycleOwner.current
@@ -74,7 +77,7 @@ fun ExercisesScreen(
                 )
                 CreateButton(
                     onClick = {
-                        exercisesViewModel.onEvent(ExercisesEvent.SetSelectedExercise(Exercise()))
+                        exercisesViewModel.onEvent(ExercisesEvent.SetSelectedExercise(Exercise(userId = userState.user.userId)))
                         navigationState.navController?.navigate(context.getString(R.string.add_edit_exercise_route))
                     }
                 )
@@ -85,21 +88,6 @@ fun ExercisesScreen(
             job.cancel()
         }
     }
-
-//    GroupedWidgetList(
-//        sortingState = exercisesState,
-//        itemsList = exercisesState.exercises,
-//        widget = @Composable {
-//            SelectedExerciseWidget(
-//                exercise = it,
-//                onClick = { exercise, _ ->
-//                    exercisesViewModel.onEvent(ExercisesEvent.SetSelectedExercise(exercise))
-//                    navigationState.navController?.navigate(context.getString(R.string.view_exercise_route))
-//                }
-//            )
-//        },
-//        parametersState = parametersState
-//    )
 
     ExercisesGroupedList(
         parametersState = parametersState,

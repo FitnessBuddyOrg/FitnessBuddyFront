@@ -14,7 +14,7 @@ data class RoutineExerciseDTO(
         parentColumn = "exercise_id",
         entityColumn = "exercise_id"
     )
-    val exercise: Exercise = Exercise(),
+    val exercise: Exercise,
 
     @Relation(
         parentColumn = "routine_exercise_id",

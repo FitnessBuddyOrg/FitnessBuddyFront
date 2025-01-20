@@ -71,14 +71,6 @@ class RoutinesViewModel(
                 }
             }
 
-            is RoutinesEvent.ResetSelectedRoutineDTO -> {
-                _state.update {
-                    it.copy(
-                        selectedRoutineDTO = RoutineDTO()
-                    )
-                }
-            }
-
             is RoutinesEvent.SetEditType -> {
                 _state.update {
                     it.copy(
@@ -91,7 +83,6 @@ class RoutinesViewModel(
                 viewModelScope.launch {
                     routineDao.delete(routinesEvent.routine)
                 }
-                onEvent(RoutinesEvent.ResetSelectedRoutineDTO)
             }
 
             is RoutinesEvent.UpsertSelectedRoutineDTO -> {

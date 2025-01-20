@@ -206,6 +206,7 @@ fun AppNavGraph(
                             exercisesViewModel = exercisesViewModel,
                             parametersState = parametersState,
                             parametersViewModel = parametersViewModel,
+                            userState = userState
                         )
                     }
                 ),
@@ -252,6 +253,7 @@ fun AppNavGraph(
                             routinesViewModel = routinesViewModel,
                             parametersState = parametersState,
                             parametersViewModel = parametersViewModel,
+                            userState = userState
                         )
                     }
                 ),
@@ -280,6 +282,7 @@ fun AppNavGraph(
                             routinesViewModel = routinesViewModel,
                             parametersState = parametersState,
                             parametersViewModel = parametersViewModel,
+                            userState = userState
                         )
                     }
                 ),

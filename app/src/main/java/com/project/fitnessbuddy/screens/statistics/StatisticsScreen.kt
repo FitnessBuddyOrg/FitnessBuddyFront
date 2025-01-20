@@ -37,7 +37,7 @@ fun StatisticsScreen(
     userState: UserState,
 ) {
     val appOpenData by statisticsViewModel.appOpenData.collectAsState()
-    val userId = userState.id ?: return
+    val userId = userState.user.userId ?: return
 
     val context = LocalContext.current
     val lifecycleOwner = LocalLifecycleOwner.current

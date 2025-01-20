@@ -1,15 +1,13 @@
 package com.project.fitnessbuddy.api.auth
 
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.staticCompositionLocalOf
+import com.project.fitnessbuddy.database.entity.User
 
 data class UserState(
-    val accessToken: String? = null,
-    val isLoggedIn: Boolean = false,
-    val email: String? = null,
-    val name: String? = null,
-    val id: Long? = null
+    val user: User = User(),
+//    val accessToken: String? = null,
+//    val email: String? = null,
+//    val name: String? = null,
+//    val userId: Long? = null,
 
+    val isLoggedIn: Boolean = false
 )
-
-val LocalUserState = staticCompositionLocalOf { mutableStateOf(UserState()) }
