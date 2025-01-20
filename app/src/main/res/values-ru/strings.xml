@@ -101,4 +101,5 @@
     <string name="no_data">No data</string>
     <string name="google_sign_in">Sign in with Google</string>
     <string name="weekly_app_open_statistics">Weekly App Open Statistics</string>
+    <string name="completed_routines">Completed Routines</string>
 </resources>

@@ -1,32 +1,21 @@
 package com.project.fitnessbuddy
 
-import android.Manifest
 import android.content.Intent
-import android.content.pm.PackageManager
 import android.net.Uri
-import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
-import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
-import androidx.compose.ui.platform.LocalContext
-import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
-import androidx.navigation.compose.rememberNavController
 import androidx.room.Room
 import com.project.fitnessbuddy.api.auth.AuthViewModel
 import com.project.fitnessbuddy.api.auth.GitHubTokenRequestDTO
-import com.project.fitnessbuddy.api.statistics.StatisticsViewModel
+import com.project.fitnessbuddy.screens.statistics.StatisticsViewModel
 import com.project.fitnessbuddy.database.FitnessBuddyDatabase
 import com.project.fitnessbuddy.navigation.AppNavGraph
 import com.project.fitnessbuddy.navigation.NavigationViewModel
@@ -156,7 +145,7 @@ class MainActivity : ComponentActivity() {
         object : ViewModelProvider.Factory {
             override fun <T : ViewModel> create(modelClass: Class<T>): T {
                 @Suppress("UNCHECKED_CAST")
-                return StatisticsViewModel(RetrofitInstance.userApi) as T
+                return StatisticsViewModel(RetrofitInstance.userApi, db.routineDao) as T
             }
         }
     }
@@ -183,6 +172,7 @@ class MainActivity : ComponentActivity() {
                 val navigationState by navigationViewModel.state.collectAsState()
                 val exerciseState by exercisesViewModel.state.collectAsState()
                 val routinesState by routinesViewModel.state.collectAsState()
+                val statisticsState by statisticsViewModel.state.collectAsState()
 
                 val userState by authViewModel.userState.collectAsState()
                 val parametersState by parametersViewModel.state.collectAsState()
@@ -203,6 +193,7 @@ class MainActivity : ComponentActivity() {
                     userState = userState,
                     authViewModel = authViewModel,
 
+                    statisticsState = statisticsState,
                     statisticsViewModel = statisticsViewModel,
 
                     profileViewModel = profileViewModel

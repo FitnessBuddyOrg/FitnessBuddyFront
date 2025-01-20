@@ -3,6 +3,8 @@ package com.project.fitnessbuddy.screens.common
 import android.content.Context
 import com.project.fitnessbuddy.R
 import java.text.SimpleDateFormat
+import java.time.LocalDate
+import java.time.ZoneId
 import java.util.Date
 import java.util.Locale
 import java.util.concurrent.TimeUnit
@@ -67,4 +69,10 @@ fun Date.timeInLetters(context: Context) : String {
         days < 365 -> "${days / 30} ${context.getString(R.string.months)}"
         else -> "${days / 365} ${context.getString(R.string.years)}"
     }
+}
+
+fun Date.toLocalDate(): LocalDate {
+    return this.toInstant()
+        .atZone(ZoneId.systemDefault())
+        .toLocalDate()
 }

@@ -6,7 +6,6 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -24,7 +23,6 @@ import com.github.mikephil.charting.data.LineDataSet
 import com.github.mikephil.charting.formatter.IndexAxisValueFormatter
 import com.project.fitnessbuddy.R
 import com.project.fitnessbuddy.api.auth.UserState
-import com.project.fitnessbuddy.api.statistics.StatisticsViewModel
 import com.project.fitnessbuddy.navigation.MediumTextWidget
 import com.project.fitnessbuddy.navigation.NavigationEvent
 import com.project.fitnessbuddy.navigation.NavigationViewModel
@@ -34,6 +32,7 @@ import java.time.LocalDate
 @Composable
 fun StatisticsScreen(
     statisticsViewModel: StatisticsViewModel,
+    statisticsState: StatisticsState,
     navigationViewModel: NavigationViewModel,
     userState: UserState,
 ) {
@@ -77,7 +76,19 @@ fun StatisticsScreen(
         }
         item {
             RoundedChartBox {
-                AppOpenChart(appOpenData)
+                AppOpenChart(
+                    data = appOpenData,
+                    title = stringResource(R.string.weekly_app_open_statistics)
+                )
+            }
+        }
+
+        item {
+            RoundedChartBox {
+                AppOpenChart(
+                    data = statisticsState.getCompletedRoutinesData(),
+                    title = stringResource(R.string.completed_routines)
+                )
             }
         }
 
@@ -104,7 +115,10 @@ fun RoundedChartBox(
 }
 
 @Composable
-fun AppOpenChart(data: Map<LocalDate, Int>) {
+fun AppOpenChart(
+    data: Map<LocalDate, Int>,
+    title: String
+) {
     val daysOfWeek = List(7) { LocalDate.now().minusDays(6 - it.toLong()) }
     val completeData = daysOfWeek.associateWith { data[it] ?: 0 }
 
@@ -136,7 +150,7 @@ fun AppOpenChart(data: Map<LocalDate, Int>) {
         contentAlignment = Alignment.Center
     ) {
         Text(
-            text = stringResource(R.string.weekly_app_open_statistics),
+            text = title,
             style = MaterialTheme.typography.headlineMedium.copy(fontSize = 24.sp),
             modifier = Modifier.padding(16.dp)
         )
