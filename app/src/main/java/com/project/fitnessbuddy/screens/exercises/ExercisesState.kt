@@ -1,6 +1,7 @@
 package com.project.fitnessbuddy.screens.exercises
 
 import com.project.fitnessbuddy.database.entity.Exercise
+import com.project.fitnessbuddy.database.entity.enums.CustomState
 import com.project.fitnessbuddy.navigation.EditType
 import com.project.fitnessbuddy.screens.common.SortingState
 
@@ -15,4 +16,7 @@ data class ExercisesState(
     val searchValue: String = "",
 
     val sharedExerciseToken: String = "",
+    val fetchedExerciseToken: String = "",
+    val exerciseFetched: CustomState = CustomState.NONE
+
 ): SortingState

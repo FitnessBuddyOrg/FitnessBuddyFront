@@ -41,7 +41,6 @@ import com.google.gson.Gson
 import com.project.fitnessbuddy.R
 import com.project.fitnessbuddy.api.auth.AuthViewModel
 import com.project.fitnessbuddy.api.auth.UserState
-import com.project.fitnessbuddy.screens.statistics.StatisticsViewModel
 import com.project.fitnessbuddy.api.user.ProfileViewModel
 import com.project.fitnessbuddy.database.dto.RoutineDTO
 import com.project.fitnessbuddy.screens.HomeScreen
@@ -51,6 +50,7 @@ import com.project.fitnessbuddy.screens.common.ParametersEvent
 import com.project.fitnessbuddy.screens.common.ParametersState
 import com.project.fitnessbuddy.screens.common.ParametersViewModel
 import com.project.fitnessbuddy.screens.exercises.AddEditExerciseScreen
+import com.project.fitnessbuddy.screens.exercises.AddExerciseCodeScreen
 import com.project.fitnessbuddy.screens.exercises.ExercisesScreen
 import com.project.fitnessbuddy.screens.exercises.ExercisesState
 import com.project.fitnessbuddy.screens.exercises.ExercisesViewModel
@@ -71,6 +71,7 @@ import com.project.fitnessbuddy.screens.routines.StartRoutineServiceNotification
 import com.project.fitnessbuddy.screens.routines.ViewRoutineScreen
 import com.project.fitnessbuddy.screens.statistics.StatisticsScreen
 import com.project.fitnessbuddy.screens.statistics.StatisticsState
+import com.project.fitnessbuddy.screens.statistics.StatisticsViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
@@ -116,6 +117,7 @@ fun AppNavGraph(
     val exercisesOverviewRoute = stringResource(id = R.string.exercises_overview_route)
     val addEditExerciseRoute = stringResource(id = R.string.add_edit_exercise_route)
     val viewExerciseRoute = stringResource(id = R.string.view_exercise_route)
+    val addExerciseCodeRoute = stringResource(id = R.string.add_exercise_code_route)
 
     val routinesRoute = stringResource(id = R.string.routines_route)
     val routinesOverviewRoute = stringResource(id = R.string.routines_overview_route)
@@ -224,6 +226,18 @@ fun AppNavGraph(
                     name = stringResource(id = R.string.view_exercise),
                     screen = {
                         ViewExerciseScreen(
+                            navigationState = navigationState,
+                            navigationViewModel = navigationViewModel,
+                            exercisesState = exercisesState,
+                            exercisesViewModel = exercisesViewModel,
+                        )
+                    }
+                ),
+                AppRoute(
+                    routeName = addExerciseCodeRoute,
+                    name = stringResource(id = R.string.add_exercise_from_code),
+                    screen = {
+                        AddExerciseCodeScreen(
                             navigationState = navigationState,
                             navigationViewModel = navigationViewModel,
                             exercisesState = exercisesState,
