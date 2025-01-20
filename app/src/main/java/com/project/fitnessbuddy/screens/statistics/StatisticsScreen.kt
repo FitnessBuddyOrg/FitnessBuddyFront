@@ -1,5 +1,6 @@
 package com.project.fitnessbuddy.screens.statistics
 
+import android.graphics.Typeface
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.*
@@ -28,6 +29,7 @@ import com.project.fitnessbuddy.navigation.NavigationEvent
 import com.project.fitnessbuddy.navigation.NavigationViewModel
 import kotlinx.coroutines.launch
 import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 
 @Composable
 fun StatisticsScreen(
@@ -137,6 +139,7 @@ fun AppOpenChart(
         setDrawValues(true)
         valueTextSize = 12f
         valueTextColor = onSecondaryContainerColor
+        valueTypeface = Typeface.DEFAULT_BOLD
         valueFormatter = object : com.github.mikephil.charting.formatter.ValueFormatter() {
             override fun getFormattedValue(value: Float): String {
                 return value.toInt().toString()
@@ -164,11 +167,13 @@ fun AppOpenChart(
                 setScaleEnabled(true)
                 xAxis.apply {
                     granularity = 1f
-                    valueFormatter = IndexAxisValueFormatter(completeData.keys.map { it.toString() })
+                    valueFormatter = IndexAxisValueFormatter(completeData.keys.map { it.format(
+                        DateTimeFormatter.ofPattern("dd MMM")) })
                     position = XAxis.XAxisPosition.BOTTOM
                     textSize = 12f
                     textColor = onSecondaryContainerColor
                     labelRotationAngle = 70f
+                    yOffset = 10f
                 }
                 axisLeft.apply {
                     textSize = 12f
