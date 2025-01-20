@@ -1,6 +1,7 @@
 package com.project.fitnessbuddy.api.auth
 
 import RetrofitInstance
+import RetrofitInstance.userApi
 import android.app.Activity
 import android.app.Application
 import android.content.Context
@@ -10,6 +11,7 @@ import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
+import androidx.compose.ui.platform.LocalContext
 import androidx.credentials.CredentialManager
 import androidx.credentials.CustomCredential
 import androidx.credentials.GetCredentialRequest
@@ -38,7 +40,6 @@ class AuthViewModel(
 
     private val _loading = MutableStateFlow(false)
     val loading: StateFlow<Boolean> = _loading
-
     private val appContext: Context = application.applicationContext
 
     fun login(email: String, password: String) {
@@ -259,6 +260,26 @@ class AuthViewModel(
                 }
             }
         }
+    }
+
+    fun updateProfilePictureUrl(url: String) {
+        _userState.value = _userState.value.copy(profilePictureUrl = url)
+    }
+
+    private fun getRolesFromToken(token: String): List<String> {
+        val jwt = token.split(".")[1]
+        val decoded = String(android.util.Base64.decode(jwt, android.util.Base64.DEFAULT))
+        val json = JSONObject(decoded)
+        val roles = json.getJSONArray("roles")
+        val rolesList = mutableListOf<String>()
+        for (i in 0 until roles.length()) {
+            rolesList.add(roles.getString(i))
+        }
+        return rolesList
+    }
+
+    private fun hasRole(userState: UserState, role: String): Boolean {
+        return getRolesFromToken(userState.user.accessToken.orEmpty()).contains(role)
     }
 }
 

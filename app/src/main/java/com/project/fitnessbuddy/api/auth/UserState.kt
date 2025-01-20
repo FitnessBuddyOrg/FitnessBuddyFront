@@ -9,5 +9,6 @@ data class UserState(
 //    val name: String? = null,
 //    val userId: Long? = null,
 
+    val profilePictureUrl: String? = null,
     val isLoggedIn: Boolean = false
 )

@@ -84,17 +84,16 @@ fun AppDrawer(
 @Composable
 fun DrawerHeader(modifier: Modifier, userState: UserState, authViewModel: AuthViewModel) {
     val context = LocalContext.current
-    var profilePictureUrl by remember { mutableStateOf<String?>(null) }
     val loading by authViewModel.loading.collectAsState()
 
     LaunchedEffect(Unit) {
-        if (userState.isLoggedIn) {
+        if (userState.isLoggedIn && userState.profilePictureUrl.isNullOrEmpty()) {
             authViewModel.viewModelScope.launch {
                 try {
-                    profilePictureUrl = RetrofitInstance.userApi.getProfilePicture().url
+                    val profilePictureUrl = RetrofitInstance.userApi.getProfilePicture().url
+                    authViewModel.updateProfilePictureUrl(profilePictureUrl)
                 } catch (e: Exception) {
                     Log.e("DrawerHeader", "Failed to fetch profile picture: ${e.localizedMessage}")
-                    profilePictureUrl = null
                 }
             }
         }
@@ -112,11 +111,10 @@ fun DrawerHeader(modifier: Modifier, userState: UserState, authViewModel: AuthVi
             CircularProgressIndicator(modifier = Modifier.size(50.dp))
         } else {
             Image(
-
-                painter = if (profilePictureUrl.isNullOrEmpty()) {
+                painter = if (userState.profilePictureUrl.isNullOrEmpty()) {
                     painterResource(id = R.drawable.profile_picture)
                 } else {
-                    rememberAsyncImagePainter(profilePictureUrl)
+                    rememberAsyncImagePainter(userState.profilePictureUrl)
                 },
                 contentDescription = "Profile Picture",
                 contentScale = ContentScale.Crop,
@@ -124,7 +122,6 @@ fun DrawerHeader(modifier: Modifier, userState: UserState, authViewModel: AuthVi
                     .size(dimensionResource(id = R.dimen.header_image_size))
                     .clip(CircleShape)
             )
-
         }
 
         Spacer(modifier = Modifier.padding(dimensionResource(id = R.dimen.spacer_padding)))

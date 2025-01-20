@@ -2,6 +2,7 @@ package com.project.fitnessbuddy.api.user
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.project.fitnessbuddy.api.auth.AuthViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -10,20 +11,21 @@ import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.asRequestBody
 import java.io.File
 
-
-class ProfileViewModel(private val userApi: UserApi) : ViewModel() {
+class ProfileViewModel(
+    private val userApi: UserApi,
+    private val authViewModel: AuthViewModel
+) : ViewModel() {
 
     private val _user = MutableStateFlow<UserDTO?>(null)
     val user: StateFlow<UserDTO?> = _user
-    private val _profilePictureUrl = MutableStateFlow<String?>(null)
-    val profilePictureUrl: StateFlow<String?> = _profilePictureUrl
 
     fun fetchUser() {
         viewModelScope.launch {
             try {
                 val user = userApi.getMe()
                 _user.value = user
-                _profilePictureUrl.value = userApi.getProfilePicture().url
+                val profilePictureUrl = userApi.getProfilePicture().url
+                authViewModel.updateProfilePictureUrl(profilePictureUrl)
             } catch (e: Exception) {
                 println("Error fetching user: ${e.message}")
             }
@@ -48,7 +50,7 @@ class ProfileViewModel(private val userApi: UserApi) : ViewModel() {
                     "file", file.name, file.asRequestBody("image/*".toMediaTypeOrNull())
                 )
                 val response = userApi.updateProfilePicture(requestFile)
-                _profilePictureUrl.value = response.url
+                authViewModel.updateProfilePictureUrl(response.url)
             } catch (e: Exception) {
                 println("Error updating profile picture: ${e.message}")
             }

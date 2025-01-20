@@ -121,4 +121,5 @@
     <string name="kg">kg</string>
     <string name="weekly_app_open_statistics">Weekly App Open Statistics</string>
     <string name="completed_routines">Completed Routines</string>
+    <string name="user_profile">User Profile</string>
 </resources>

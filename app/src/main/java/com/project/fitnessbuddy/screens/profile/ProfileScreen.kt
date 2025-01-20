@@ -12,8 +12,10 @@ import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatDelegate
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
@@ -26,7 +28,9 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
@@ -66,20 +70,15 @@ import java.io.File
 fun ProfileScreen(
     navigationState: NavigationState,
     navigationViewModel: NavigationViewModel,
-
     parametersState: ParametersState,
     parametersViewModel: ParametersViewModel,
-
     userState: UserState,
     authViewModel: AuthViewModel,
-
-    profileViewModel: ProfileViewModel = viewModel(),
+    profileViewModel: ProfileViewModel = viewModel()
 ) {
     val context = LocalContext.current
     val lifecycleOwner = LocalLifecycleOwner.current
-    val coroutineScope = remember {
-        lifecycleOwner.lifecycleScope
-    }
+    val coroutineScope = remember { lifecycleOwner.lifecycleScope }
     var isEditing by remember { mutableStateOf(false) }
     var name by remember { mutableStateOf("") }
     val user = profileViewModel.user.collectAsState()
@@ -89,28 +88,21 @@ fun ProfileScreen(
         val job = coroutineScope.launch {
             navigationViewModel.onEvent(NavigationEvent.ClearTopBarActions)
             navigationViewModel.onEvent(NavigationEvent.DisableCustomButton)
-
-
             navigationViewModel.onEvent(NavigationEvent.UpdateTitleWidget {
                 MediumTextWidget(context.getString(R.string.profile))
             })
         }
 
-        onDispose {
-            job.cancel()
-        }
+        onDispose { job.cancel() }
     }
 
-    // External cache directory
     val cacheDir =
         context.externalCacheDir ?: throw IllegalStateException("Cache directory not found")
     val croppedFile = File(cacheDir, "cropped_${System.currentTimeMillis()}.jpg")
 
-    // UCrop launcher
     val cropLauncher =
         rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             if (result.resultCode == Activity.RESULT_OK) {
-                // Handle cropped image
                 Toast.makeText(context, "Image cropped successfully!", Toast.LENGTH_SHORT).show()
                 profileViewModel.updateProfilePicture(croppedFile)
             } else {
@@ -126,8 +118,6 @@ fun ProfileScreen(
                     "${context.packageName}.fileprovider",
                     croppedFile
                 )
-
-                // Launch UCrop with an explicit intent
                 val uCropIntent = UCrop.of(uri, cropUri)
                     .withAspectRatio(1f, 1f)
                     .withMaxResultSize(512, 512)
@@ -138,8 +128,6 @@ fun ProfileScreen(
             }
         }
 
-
-    // Permission Request Launcher
     val permissionLauncher =
         rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
             if (isGranted) {
@@ -149,7 +137,6 @@ fun ProfileScreen(
             }
         }
 
-    // Handle Image Picker Click
     val handleImagePickerClick: () -> Unit = {
         val permission = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             Manifest.permission.READ_MEDIA_IMAGES
@@ -182,123 +169,132 @@ fun ProfileScreen(
         verticalArrangement = Arrangement.Top,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-
         Card(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(8.dp),
             elevation = CardDefaults.cardElevation(8.dp)
         ) {
-            Box(
-                modifier = Modifier
-                    .size(120.dp)
-                    .clip(CircleShape)
-                    .background(MaterialTheme.colorScheme.primary)
-                    .clickable { handleImagePickerClick() },
-                contentAlignment = Alignment.Center
-            ) {
-                Image(
-                    painter = rememberAsyncImagePainter(
-                        profileViewModel.profilePictureUrl.collectAsState().value ?: ""
-                    ),
-                    contentDescription = "Profile Picture",
-                    modifier = Modifier
-                        .size(120.dp)
-                        .clip(CircleShape),
-                    contentScale = ContentScale.Crop
-                )
-                Text(
-                    text = "Edit",
-                    color = Color.White,
-                    modifier = Modifier.align(Alignment.BottomCenter)
-                )
-            }
-
             Column(
-                modifier = Modifier
-                    .padding(16.dp),
+                modifier = Modifier.padding(16.dp),
                 verticalArrangement = Arrangement.spacedBy(16.dp),
-                horizontalAlignment = Alignment.Start
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(
-                    text = "User Profile",
+                    text = stringResource(R.string.user_profile),
                     style = MaterialTheme.typography.headlineMedium.copy(
                         fontSize = 24.sp,
                         fontWeight = FontWeight.Bold
                     ),
                     color = MaterialTheme.colorScheme.primary
                 )
-
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text(
-                        text = "${stringResource(R.string.email)}:",
-                        style = MaterialTheme.typography.labelMedium,
-                        modifier = Modifier.weight(1f)
+                Box(
+                    modifier = Modifier
+                        .size(120.dp)
+                        .clip(CircleShape)
+                        .background(MaterialTheme.colorScheme.primary)
+                        .clickable { handleImagePickerClick() },
+                    contentAlignment = Alignment.Center
+                ) {
+                    Image(
+                        painter = rememberAsyncImagePainter(userState.profilePictureUrl ?: ""),
+                        contentDescription = "Profile Picture",
+                        modifier = Modifier
+                            .size(120.dp)
+                            .clip(CircleShape),
+                        contentScale = ContentScale.Crop
                     )
                     Text(
-                        text = user.value?.email ?: stringResource(id = R.string.no_data),
-                        style = MaterialTheme.typography.bodyLarge
+                        text = stringResource(R.string.edit),
+                        color = Color.White,
+                        modifier = Modifier.align(Alignment.BottomCenter),
+                        style = TextStyle(
+                            fontSize = 16.sp,
+                            fontWeight = FontWeight.Bold,
+                            background = Color.Transparent,
+                            shadow = Shadow(
+                                color = Color.Black,
+                                offset = Offset(1f, 1f),
+                                blurRadius = 5f
+                            ),
+                        )
                     )
                 }
 
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    modifier = Modifier.fillMaxWidth()
+                Column(
+                    modifier = Modifier.padding(16.dp),
+                    verticalArrangement = Arrangement.spacedBy(16.dp),
+                    horizontalAlignment = Alignment.Start
                 ) {
-                    Text(
-                        text = "${stringResource(R.string.name)}:",
-                        style = MaterialTheme.typography.labelMedium,
-                        modifier = Modifier.weight(1f)
-                    )
-                    if (isEditing) {
-                        BasicTextField(
-                            value = name,
-                            onValueChange = { name = it },
-                            textStyle = TextStyle(
-                                fontSize = 16.sp,
-                                color = MaterialTheme.colorScheme.onBackground
-                            ),
-                            modifier = Modifier
-                                .background(Color.LightGray, MaterialTheme.shapes.small)
-                                .padding(8.dp)
-                        )
-                        Spacer(modifier = Modifier.width(8.dp))
-                        IconButton(onClick = {
-                            isEditing = false
-                            user.value?.let {
-                                profileViewModel.updateUser(it.id, name)
-                            }
-                        }) {
-                            Icon(
-                                imageVector = Icons.Default.Edit,
-                                contentDescription = stringResource(R.string.save_changes),
-                                tint = MaterialTheme.colorScheme.primary
-                            )
-                        }
-                    } else {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
                         Text(
-                            text = user.value?.name ?: stringResource(id = R.string.no_data),
+                            text = "${stringResource(R.string.email)}:",
+                            style = MaterialTheme.typography.labelMedium,
+                            modifier = Modifier.weight(1f)
+                        )
+                        Text(
+                            text = user.value?.email ?: stringResource(id = R.string.no_data),
                             style = MaterialTheme.typography.bodyLarge
                         )
-                        Spacer(modifier = Modifier.width(8.dp))
-                        IconButton(onClick = { isEditing = true }) {
-                            Icon(
-                                imageVector = Icons.Default.Edit,
-                                contentDescription = "Edit Name",
-                                tint = MaterialTheme.colorScheme.primary
-                            )
-                        }
                     }
 
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Text(
+                            text = "${stringResource(R.string.name)}:",
+                            style = MaterialTheme.typography.labelMedium,
+                            modifier = Modifier.weight(1f)
+                        )
+                        if (isEditing) {
+                            BasicTextField(
+                                value = name,
+                                onValueChange = { name = it },
+                                textStyle = TextStyle(
+                                    fontSize = 16.sp,
+                                    color = MaterialTheme.colorScheme.onBackground
+                                ),
+                                modifier = Modifier
+                                    .background(Color.LightGray, MaterialTheme.shapes.small)
+                                    .padding(8.dp)
+                            )
+                            Spacer(modifier = Modifier.width(8.dp))
+                            IconButton(onClick = {
+                                isEditing = false
+                                user.value?.let {
+                                    profileViewModel.updateUser(it.id, name)
+                                }
+                            }) {
+                                Icon(
+                                    imageVector = Icons.Default.Edit,
+                                    contentDescription = stringResource(R.string.save_changes),
+                                    tint = MaterialTheme.colorScheme.primary
+                                )
+                            }
+                        } else {
+                            Text(
+                                text = user.value?.name ?: stringResource(id = R.string.no_data),
+                                style = MaterialTheme.typography.bodyLarge
+                            )
+                            Spacer(modifier = Modifier.width(8.dp))
+                            IconButton(onClick = { isEditing = true }) {
+                                Icon(
+                                    imageVector = Icons.Default.Edit,
+                                    contentDescription = "Edit Name",
+                                    tint = MaterialTheme.colorScheme.primary
+                                )
+                            }
+                        }
+                    }
+                    Spacer(modifier = Modifier.height(24.dp))
 
+                    ParametersList(
+                        parametersState = parametersState,
+                        parametersViewModel = parametersViewModel
+                    )
                 }
-                Spacer(modifier = Modifier.height(24.dp))
-
-                ParametersList(
-                    parametersState = parametersState,
-                    parametersViewModel = parametersViewModel
-                )
             }
         }
 
@@ -315,7 +311,6 @@ fun ProfileScreen(
                 }
             }
         )
-
     }
 }
 

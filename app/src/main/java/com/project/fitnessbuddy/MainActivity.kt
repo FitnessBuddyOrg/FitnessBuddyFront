@@ -165,7 +165,21 @@ class MainActivity : ComponentActivity() {
         object : ViewModelProvider.Factory {
             override fun <T : ViewModel> create(modelClass: Class<T>): T {
                 @Suppress("UNCHECKED_CAST")
-                return ProfileViewModel(RetrofitInstance.userApi) as T
+                return ProfileViewModel(RetrofitInstance.userApi, authViewModel) as T
+            }
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        if (authViewModel.userState.value.isLoggedIn && authViewModel.userState.value.profilePictureUrl.isNullOrEmpty()) {
+            lifecycleScope.launch {
+                try {
+                    val profilePictureUrl = RetrofitInstance.userApi.getProfilePicture().url
+                    authViewModel.updateProfilePictureUrl(profilePictureUrl)
+                } catch (e: Exception) {
+                    Log.e("MainActivity", "Failed to fetch profile picture: ${e.localizedMessage}")
+                }
             }
         }
     }
