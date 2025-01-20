@@ -30,7 +30,7 @@ interface ExerciseApi {
     @POST("exercise/share")
     suspend fun shareExercise(@Body shareExerciseDTO: ShareExerciseDTO): TokenResponseDTO
 
-    @GET("exercise/share")
+    @GET("exercise/share/{token}")
     suspend fun getSharedExercise(@Path("token") token: String): ShareExerciseDTO
 
     @GET("exercise/templates")

@@ -38,6 +38,7 @@ fun AddEditExerciseScreen(
     exercisesState: ExercisesState,
     exercisesViewModel: ExercisesViewModel
 ) {
+    val context = LocalContext.current
     val lifecycleOwner = LocalLifecycleOwner.current
     val coroutineScope = remember {
         lifecycleOwner.lifecycleScope
@@ -66,23 +67,6 @@ fun AddEditExerciseScreen(
             job.cancel()
         }
     }
-
-    InputInformation(
-        navigationState = navigationState,
-        navigationViewModel = navigationViewModel,
-        exercisesState = exercisesState,
-        exercisesViewModel = exercisesViewModel,
-    )
-}
-
-@Composable
-fun InputInformation(
-    navigationState: NavigationState,
-    navigationViewModel: NavigationViewModel,
-    exercisesState: ExercisesState,
-    exercisesViewModel: ExercisesViewModel
-) {
-    val context = LocalContext.current
 
     Scaffold(
         modifier = Modifier

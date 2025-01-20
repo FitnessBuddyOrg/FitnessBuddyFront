@@ -110,12 +110,14 @@ fun ViewExerciseScreen(
 
     LaunchedEffect(exercisesState.sharedExerciseToken) {
         if(exercisesState.sharedExerciseToken != "") {
-            val message = ""
-            
+            val message = "A friend shared an exercise with you!" +
+                    "\nInput this code in the exercises screen to add to your exercises:" +
+                    "\n${exercisesState.sharedExerciseToken}"
+
             val sendIntent = Intent().apply {
                 flags = Intent.FLAG_ACTIVITY_NEW_TASK
                 action = Intent.ACTION_SEND
-                putExtra(Intent.EXTRA_TEXT, exercisesState.sharedExerciseToken)
+                putExtra(Intent.EXTRA_TEXT, message)
                 type = "text/plain"
             }
             context.startActivity(Intent.createChooser(sendIntent, "Share via"))
@@ -192,7 +194,7 @@ fun AboutTab(
     ) {
         if (exercisesState.selectedExercise.videoLink.isNotEmpty() && isValidYtLink(exercisesState.selectedExercise.videoLink)) {
             val videoId = extractIdFromYtLink(exercisesState.selectedExercise.videoLink)
-//            LiveTvScreen(videoId)
+            LiveTvScreen(videoId)
         } else {
             Text(
                 modifier = Modifier

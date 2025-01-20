@@ -28,4 +28,8 @@ sealed interface ExercisesEvent {
 
     data object ShareSelectedExercise : ExercisesEvent
     data object ClearSharedExerciseToken: ExercisesEvent
+
+    data class SetFetchedExerciseToken(val fetchedExerciseToken: String) : ExercisesEvent
+    data object FetchExerciseByToken: ExercisesEvent
+    data object ResetFetching: ExercisesEvent
 }

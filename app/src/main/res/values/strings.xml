@@ -38,6 +38,7 @@
     <string name="completed_routine_route" translatable="false">completed_routine_route</string>
     <string name="login_route" translatable="false">login_route</string>
     <string name="register_route" translatable="false">register_route</string>
+    <string name="add_exercise_code_route" translatable="false">add_exercise_code_route</string>
     <string name="an_exercise">an exercise</string>
     <string name="add">Add</string>
     <string name="edit">Edit</string>
@@ -121,4 +122,8 @@
     <string name="kg">kg</string>
     <string name="weekly_app_open_statistics">Weekly App Open Statistics</string>
     <string name="completed_routines">Completed Routines</string>
+    <string name="add_exercise_from_code">Add exercise from code</string>
+    <string name="exercise_code">Exercise Code</string>
+    <string name="fetched_exercise">Fetched Exercise</string>
+    <string name="no_exercise_fetched">Could not find exercise</string>
 </resources>
