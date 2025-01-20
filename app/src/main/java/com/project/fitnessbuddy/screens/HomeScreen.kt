@@ -80,11 +80,11 @@ fun HomeScreen(
 @Composable
 fun NavigationGrid(navController: NavController) {
     val menuItems = listOf(
-        NavigationItem(stringResource(R.string.profile), Icons.Default.Person, "profile"),
-        NavigationItem(stringResource(R.string.statistics), ImageVector.vectorResource(id = R.drawable.monitoring), "statistics"),
-        NavigationItem(stringResource(R.string.exercises), Icons.Default.FitnessCenter, "exercises"),
-        NavigationItem(stringResource(R.string.routines), Icons.Default.BrowseGallery, "routines"),
-        NavigationItem(stringResource(R.string.progress_calendar), Icons.Default.CalendarMonth, "progressCalendar"),
+        NavigationItem(stringResource(R.string.profile), Icons.Default.Person, stringResource(R.string.profile_route)),
+        NavigationItem(stringResource(R.string.statistics), ImageVector.vectorResource(id = R.drawable.monitoring), stringResource(R.string.statistics_route)),
+        NavigationItem(stringResource(R.string.exercises), Icons.Default.FitnessCenter, stringResource(R.string.exercises_route)),
+        NavigationItem(stringResource(R.string.routines), Icons.Default.BrowseGallery, stringResource(R.string.routines_route)),
+        NavigationItem(stringResource(R.string.progress_calendar), Icons.Default.CalendarMonth, stringResource(R.string.progress_calendar_route)),
         )
 
     Column(

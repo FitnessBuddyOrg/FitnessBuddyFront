@@ -7,6 +7,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
@@ -20,6 +21,7 @@ fun RegisterScreen(
     authViewModel: AuthViewModel,
     onRegisterSuccess: () -> Unit
 ) {
+    val context = LocalContext.current
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var confirmPassword by remember { mutableStateOf("") }
@@ -89,7 +91,7 @@ fun RegisterScreen(
                     }
 
                     TextButton(
-                        onClick = { navController.navigate("login") },
+                        onClick = { navController.navigate(context.getString(R.string.login_route)) },
                         modifier = Modifier.fillMaxWidth()
                     ) {
                         Text(stringResource(id = R.string.already_have_account))

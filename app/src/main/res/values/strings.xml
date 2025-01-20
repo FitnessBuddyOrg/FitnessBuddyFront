@@ -60,5 +60,6 @@
     <string name="no_data">No data</string>
     <string name="google_sign_in">Sign in with Google</string>
     <string name="github_sign_in">Sign in with GitHub</string>
+    <string name="save_changes">Save Changes</string>
 
 </resources>

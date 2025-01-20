@@ -1,6 +1,7 @@
 package com.project.fitnessbuddy.screens
 
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
@@ -25,7 +26,7 @@ import com.github.mikephil.charting.formatter.IndexAxisValueFormatter
 import com.project.fitnessbuddy.R
 import com.project.fitnessbuddy.api.auth.UserState
 import com.project.fitnessbuddy.api.statistics.StatisticsViewModel
-import com.project.fitnessbuddy.navigation.DefaultTitleWidget
+import com.project.fitnessbuddy.navigation.MediumTextWidget
 import com.project.fitnessbuddy.navigation.NavigationEvent
 import com.project.fitnessbuddy.navigation.NavigationViewModel
 import kotlinx.coroutines.launch
@@ -51,7 +52,7 @@ fun StatisticsScreen(
             navigationViewModel.onEvent(NavigationEvent.DisableAllButtons)
 
             navigationViewModel.onEvent(NavigationEvent.UpdateTitleWidget {
-                DefaultTitleWidget(context.getString(R.string.statistics))
+                MediumTextWidget(context.getString(R.string.statistics))
             })
         }
 
@@ -64,18 +65,22 @@ fun StatisticsScreen(
         statisticsViewModel.fetchAppOpenData(userId)
     }
 
-    Column(
+    LazyColumn(
         modifier = Modifier
             .fillMaxSize()
-            .padding(16.dp)
-            .verticalScroll(rememberScrollState()),
+            .padding(16.dp),
         verticalArrangement = Arrangement.Top,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Spacer(modifier = Modifier.height(16.dp))
-        RoundedChartBox {
-            AppOpenChart(appOpenData)
+        item {
+            Spacer(modifier = Modifier.height(16.dp))
         }
+        item {
+            RoundedChartBox {
+                AppOpenChart(appOpenData)
+            }
+        }
+
     }
 }
 

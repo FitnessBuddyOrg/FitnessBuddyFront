@@ -85,7 +85,7 @@ fun LoginScreen(
                     }
 
                     TextButton(
-                        onClick = { navController.navigate("register") },
+                        onClick = { navController.navigate(context.getString(R.string.register_route)) },
                         modifier = Modifier.fillMaxWidth()
                     ) {
                         Text(stringResource(id = R.string.dont_have_account))

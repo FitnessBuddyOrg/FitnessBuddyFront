@@ -62,11 +62,8 @@ import com.project.fitnessbuddy.R
 import com.project.fitnessbuddy.api.auth.AuthViewModel
 import com.project.fitnessbuddy.api.auth.UserState
 import com.project.fitnessbuddy.api.user.ProfileViewModel
-import com.project.fitnessbuddy.navigation.DefaultTitleWidget
-import com.project.fitnessbuddy.auth.AuthViewModel
 import com.project.fitnessbuddy.navigation.MediumTextWidget
 import com.project.fitnessbuddy.navigation.NavigationEvent
-import com.project.fitnessbuddy.navigation.NavigationState
 import com.project.fitnessbuddy.navigation.NavigationViewModel
 import com.yalantis.ucrop.UCrop
 import com.project.fitnessbuddy.screens.common.CountryFlagComposable
@@ -76,7 +73,6 @@ import com.project.fitnessbuddy.screens.common.ParametersEvent
 import com.project.fitnessbuddy.screens.common.ParametersState
 import com.project.fitnessbuddy.screens.common.ParametersViewModel
 import com.project.fitnessbuddy.screens.common.StoredLanguageValue
-import com.project.fitnessbuddy.screens.common.countryCodeToFlag
 import kotlinx.coroutines.launch
 import java.io.File
 
@@ -117,44 +113,52 @@ fun ProfileScreen(
     }
 
     // External cache directory
-    val cacheDir = context.externalCacheDir ?: throw IllegalStateException("Cache directory not found")
+    val cacheDir =
+        context.externalCacheDir ?: throw IllegalStateException("Cache directory not found")
     val croppedFile = File(cacheDir, "cropped_${System.currentTimeMillis()}.jpg")
 
     // UCrop launcher
-    val cropLauncher = rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-        if (result.resultCode == Activity.RESULT_OK) {
-            // Handle cropped image
-            Toast.makeText(context, "Image cropped successfully!", Toast.LENGTH_SHORT).show()
-            profileViewModel.updateProfilePicture(croppedFile)
-        } else {
-            Toast.makeText(context, "Image cropping canceled.", Toast.LENGTH_SHORT).show()
+    val cropLauncher =
+        rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            if (result.resultCode == Activity.RESULT_OK) {
+                // Handle cropped image
+                Toast.makeText(context, "Image cropped successfully!", Toast.LENGTH_SHORT).show()
+                profileViewModel.updateProfilePicture(croppedFile)
+            } else {
+                Toast.makeText(context, "Image cropping canceled.", Toast.LENGTH_SHORT).show()
+            }
         }
-    }
 
-    val imagePickerLauncher = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri ->
-        if (uri != null) {
-            val cropUri = FileProvider.getUriForFile(context, "${context.packageName}.fileprovider", croppedFile)
+    val imagePickerLauncher =
+        rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri ->
+            if (uri != null) {
+                val cropUri = FileProvider.getUriForFile(
+                    context,
+                    "${context.packageName}.fileprovider",
+                    croppedFile
+                )
 
-            // Launch UCrop with an explicit intent
-            val uCropIntent = UCrop.of(uri, cropUri)
-                .withAspectRatio(1f, 1f)
-                .withMaxResultSize(512, 512)
-                .getIntent(context)
-            cropLauncher.launch(uCropIntent)
-        } else {
-            Toast.makeText(context, "No image selected.", Toast.LENGTH_SHORT).show()
+                // Launch UCrop with an explicit intent
+                val uCropIntent = UCrop.of(uri, cropUri)
+                    .withAspectRatio(1f, 1f)
+                    .withMaxResultSize(512, 512)
+                    .getIntent(context)
+                cropLauncher.launch(uCropIntent)
+            } else {
+                Toast.makeText(context, "No image selected.", Toast.LENGTH_SHORT).show()
+            }
         }
-    }
 
 
     // Permission Request Launcher
-    val permissionLauncher = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
-        if (isGranted) {
-            imagePickerLauncher.launch("image/*")
-        } else {
-            Toast.makeText(context, "Storage permission denied.", Toast.LENGTH_SHORT).show()
+    val permissionLauncher =
+        rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
+            if (isGranted) {
+                imagePickerLauncher.launch("image/*")
+            } else {
+                Toast.makeText(context, "Storage permission denied.", Toast.LENGTH_SHORT).show()
+            }
         }
-    }
 
     // Handle Image Picker Click
     val handleImagePickerClick: () -> Unit = {
@@ -164,7 +168,11 @@ fun ProfileScreen(
             Manifest.permission.READ_EXTERNAL_STORAGE
         }
 
-        if (ContextCompat.checkSelfPermission(context, permission) == PackageManager.PERMISSION_GRANTED) {
+        if (ContextCompat.checkSelfPermission(
+                context,
+                permission
+            ) == PackageManager.PERMISSION_GRANTED
+        ) {
             imagePickerLauncher.launch("image/*")
         } else {
             permissionLauncher.launch(permission)
@@ -211,11 +219,13 @@ fun ProfileScreen(
                     .size(120.dp)
                     .clip(CircleShape)
                     .background(MaterialTheme.colorScheme.primary)
-                    .clickable {handleImagePickerClick() },
+                    .clickable { handleImagePickerClick() },
                 contentAlignment = Alignment.Center
             ) {
                 Image(
-                    painter = rememberAsyncImagePainter(profileViewModel.profilePictureUrl.collectAsState().value ?: ""),
+                    painter = rememberAsyncImagePainter(
+                        profileViewModel.profilePictureUrl.collectAsState().value ?: ""
+                    ),
                     contentDescription = "Profile Picture",
                     modifier = Modifier
                         .size(120.dp)
@@ -246,8 +256,8 @@ fun ProfileScreen(
 
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Text(
-                        text = "Email:",
-                        style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Medium),
+                        text =  "${stringResource(R.string.email)}:",
+                        style = MaterialTheme.typography.labelMedium,
                         modifier = Modifier.weight(1f)
                     )
                     Text(
@@ -262,8 +272,8 @@ fun ProfileScreen(
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     Text(
-                        text = "Name:",
-                        style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Medium),
+                        text = "${stringResource(R.string.name)}:",
+                        style = MaterialTheme.typography.labelMedium,
                         modifier = Modifier.weight(1f)
                     )
                     if (isEditing) {
@@ -287,7 +297,7 @@ fun ProfileScreen(
                         }) {
                             Icon(
                                 imageVector = Icons.Default.Edit,
-                                contentDescription = "Save Changes",
+                                contentDescription = stringResource(R.string.save_changes),
                                 tint = MaterialTheme.colorScheme.primary
                             )
                         }
@@ -305,7 +315,15 @@ fun ProfileScreen(
                             )
                         }
                     }
+
+
                 }
+                Spacer(modifier = Modifier.height(24.dp))
+
+                ParametersList(
+                    parametersState = parametersState,
+                    parametersViewModel = parametersViewModel
+                )
             }
         }
 
@@ -317,20 +335,14 @@ fun ProfileScreen(
             onClick = {
                 authViewModel.logout()
                 profileViewModel.clearUserData()
-                navController.navigate("login") {
+                navController.navigate(context.getString(R.string.login_route)) {
                     popUpTo(0) { inclusive = true }
                 }
             }
         )
-        Spacer(modifier = Modifier.height(24.dp))
 
-        ParametersList(
-            parametersState = parametersState,
-            parametersViewModel = parametersViewModel
-        )
     }
 }
-
 
 
 @Composable
@@ -362,44 +374,39 @@ fun ParametersList(
 
     val language = Language.getLanguage(parametersState.languageParameter.value)
 
-    Scaffold(
-        modifier = Modifier
-            .fillMaxSize()
-    ) { padding ->
-        LazyColumn(
-            modifier = Modifier.fillMaxSize(),
-            contentPadding = padding,
-            verticalArrangement = Arrangement.spacedBy(0.dp)
-        ) {
-            item {
-                DialogRadioButtonList(
-                    modifier = Modifier.padding(16.dp),
-                    label = stringResource(R.string.language),
-                    options = Language.entries.map {
-                        StoredLanguageValue(
-                            it,
-                            stringResource(it.resourceId),
-                            it.localeString
-                        )
-                    },
-                    initialStoredValue = StoredLanguageValue(
-                        language,
-                        language.name,
-                        language.localeString
-                    ),
-                    onValueChange = {
-                        parametersViewModel.onEvent(ParametersEvent.SetLanguageParameterValue(it.value.name))
-                        changeLocales(context, it.localeString)
-                    },
-                    valueComposable = {
-                        CountryFlagComposable(it.localeString, it.displayValue)
-                    }
-                )
-            }
 
-        }
+    Column(
+        modifier = Modifier.fillMaxWidth(),
+        verticalArrangement = Arrangement.spacedBy(0.dp)
+    ) {
+
+        DialogRadioButtonList(
+            label = stringResource(R.string.language),
+            options = Language.entries.map {
+                StoredLanguageValue(
+                    it,
+                    stringResource(it.resourceId),
+                    it.localeString
+                )
+            },
+            initialStoredValue = StoredLanguageValue(
+                language,
+                language.name,
+                language.localeString
+            ),
+            onValueChange = {
+                parametersViewModel.onEvent(ParametersEvent.SetLanguageParameterValue(it.value.name))
+                changeLocales(context, it.localeString)
+            },
+            valueComposable = {
+                CountryFlagComposable(it.localeString, it.displayValue)
+            }
+        )
+
+
     }
 }
+
 
 fun changeLocales(context: Context, localeString: String) {
 

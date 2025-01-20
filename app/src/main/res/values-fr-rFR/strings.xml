@@ -50,4 +50,5 @@
     <string name="no_data">Pas de données</string>
     <string name="google_sign_in">Se connecter avec Google</string>
     <string name="github_sign_in">Se connecter avec Github</string>
+    <string name="save_changes">Sauvegarder les modifications</string>
 </resources>

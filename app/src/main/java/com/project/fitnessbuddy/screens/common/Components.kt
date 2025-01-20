@@ -132,8 +132,7 @@ fun <T, V : StoredValue<T>> DialogRadioButtonList(
         Text(
             modifier = Modifier
                 .align(Alignment.CenterVertically)
-                .weight(1f)
-                .padding(start = 8.dp),
+                .weight(1f),
             text = label,
             style = MaterialTheme.typography.labelMedium,
         )

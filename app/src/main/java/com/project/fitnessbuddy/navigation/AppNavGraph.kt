@@ -54,7 +54,6 @@ import com.project.fitnessbuddy.screens.exercises.ExercisesScreen
 import com.project.fitnessbuddy.screens.exercises.ExercisesState
 import com.project.fitnessbuddy.screens.exercises.ExercisesViewModel
 import com.project.fitnessbuddy.screens.exercises.ViewExerciseScreen
-import com.project.fitnessbuddy.screens.profile.ProfileScreen
 import com.project.fitnessbuddy.screens.routines.RoutinesScreen
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -290,17 +289,6 @@ fun AppNavGraph(
                                 }
                             }
                         )
-                    }
-
-                    composable("home") {
-                        HomeScreen(
-                            navController = navController,
-                            navigationViewModel = navigationViewModel
-                        )
-                    }
-
-                    composable("progressCalendar") {
-                        ProgressCalendarScreen()
                     }
 
                     appRoutes.forEach { appRoute ->
