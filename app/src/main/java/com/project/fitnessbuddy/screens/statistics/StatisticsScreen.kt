@@ -1,9 +1,7 @@
-package com.project.fitnessbuddy.screens
+package com.project.fitnessbuddy.screens.statistics
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -11,6 +9,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -89,7 +88,6 @@ fun StatisticsScreen(
 fun RoundedChartBox(
     modifier: Modifier = Modifier,
     shape: Shape = MaterialTheme.shapes.medium,
-    backgroundColor: Color = Color.White,
     elevation: Dp = 4.dp,
     content: @Composable () -> Unit
 ) {
@@ -98,7 +96,7 @@ fun RoundedChartBox(
             .fillMaxWidth()
             .padding(8.dp),
         shape = shape,
-        colors = CardDefaults.cardColors(backgroundColor),
+        colors = CardDefaults.cardColors(MaterialTheme.colorScheme.secondaryContainer),
         elevation = CardDefaults.cardElevation(elevation)
     ) {
         content()
@@ -114,15 +112,17 @@ fun AppOpenChart(data: Map<LocalDate, Int>) {
         Entry(index.toFloat(), count.toFloat())
     }
 
+    val onSecondaryContainerColor = MaterialTheme.colorScheme.onSecondaryContainer.hashCode()
+
     val dataSet = LineDataSet(entries, "App Opens").apply {
         lineWidth = 3f
         circleRadius = 6f
         setDrawCircleHole(true)
-        setCircleColor(0xFFbc5090.toInt())
-        color = 0xFF58508d.toInt()
+        setCircleColor(MaterialTheme.colorScheme.primary.hashCode())
+        color = MaterialTheme.colorScheme.secondary.hashCode()
         setDrawValues(true)
         valueTextSize = 12f
-        valueTextColor = android.graphics.Color.BLACK
+        valueTextColor = onSecondaryContainerColor
         valueFormatter = object : com.github.mikephil.charting.formatter.ValueFormatter() {
             override fun getFormattedValue(value: Float): String {
                 return value.toInt().toString()
@@ -136,7 +136,7 @@ fun AppOpenChart(data: Map<LocalDate, Int>) {
         contentAlignment = Alignment.Center
     ) {
         Text(
-            text = "Weekly App Open Statistics",
+            text = stringResource(R.string.weekly_app_open_statistics),
             style = MaterialTheme.typography.headlineMedium.copy(fontSize = 24.sp),
             modifier = Modifier.padding(16.dp)
         )
@@ -153,12 +153,12 @@ fun AppOpenChart(data: Map<LocalDate, Int>) {
                     valueFormatter = IndexAxisValueFormatter(completeData.keys.map { it.toString() })
                     position = XAxis.XAxisPosition.BOTTOM
                     textSize = 12f
-                    textColor = android.graphics.Color.BLACK
+                    textColor = onSecondaryContainerColor
                     labelRotationAngle = 70f
                 }
                 axisLeft.apply {
                     textSize = 12f
-                    textColor = android.graphics.Color.BLACK
+                    textColor = onSecondaryContainerColor
                     axisMinimum = 0f
                 }
                 axisRight.isEnabled = false

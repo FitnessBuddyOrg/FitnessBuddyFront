@@ -3,7 +3,6 @@
     <string name="home">Home</string>
     <string name="profile">Profile</string>
     <string name="exercises">Exercises</string>
-    <string name="progress_calendar">Progress Calendar</string>
     <string name="statistics">Statistics</string>
     <string name="username_placeholder">username</string>
     <string name="routines">Routines</string>
@@ -23,7 +22,7 @@
     <string name="home_route" translatable="false">home_route</string>
     <string name="profile_route" translatable="false">profile_route</string>
     <string name="exercises_route" translatable="false">exercises_route</string>
-    <string name="progress_calendar_route" translatable="false">progress_calendar_route</string>
+    <string name="history_route" translatable="false">history_route</string>
     <string name="statistics_route" translatable="false">statistics_route</string>
     <string name="routines_route" translatable="false">routines_route</string>
     <string name="add_edit_exercise_route" translatable="false">add_edit_exercise_route</string>
@@ -120,4 +119,5 @@
     <string name="years">years</string>
     <string name="best_set">Best set</string>
     <string name="kg">kg</string>
+    <string name="weekly_app_open_statistics">Weekly App Open Statistics</string>
 </resources>

@@ -1,6 +1,5 @@
 package com.project.fitnessbuddy.screens
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -16,6 +15,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.BrowseGallery
 import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.FitnessCenter
+import androidx.compose.material.icons.filled.History
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -27,7 +27,6 @@ import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -116,9 +115,9 @@ fun NavigationGrid(navigationState: NavigationState) {
             stringResource(R.string.routines_route)
         ),
         NavigationItem(
-            stringResource(R.string.progress_calendar),
-            Icons.Default.CalendarMonth,
-            stringResource(R.string.progress_calendar_route)
+            stringResource(R.string.history),
+            Icons.Default.History,
+            stringResource(R.string.history_route)
         ),
     )
 

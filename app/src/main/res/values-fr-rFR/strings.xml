@@ -4,7 +4,6 @@
     <string name="home">Accueil</string>
     <string name="profile">Profil</string>
     <string name="exercises">Exercices</string>
-    <string name="progress_calendar">Calendrier de Progression</string>
     <string name="statistics">Statistiques</string>
     <string name="username_placeholder">Pseudo</string>
     <string name="routines">Routines</string>
@@ -101,4 +100,5 @@
     <string name="years" >years</string>
     <string name="best_set">Best set</string>
     <string name="kg">kg</string>
+    <string name="weekly_app_open_statistics">Weekly App Open Statistics</string>
 </resources>

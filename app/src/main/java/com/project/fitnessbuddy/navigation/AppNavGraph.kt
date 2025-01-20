@@ -6,8 +6,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.BrowseGallery
-import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.FitnessCenter
+import androidx.compose.material.icons.filled.History
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Person
@@ -45,8 +45,6 @@ import com.project.fitnessbuddy.api.statistics.StatisticsViewModel
 import com.project.fitnessbuddy.api.user.ProfileViewModel
 import com.project.fitnessbuddy.database.dto.RoutineDTO
 import com.project.fitnessbuddy.screens.HomeScreen
-import com.project.fitnessbuddy.screens.ProgressCalendarScreen
-import com.project.fitnessbuddy.screens.StatisticsScreen
 import com.project.fitnessbuddy.screens.auth.LoginScreen
 import com.project.fitnessbuddy.screens.auth.RegisterScreen
 import com.project.fitnessbuddy.screens.common.ParametersEvent
@@ -57,6 +55,7 @@ import com.project.fitnessbuddy.screens.exercises.ExercisesScreen
 import com.project.fitnessbuddy.screens.exercises.ExercisesState
 import com.project.fitnessbuddy.screens.exercises.ExercisesViewModel
 import com.project.fitnessbuddy.screens.exercises.ViewExerciseScreen
+import com.project.fitnessbuddy.screens.history.HistoryScreen
 import com.project.fitnessbuddy.screens.profile.ProfileScreen
 import com.project.fitnessbuddy.screens.routines.AddEditRoutineScreen
 import com.project.fitnessbuddy.screens.routines.AddExercisesScreen
@@ -70,6 +69,7 @@ import com.project.fitnessbuddy.screens.routines.SELECTED_ROUTINE_DTO
 import com.project.fitnessbuddy.screens.routines.StartRoutineScreen
 import com.project.fitnessbuddy.screens.routines.StartRoutineServiceNotification
 import com.project.fitnessbuddy.screens.routines.ViewRoutineScreen
+import com.project.fitnessbuddy.screens.statistics.StatisticsScreen
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
@@ -124,7 +124,7 @@ fun AppNavGraph(
     val startRoutineRoute = stringResource(id = R.string.start_routine_route)
     val completedRoutineRoute = stringResource(id = R.string.completed_routine_route)
 
-    val progressCalendarRoute = stringResource(id = R.string.progress_calendar_route)
+    val historyRoute = stringResource(id = R.string.history_route)
     val statisticsRoute = stringResource(id = R.string.statistics_route)
 
     val currentNavBackStackEntry by navController.currentBackStackEntryAsState()
@@ -324,10 +324,14 @@ fun AppNavGraph(
             )
         ),
         AppRoute(
-            routeName = progressCalendarRoute,
-            name = stringResource(id = R.string.progress_calendar),
-            icon = { Icon(imageVector = Icons.Default.CalendarMonth, contentDescription = null) },
-            screen = { ProgressCalendarScreen() }
+            routeName = historyRoute,
+            name = stringResource(id = R.string.history),
+            icon = { Icon(imageVector = Icons.Default.History, contentDescription = null) },
+            screen = {
+                HistoryScreen(
+
+                )
+            }
         ),
         AppRoute(
             routeName = statisticsRoute,
