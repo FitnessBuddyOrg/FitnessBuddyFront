@@ -34,8 +34,8 @@ val Typography = Typography(
         fontSize = 14.sp
     ),
     labelSmall = TextStyle(
-        fontFamily = FontFamily(Font(R.font.roboto_thin)),
-        fontWeight = FontWeight.Normal,
+        fontFamily = FontFamily(Font(R.font.roboto_light)),
+        fontWeight = FontWeight.Medium,
         fontSize = 12.sp,
         lineHeight = 16.sp,
         letterSpacing = 0.5.sp

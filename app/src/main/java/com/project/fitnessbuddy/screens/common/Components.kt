@@ -478,7 +478,7 @@ fun SelectedExerciseWidget(
     var selected by remember { mutableStateOf(initialSelected) }
     fun setBackgroundColor(): Color {
         return if (selected && selectionEnabled) {
-            colorScheme.onPrimary
+            colorScheme.secondaryContainer
         } else {
             Color.Transparent
         }

@@ -68,7 +68,7 @@ fun HistoryScreen(
         verticalArrangement = Arrangement.spacedBy(16.dp),
 
         keySelector = {
-            it.routine.startDate?.format("MMMM").toString()
+            it.routine.startDate?.format("MMMM").toString().uppercase()
         },
         predicate = {
             true

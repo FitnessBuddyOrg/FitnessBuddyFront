@@ -356,7 +356,6 @@ fun ParametersList(
     ) {
 
         DialogRadioButtonList(
-            modifier = Modifier.padding(16.dp),
             label = stringResource(R.string.language),
             options = Language
                 .entries
