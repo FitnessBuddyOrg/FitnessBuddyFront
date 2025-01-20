@@ -13,6 +13,12 @@
         android:maxSdkVersion="32" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"
         android:maxSdkVersion="29" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK" />
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+
+
+
     <application
         android:networkSecurityConfig="@xml/network_security_config"
         android:allowBackup="true"
@@ -26,6 +32,12 @@
         android:theme="@style/Theme.FitnessBuddy"
         android:requestLegacyExternalStorage="true"
         tools:targetApi="33">
+
+        <service
+            android:name=".screens.routines.StartRoutineServiceNotification"
+            android:foregroundServiceType="mediaPlayback"
+            android:exported="false"/>
+
         <activity
             android:name=".MainActivity"
             android:exported="true"
@@ -47,7 +59,6 @@
                 <category android:name="android.intent.category.BROWSABLE" />
                 <data android:scheme="fitnessbuddy" android:host="auth" />
             </intent-filter>
-
 
         </activity>
         <activity

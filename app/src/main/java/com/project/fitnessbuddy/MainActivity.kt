@@ -1,17 +1,28 @@
 package com.project.fitnessbuddy
 
+import android.Manifest
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
+import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.platform.LocalContext
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.compose.rememberNavController
 import androidx.room.Room
 import com.project.fitnessbuddy.api.auth.AuthViewModel
 import com.project.fitnessbuddy.api.auth.GitHubTokenRequestDTO
@@ -21,6 +32,7 @@ import com.project.fitnessbuddy.navigation.AppNavGraph
 import com.project.fitnessbuddy.navigation.NavigationViewModel
 import com.project.fitnessbuddy.screens.common.ParametersViewModel
 import com.project.fitnessbuddy.screens.exercises.ExercisesViewModel
+import com.project.fitnessbuddy.screens.routines.RoutinesViewModel
 import com.project.fitnessbuddy.ui.theme.FitnessBuddyTheme
 import kotlinx.coroutines.launch
 import com.github.mikephil.charting.utils.Utils
@@ -41,7 +53,7 @@ class MainActivity : ComponentActivity() {
         Room.databaseBuilder(
             applicationContext,
             FitnessBuddyDatabase::class.java,
-            "fitnessBuddy.db"
+            FitnessBuddyDatabase.DATABASE_NAME
         )
             .fallbackToDestructiveMigration()
             .build()
@@ -68,6 +80,7 @@ class MainActivity : ComponentActivity() {
                     }
                 }
 
+                // Handle custom scheme redirection (fitnessbuddy://auth)
                 data.toString().startsWith("fitnessbuddy://auth") -> {
                     val token = data.getQueryParameter("token")
                     val email = data.getQueryParameter("email")
@@ -82,6 +95,7 @@ class MainActivity : ComponentActivity() {
             }
         }
     }
+
 
     private fun exchangeCodeForToken(code: String) {
         lifecycleScope.launch {
@@ -109,6 +123,20 @@ class MainActivity : ComponentActivity() {
             object : ViewModelProvider.Factory {
                 override fun <T : ViewModel> create(modelClass: Class<T>): T {
                     return NavigationViewModel() as T
+                }
+            }
+        }
+    )
+
+    private val routinesViewModel by viewModels<RoutinesViewModel>(
+        factoryProducer = {
+            object : ViewModelProvider.Factory {
+                override fun <T : ViewModel> create(modelClass: Class<T>): T {
+                    return RoutinesViewModel(
+                        routineDao = db.routineDao,
+                        routineExerciseDao = db.routineExerciseDao,
+                        routineExerciseSetDao = db.routineExerciseSetDao,
+                    ) as T
                 }
             }
         }
@@ -154,6 +182,8 @@ class MainActivity : ComponentActivity() {
             FitnessBuddyTheme {
                 val navigationState by navigationViewModel.state.collectAsState()
                 val exerciseState by exercisesViewModel.state.collectAsState()
+                val routinesState by routinesViewModel.state.collectAsState()
+
                 val userState by authViewModel.userState.collectAsState()
                 val parametersState by parametersViewModel.state.collectAsState()
 
@@ -163,6 +193,9 @@ class MainActivity : ComponentActivity() {
 
                     exercisesState = exerciseState,
                     exercisesViewModel = exercisesViewModel,
+
+                    routinesState = routinesState,
+                    routinesViewModel = routinesViewModel,
 
                     parametersState = parametersState,
                     parametersViewModel = parametersViewModel,
@@ -186,8 +219,6 @@ class MainActivity : ComponentActivity() {
             }
         }
     }
-
-
 }
 
 

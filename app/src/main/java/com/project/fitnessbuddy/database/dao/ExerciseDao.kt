@@ -11,7 +11,7 @@ import kotlinx.coroutines.flow.Flow
 interface ExerciseDao {
 
     @Upsert
-    suspend fun upsert(exercise: Exercise)
+    suspend fun upsert(exercise: Exercise): Long
 
     @Delete
     suspend fun delete(exercise: Exercise)

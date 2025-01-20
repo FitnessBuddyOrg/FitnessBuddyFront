@@ -5,8 +5,10 @@ MUST:
 - [x] user statistics for user (including screen time)
 - [x] user profile page
 - [ ] sharing exercises with other users
-- [ ] changing languages
+- [x] changing languages
 - [ ] unit test
+- [x] exercises screen and all that comes with it
+- [x] routines screen and all that comes with it
 
 SHOULD:
 

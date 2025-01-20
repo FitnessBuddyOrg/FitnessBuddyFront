@@ -1,4 +1,4 @@
-package com.project.fitnessbuddy.database.entity
+package com.project.fitnessbuddy.database.entity.enums
 
 import com.project.fitnessbuddy.R
 import com.project.fitnessbuddy.screens.common.Functions

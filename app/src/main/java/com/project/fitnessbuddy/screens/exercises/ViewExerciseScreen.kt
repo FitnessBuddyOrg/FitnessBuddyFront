@@ -31,6 +31,9 @@ import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.YouTubePlayer
 import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.listeners.AbstractYouTubePlayerListener
 import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.views.YouTubePlayerView
 import com.project.fitnessbuddy.R
+import com.project.fitnessbuddy.navigation.DeleteButton
+import com.project.fitnessbuddy.navigation.EditButton
+import com.project.fitnessbuddy.navigation.EditType
 import com.project.fitnessbuddy.navigation.LargeTextWidget
 import com.project.fitnessbuddy.navigation.MediumTextWidget
 import com.project.fitnessbuddy.navigation.NavigationEvent
@@ -54,24 +57,33 @@ fun ViewExerciseScreen(
 
     DisposableEffect(Unit) {
         val job = coroutineScope.launch {
-            navigationViewModel.onEvent(NavigationEvent.DisableAllButtons)
-            navigationViewModel.onEvent(NavigationEvent.EnableBackButton)
+            navigationViewModel.onEvent(NavigationEvent.ClearTopBarActions)
+            navigationViewModel.onEvent(NavigationEvent.DisableCustomButton)
 
-            navigationViewModel.onEvent(NavigationEvent.EnableEditButton)
-            navigationViewModel.onEvent(NavigationEvent.SetEditButtonRoute(context.getString(R.string.add_edit_exercise)))
-
-            navigationViewModel.onEvent(NavigationEvent.EnableDeleteButton)
-            navigationViewModel.onEvent(NavigationEvent.SetOnDeleteButtonClicked {
-                onDeleteExercise(
-                    navigationState = navigationState,
-                    exercisesViewModel = exercisesViewModel,
-                    exercisesState = exercisesState,
-                    context = context
-                )
-            })
+            navigationViewModel.onEvent(NavigationEvent.EnableCustomButton)
+            navigationViewModel.onEvent(NavigationEvent.SetBackButton(navigationState.navController))
 
             navigationViewModel.onEvent(NavigationEvent.UpdateTitleWidget {
                 exercisesState.selectedExercise.name.let { MediumTextWidget(it) }
+            })
+
+            navigationViewModel.onEvent(NavigationEvent.AddTopBarActions {
+                EditButton(
+                    onClick = {
+                        exercisesViewModel.onEvent(ExercisesEvent.SetEditType(EditType.EDIT))
+                        navigationState.navController?.navigate(context.getString(R.string.add_edit_exercise_route))
+                    }
+                )
+                DeleteButton(
+                    onClick = {
+                        onDeleteExercise(
+                            navigationState = navigationState,
+                            exercisesViewModel = exercisesViewModel,
+                            exercisesState = exercisesState,
+                            context = context
+                        )
+                    }
+                )
             })
         }
 
@@ -96,14 +108,13 @@ fun onDeleteExercise(
         navigationState.navController?.navigateUp()
         Toast.makeText(
             context,
-            "Deleted ${exercisesState.selectedExercise.name}",
+            "${context.getString(R.string.deleted)} ${exercisesState.selectedExercise.name}",
             Toast.LENGTH_SHORT
         ).show()
-        exercisesViewModel.onEvent(ExercisesEvent.ResetEditingExercise)
     } else {
         Toast.makeText(
             context,
-            "Failed to delete ${exercisesState.selectedExercise.name}",
+            "${context.getString(R.string.failed_to_delete)} ${exercisesState.selectedExercise.name}",
             Toast.LENGTH_SHORT
         ).show()
     }

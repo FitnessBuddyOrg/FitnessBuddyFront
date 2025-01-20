@@ -1,14 +1,13 @@
 package com.project.fitnessbuddy.screens.exercises
 
-import com.project.fitnessbuddy.database.entity.Category
+import com.project.fitnessbuddy.database.entity.enums.Category
 import com.project.fitnessbuddy.database.entity.Exercise
-import com.project.fitnessbuddy.database.entity.ShareType
+import com.project.fitnessbuddy.database.entity.enums.ShareType
 import com.project.fitnessbuddy.navigation.EditType
-import com.project.fitnessbuddy.screens.common.Language
+import com.project.fitnessbuddy.database.entity.enums.Language
 
 sealed interface ExercisesEvent {
-    data object SaveExercise : ExercisesEvent
-    data object UpdateExercise : ExercisesEvent
+    data object UpsertExercise : ExercisesEvent
 
     data class SetName(val name: String) : ExercisesEvent
     data class SetInstructions(val instructions: String) : ExercisesEvent
@@ -19,8 +18,8 @@ sealed interface ExercisesEvent {
 
     data class SortExercises(val sortType: SortType) : ExercisesEvent
 
-    data class SetEditingExercise(val selectedExercise: Exercise) : ExercisesEvent
-    data object ResetEditingExercise : ExercisesEvent
+    data class SetSelectedExercise(val selectedExercise: Exercise) : ExercisesEvent
+    data object ResetSelectedExercise : ExercisesEvent
 
     data class DeleteExercise(val exercise: Exercise) : ExercisesEvent
 

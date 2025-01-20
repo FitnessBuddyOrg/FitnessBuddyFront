@@ -1,6 +1,7 @@
 package com.project.fitnessbuddy.navigation
 
-
+import android.app.Activity
+import android.content.Intent
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
@@ -23,10 +24,12 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.navigation.NavHostController
@@ -35,11 +38,15 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.navigation
 import androidx.navigation.compose.rememberNavController
+import com.google.gson.Gson
 import com.project.fitnessbuddy.R
 import com.project.fitnessbuddy.api.auth.AuthViewModel
 import com.project.fitnessbuddy.api.auth.UserState
 import com.project.fitnessbuddy.api.statistics.StatisticsViewModel
 import com.project.fitnessbuddy.api.user.ProfileViewModel
+import com.project.fitnessbuddy.auth.AuthViewModel
+import com.project.fitnessbuddy.auth.UserState
+import com.project.fitnessbuddy.database.dto.RoutineDTO
 import com.project.fitnessbuddy.screens.HomeScreen
 import com.project.fitnessbuddy.screens.profile.ProfileScreen
 import com.project.fitnessbuddy.screens.ProgressCalendarScreen
@@ -54,7 +61,19 @@ import com.project.fitnessbuddy.screens.exercises.ExercisesScreen
 import com.project.fitnessbuddy.screens.exercises.ExercisesState
 import com.project.fitnessbuddy.screens.exercises.ExercisesViewModel
 import com.project.fitnessbuddy.screens.exercises.ViewExerciseScreen
+import com.project.fitnessbuddy.screens.profile.ProfileScreen
+import com.project.fitnessbuddy.screens.routines.AddEditRoutineScreen
+import com.project.fitnessbuddy.screens.routines.AddExercisesScreen
+import com.project.fitnessbuddy.screens.routines.CompletedRoutineScreen
+import com.project.fitnessbuddy.screens.routines.DESTINATION
+import com.project.fitnessbuddy.screens.routines.RoutinesEvent
 import com.project.fitnessbuddy.screens.routines.RoutinesScreen
+import com.project.fitnessbuddy.screens.routines.RoutinesState
+import com.project.fitnessbuddy.screens.routines.RoutinesViewModel
+import com.project.fitnessbuddy.screens.routines.SELECTED_ROUTINE_DTO
+import com.project.fitnessbuddy.screens.routines.StartRoutineScreen
+import com.project.fitnessbuddy.screens.routines.StartRoutineServiceNotification
+import com.project.fitnessbuddy.screens.routines.ViewRoutineScreen
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
@@ -68,6 +87,9 @@ fun AppNavGraph(
 
     exercisesState: ExercisesState,
     exercisesViewModel: ExercisesViewModel,
+
+    routinesState: RoutinesState,
+    routinesViewModel: RoutinesViewModel,
 
     parametersState: ParametersState,
     parametersViewModel: ParametersViewModel,
@@ -99,35 +121,74 @@ fun AppNavGraph(
     val viewExerciseRoute = stringResource(id = R.string.view_exercise_route)
 
     val routinesRoute = stringResource(id = R.string.routines_route)
+    val routinesOverviewRoute = stringResource(id = R.string.routines_overview_route)
+    val addEditRoutineRoute = stringResource(id = R.string.add_edit_routine_route)
+    val addExercisesRoute = stringResource(id = R.string.add_exercises_route)
+    val viewRoutineRoute = stringResource(id = R.string.view_routine_route)
+    val startRoutineRoute = stringResource(id = R.string.start_routine_route)
+    val completedRoutineRoute = stringResource(id = R.string.completed_routine_route)
+
     val progressCalendarRoute = stringResource(id = R.string.progress_calendar_route)
     val statisticsRoute = stringResource(id = R.string.statistics_route)
 
     val currentNavBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = currentNavBackStackEntry?.destination?.route ?: homeRoute
+    val context = LocalContext.current
+
+    LaunchedEffect(Unit) {
+        val activity = context as? Activity
+        val intent = activity?.intent
+
+        context.stopService(
+            Intent(
+                context,
+                StartRoutineServiceNotification::class.java
+            )
+        )
+
+        val destination = intent?.getStringExtra(DESTINATION)
+        if (destination != null) {
+            navController.navigate(destination)
+        }
+
+        val routineDTOJson = intent?.getStringExtra(SELECTED_ROUTINE_DTO)
+        if (routineDTOJson != null) {
+            val routineDTO = Gson().fromJson(routineDTOJson, RoutineDTO::class.java)
+            routinesViewModel.onEvent(RoutinesEvent.SetSelectedRoutineDTO(routineDTO))
+        }
+    }
 
     val appRoutes: List<AppRoute> = listOf(
         AppRoute(
             routeName = homeRoute,
             name = stringResource(id = R.string.home),
             icon = { Icon(imageVector = Icons.Default.Home, contentDescription = null) },
-            screen = { HomeScreen(
-                navController = navController,
-                navigationViewModel = navigationViewModel
-            ) }
+            screen = {
+                HomeScreen(
+                    navigationState = navigationState,
+                    navigationViewModel = navigationViewModel,
+                )
+            }
         ),
         AppRoute(
             routeName = profileRoute,
             name = stringResource(id = R.string.profile),
             icon = { Icon(imageVector = Icons.Default.Person, contentDescription = null) },
-            screen = { ProfileScreen(
-                userState = userState,
-                navController = navController,
-                navigationViewModel = navigationViewModel,
-                profileViewModel = profileViewModel,
-                authViewModel = authViewModel,
-                parametersState = parametersState,
-                parametersViewModel = parametersViewModel,
-            ) }
+            screen = {
+                ProfileScreen(
+                    navigationState = navigationState,
+                    navigationViewModel = navigationViewModel,
+
+                    parametersState = parametersState,
+                    parametersViewModel = parametersViewModel,
+
+                    profileViewModel = profileViewModel,
+                    authViewModel = authViewModel,
+
+                    userState = userState,
+                    authViewModel = authViewModel,
+                )
+            }
         ),
         AppRoute(
             routeName = exercisesOverviewRoute,
@@ -144,6 +205,8 @@ fun AppNavGraph(
                             navigationViewModel = navigationViewModel,
                             exercisesState = exercisesState,
                             exercisesViewModel = exercisesViewModel,
+                            parametersState = parametersState,
+                            parametersViewModel = parametersViewModel,
                         )
                     }
                 ),
@@ -174,10 +237,96 @@ fun AppNavGraph(
             )
         ),
         AppRoute(
-            routeName = routinesRoute,
-            name = stringResource(id = R.string.routines),
+            routeName = routinesOverviewRoute,
+            name = stringResource(id = R.string.routines_overview),
+            startDestination = routinesRoute,
             icon = { Icon(imageVector = Icons.Default.BrowseGallery, contentDescription = null) },
-            screen = { RoutinesScreen() }
+            subRoutes = listOf(
+                AppRoute(
+                    routeName = routinesRoute,
+                    name = stringResource(id = R.string.routines),
+                    screen = {
+                        RoutinesScreen(
+                            navigationState = navigationState,
+                            navigationViewModel = navigationViewModel,
+                            routinesState = routinesState,
+                            routinesViewModel = routinesViewModel,
+                            parametersState = parametersState,
+                            parametersViewModel = parametersViewModel,
+                        )
+                    }
+                ),
+                AppRoute(
+                    routeName = addEditRoutineRoute,
+                    name = stringResource(id = R.string.add_edit_routine),
+                    screen = {
+                        AddEditRoutineScreen(
+                            navigationState = navigationState,
+                            navigationViewModel = navigationViewModel,
+                            routinesState = routinesState,
+                            routinesViewModel = routinesViewModel,
+                        )
+                    }
+                ),
+                AppRoute(
+                    routeName = addExercisesRoute,
+                    name = stringResource(id = R.string.add_exercises),
+                    screen = {
+                        AddExercisesScreen(
+                            navigationState = navigationState,
+                            navigationViewModel = navigationViewModel,
+                            exercisesState = exercisesState,
+                            exercisesViewModel = exercisesViewModel,
+                            routinesState = routinesState,
+                            routinesViewModel = routinesViewModel,
+                            parametersState = parametersState,
+                            parametersViewModel = parametersViewModel,
+                        )
+                    }
+                ),
+                AppRoute(
+                    routeName = viewRoutineRoute,
+                    name = stringResource(id = R.string.view_routine),
+                    screen = {
+                        ViewRoutineScreen(
+                            navigationState = navigationState,
+                            navigationViewModel = navigationViewModel,
+
+                            exercisesState = exercisesState,
+                            exercisesViewModel = exercisesViewModel,
+
+                            routinesState = routinesState,
+                            routinesViewModel = routinesViewModel,
+                        )
+                    }
+                ),
+                AppRoute(
+                    routeName = startRoutineRoute,
+                    name = stringResource(id = R.string.start_routine),
+                    screen = {
+                        StartRoutineScreen(
+                            navigationState = navigationState,
+                            navigationViewModel = navigationViewModel,
+
+                            routinesState = routinesState,
+                            routinesViewModel = routinesViewModel,
+                        )
+                    }
+                ),
+                AppRoute(
+                    routeName = completedRoutineRoute,
+                    name = stringResource(id = R.string.completed_routine),
+                    screen = {
+                        CompletedRoutineScreen(
+                            navigationState = navigationState,
+                            navigationViewModel = navigationViewModel,
+
+                            routinesState = routinesState,
+                            routinesViewModel = routinesViewModel,
+                        )
+                    }
+                )
+            )
         ),
         AppRoute(
             routeName = progressCalendarRoute,
@@ -220,15 +369,8 @@ fun AppNavGraph(
                         title = navigationState.titleWidget,
                         modifier = Modifier.fillMaxWidth(),
                         navigationIcon = {
-                            if (navigationState.backButtonEnabled) {
-                                IconButton(onClick = {
-                                    navController.navigateUp()
-                                }, content = {
-                                    Icon(
-                                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                                        contentDescription = null
-                                    )
-                                })
+                            if (navigationState.customButtonEnabled) {
+                                navigationState.iconButton.invoke()
                             } else {
                                 IconButton(onClick = {
                                     coroutineScope.launch { drawerState.open() }
@@ -240,22 +382,8 @@ fun AppNavGraph(
                             }
                         },
                         actions = {
-                            if (navigationState.searchButtonEnabled) {
-                                SearchButton(
-                                    navigationState = navigationState,
-                                    navigationViewModel = navigationViewModel,
-                                    exercisesState = exercisesState,
-                                    exercisesViewModel = exercisesViewModel,
-                                )
-                            }
-                            if (navigationState.addButtonEnabled) {
-                                CreateButton(navigationState, exercisesViewModel)
-                            }
-                            if (navigationState.editButtonEnabled) {
-                                EditButton(navigationState, exercisesViewModel)
-                            }
-                            if (navigationState.deleteButtonEnabled) {
-                                DeleteButton(navigationState)
+                            navigationState.topBarActions.forEach { action ->
+                                action()
                             }
                         },
                         colors = TopAppBarDefaults.mediumTopAppBarColors(containerColor = MaterialTheme.colorScheme.primaryContainer)
@@ -264,7 +392,7 @@ fun AppNavGraph(
             ) {
                 NavHost(
                     navController = navController,
-                    startDestination = if (userState.isLoggedIn || bypassLogin) homeRoute else loginRoute,
+                    startDestination = if (userState.isLoggedIn) homeRoute else loginRoute,
                     modifier = modifier.padding(it)
                 ) {
                     composable(loginRoute) {
@@ -344,3 +472,4 @@ fun AppNavGraph(
         }
     }
 }
+

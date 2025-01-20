@@ -26,7 +26,6 @@ import android.os.LocaleList
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
@@ -68,7 +67,7 @@ import com.project.fitnessbuddy.navigation.NavigationViewModel
 import com.yalantis.ucrop.UCrop
 import com.project.fitnessbuddy.screens.common.CountryFlagComposable
 import com.project.fitnessbuddy.screens.common.DialogRadioButtonList
-import com.project.fitnessbuddy.screens.common.Language
+import com.project.fitnessbuddy.database.entity.enums.Language
 import com.project.fitnessbuddy.screens.common.ParametersEvent
 import com.project.fitnessbuddy.screens.common.ParametersState
 import com.project.fitnessbuddy.screens.common.ParametersViewModel
@@ -79,19 +78,22 @@ import java.io.File
 
 @Composable
 fun ProfileScreen(
-    userState: UserState,
+    navigationState: NavigationState,
+    navigationViewModel: NavigationViewModel,
+
     parametersState: ParametersState,
     parametersViewModel: ParametersViewModel,
-    navController: NavHostController,
+
+    userState: UserState,
     authViewModel: AuthViewModel,
+
     profileViewModel: ProfileViewModel = viewModel(),
-    navigationViewModel: NavigationViewModel = viewModel()
 ) {
+    val context = LocalContext.current
     val lifecycleOwner = LocalLifecycleOwner.current
     val coroutineScope = remember {
         lifecycleOwner.lifecycleScope
     }
-    val context = LocalContext.current
     var isEditing by remember { mutableStateOf(false) }
     var name by remember { mutableStateOf("") }
     val user = profileViewModel.user.collectAsState()
@@ -99,10 +101,11 @@ fun ProfileScreen(
 
     DisposableEffect(Unit) {
         val job = coroutineScope.launch {
-            navigationViewModel.onEvent(NavigationEvent.DisableAllButtons)
-            navigationViewModel.onEvent(NavigationEvent.SetTitle(context.getString(R.string.profile)))
-            navigationViewModel.onEvent(NavigationEvent.UpdateTitleWidget {
+            navigationViewModel.onEvent(NavigationEvent.ClearTopBarActions)
+            navigationViewModel.onEvent(NavigationEvent.DisableCustomButton)
 
+
+            navigationViewModel.onEvent(NavigationEvent.UpdateTitleWidget {
                 MediumTextWidget(context.getString(R.string.profile))
             })
         }
@@ -381,14 +384,18 @@ fun ParametersList(
     ) {
 
         DialogRadioButtonList(
+            modifier = Modifier.padding(16.dp),
             label = stringResource(R.string.language),
-            options = Language.entries.map {
-                StoredLanguageValue(
-                    it,
-                    stringResource(it.resourceId),
-                    it.localeString
-                )
-            },
+            options = Language
+                .entries
+                .filter { !it.isCustom }
+                .map {
+                    StoredLanguageValue(
+                        it,
+                        stringResource(it.resourceId),
+                        it.localeString
+                    )
+                },
             initialStoredValue = StoredLanguageValue(
                 language,
                 language.name,
@@ -402,11 +409,8 @@ fun ParametersList(
                 CountryFlagComposable(it.localeString, it.displayValue)
             }
         )
-
-
     }
 }
-
 
 fun changeLocales(context: Context, localeString: String) {
 
