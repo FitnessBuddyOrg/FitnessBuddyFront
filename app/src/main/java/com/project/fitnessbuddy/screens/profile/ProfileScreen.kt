@@ -2,15 +2,16 @@ package com.project.fitnessbuddy.screens.profile
 
 import android.Manifest
 import android.app.Activity
-import android.content.Intent
-import android.content.pm.PackageManager
 import android.app.LocaleManager
 import android.content.Context
+import android.content.Intent
+import android.content.pm.PackageManager
 import android.os.Build
-import android.util.Log
+import android.os.LocaleList
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -22,20 +23,6 @@ import androidx.compose.material.icons.automirrored.filled.ExitToApp
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import android.os.LocaleList
-import androidx.appcompat.app.AppCompatDelegate
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.material3.Button
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -48,30 +35,29 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import androidx.core.os.LocaleListCompat
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.NavHostController
 import coil.compose.rememberAsyncImagePainter
 import com.project.fitnessbuddy.R
 import com.project.fitnessbuddy.api.auth.AuthViewModel
 import com.project.fitnessbuddy.api.auth.UserState
 import com.project.fitnessbuddy.api.user.ProfileViewModel
+import com.project.fitnessbuddy.database.entity.enums.Language
 import com.project.fitnessbuddy.navigation.MediumTextWidget
 import com.project.fitnessbuddy.navigation.NavigationEvent
+import com.project.fitnessbuddy.navigation.NavigationState
 import com.project.fitnessbuddy.navigation.NavigationViewModel
-import com.yalantis.ucrop.UCrop
 import com.project.fitnessbuddy.screens.common.CountryFlagComposable
 import com.project.fitnessbuddy.screens.common.DialogRadioButtonList
-import com.project.fitnessbuddy.database.entity.enums.Language
 import com.project.fitnessbuddy.screens.common.ParametersEvent
 import com.project.fitnessbuddy.screens.common.ParametersState
 import com.project.fitnessbuddy.screens.common.ParametersViewModel
 import com.project.fitnessbuddy.screens.common.StoredLanguageValue
+import com.yalantis.ucrop.UCrop
 import kotlinx.coroutines.launch
 import java.io.File
 
@@ -182,25 +168,11 @@ fun ProfileScreen(
         }
     }
 
-
-
-
-
-
-
-
-
-
-
     LaunchedEffect(isLoggedIn) {
         if (isLoggedIn) {
             profileViewModel.fetchUser()
             name = user.value?.name ?: ""
         }
-    }
-
-    LaunchedEffect(Unit) {
-        navigationViewModel.onEvent(NavigationEvent.SetTitle("Profile"))
     }
 
     Column(
@@ -259,7 +231,7 @@ fun ProfileScreen(
 
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Text(
-                        text =  "${stringResource(R.string.email)}:",
+                        text = "${stringResource(R.string.email)}:",
                         style = MaterialTheme.typography.labelMedium,
                         modifier = Modifier.weight(1f)
                     )
@@ -338,7 +310,7 @@ fun ProfileScreen(
             onClick = {
                 authViewModel.logout()
                 profileViewModel.clearUserData()
-                navController.navigate(context.getString(R.string.login_route)) {
+                navigationState.navController?.navigate(context.getString(R.string.login_route)) {
                     popUpTo(0) { inclusive = true }
                 }
             }

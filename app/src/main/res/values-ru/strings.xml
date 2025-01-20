@@ -45,6 +45,7 @@
     <string name="english">Английский</string>
     <string name="french">Французский</string>
     <string name="russian">Русский</string>
+    <string name="github_sign_in">Sign in with GitHub</string>
     <string name="save_changes">Сохранить изменения</string>
     <string name="ok">ОК</string>
     <string name="last_performed">Последнее выполнение</string>
@@ -98,4 +99,6 @@
     <string name="years" >years</string>
     <string name="best_set">Best set</string>
     <string name="kg">kg</string>
+    <string name="no_data">No data</string>
+    <string name="google_sign_in">Sign in with Google</string>
 </resources>

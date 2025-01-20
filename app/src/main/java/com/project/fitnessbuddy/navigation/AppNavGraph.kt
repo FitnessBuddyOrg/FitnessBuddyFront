@@ -5,7 +5,6 @@ import android.content.Intent
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.BrowseGallery
 import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.FitnessCenter
@@ -44,11 +43,8 @@ import com.project.fitnessbuddy.api.auth.AuthViewModel
 import com.project.fitnessbuddy.api.auth.UserState
 import com.project.fitnessbuddy.api.statistics.StatisticsViewModel
 import com.project.fitnessbuddy.api.user.ProfileViewModel
-import com.project.fitnessbuddy.auth.AuthViewModel
-import com.project.fitnessbuddy.auth.UserState
 import com.project.fitnessbuddy.database.dto.RoutineDTO
 import com.project.fitnessbuddy.screens.HomeScreen
-import com.project.fitnessbuddy.screens.profile.ProfileScreen
 import com.project.fitnessbuddy.screens.ProgressCalendarScreen
 import com.project.fitnessbuddy.screens.StatisticsScreen
 import com.project.fitnessbuddy.screens.auth.LoginScreen
@@ -186,7 +182,6 @@ fun AppNavGraph(
                     authViewModel = authViewModel,
 
                     userState = userState,
-                    authViewModel = authViewModel,
                 )
             }
         ),
@@ -343,11 +338,13 @@ fun AppNavGraph(
                     contentDescription = null
                 )
             },
-            screen = { StatisticsScreen(
-                statisticsViewModel = statisticsViewModel,
-                userState = userState,
-                navigationViewModel = navigationViewModel
-            ) }
+            screen = {
+                StatisticsScreen(
+                    statisticsViewModel = statisticsViewModel,
+                    userState = userState,
+                    navigationViewModel = navigationViewModel
+                )
+            }
         ),
     )
 

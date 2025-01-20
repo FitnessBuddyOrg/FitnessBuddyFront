@@ -2,14 +2,26 @@ package com.project.fitnessbuddy.screens
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.BrowseGallery
 import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.FitnessCenter
 import androidx.compose.material.icons.filled.Person
-import androidx.compose.material3.*
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.remember
@@ -20,20 +32,21 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.lifecycleScope
-import androidx.navigation.NavController
 import com.project.fitnessbuddy.R
 import com.project.fitnessbuddy.navigation.MediumTextWidget
 import com.project.fitnessbuddy.navigation.NavigationEvent
+import com.project.fitnessbuddy.navigation.NavigationState
 import com.project.fitnessbuddy.navigation.NavigationViewModel
 import kotlinx.coroutines.launch
 
 @Composable
 fun HomeScreen(
-    navController: NavController,
+    navigationState: NavigationState,
     navigationViewModel: NavigationViewModel,
 ) {
 
@@ -61,32 +74,53 @@ fun HomeScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color(0xFFCEC2D4))
             .padding(16.dp),
         verticalArrangement = Arrangement.Top,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(
-            text = stringResource(R.string.welcome) ,
+            text = stringResource(R.string.welcome),
             style = MaterialTheme.typography.headlineMedium.copy(fontSize = 28.sp),
             color = MaterialTheme.colorScheme.primary,
-            modifier = Modifier.padding(vertical = 16.dp).align(Alignment.Start)
+            modifier = Modifier
+                .padding(vertical = 16.dp)
+                .align(Alignment.Start)
         )
 
 
-        NavigationGrid(navController)
+        NavigationGrid(navigationState)
     }
 }
 
 @Composable
-fun NavigationGrid(navController: NavController) {
+fun NavigationGrid(navigationState: NavigationState) {
     val menuItems = listOf(
-        NavigationItem(stringResource(R.string.profile), Icons.Default.Person, stringResource(R.string.profile_route)),
-        NavigationItem(stringResource(R.string.statistics), ImageVector.vectorResource(id = R.drawable.monitoring), stringResource(R.string.statistics_route)),
-        NavigationItem(stringResource(R.string.exercises), Icons.Default.FitnessCenter, stringResource(R.string.exercises_route)),
-        NavigationItem(stringResource(R.string.routines), Icons.Default.BrowseGallery, stringResource(R.string.routines_route)),
-        NavigationItem(stringResource(R.string.progress_calendar), Icons.Default.CalendarMonth, stringResource(R.string.progress_calendar_route)),
-        )
+        NavigationItem(
+            stringResource(R.string.profile),
+            Icons.Default.Person,
+            stringResource(R.string.profile_route)
+        ),
+        NavigationItem(
+            stringResource(R.string.statistics),
+            ImageVector.vectorResource(id = R.drawable.monitoring),
+            stringResource(R.string.statistics_route)
+        ),
+        NavigationItem(
+            stringResource(R.string.exercises),
+            Icons.Default.FitnessCenter,
+            stringResource(R.string.exercises_route)
+        ),
+        NavigationItem(
+            stringResource(R.string.routines),
+            Icons.Default.BrowseGallery,
+            stringResource(R.string.routines_route)
+        ),
+        NavigationItem(
+            stringResource(R.string.progress_calendar),
+            Icons.Default.CalendarMonth,
+            stringResource(R.string.progress_calendar_route)
+        ),
+    )
 
     Column(
         modifier = Modifier.fillMaxSize(),
@@ -99,7 +133,7 @@ fun NavigationGrid(navController: NavController) {
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 rowItems.forEach { item ->
-                    NavigationCard(item, navController)
+                    NavigationCard(item, navigationState)
                 }
             }
         }
@@ -107,13 +141,13 @@ fun NavigationGrid(navController: NavController) {
 }
 
 @Composable
-fun NavigationCard(item: NavigationItem, navController: NavController) {
+fun NavigationCard(item: NavigationItem, navigationState: NavigationState) {
     Card(
         modifier = Modifier
             .size(175.dp)
-            .clickable { navController.navigate(item.route) },
+            .clickable { navigationState.navController?.navigate(item.route) },
         shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.secondaryContainer),
         elevation = CardDefaults.cardElevation(8.dp)
     ) {
         Column(
@@ -131,7 +165,10 @@ fun NavigationCard(item: NavigationItem, navController: NavController) {
             )
             Spacer(modifier = Modifier.height(8.dp))
             Text(
+                modifier = Modifier
+                    .fillMaxWidth(),
                 text = item.label,
+                textAlign = TextAlign.Center,
                 style = MaterialTheme.typography.bodyLarge.copy(fontSize = 16.sp),
                 color = MaterialTheme.colorScheme.onSurface
             )
