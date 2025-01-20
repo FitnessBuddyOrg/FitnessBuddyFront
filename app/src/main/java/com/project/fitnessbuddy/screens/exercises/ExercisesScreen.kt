@@ -25,6 +25,7 @@ import com.project.fitnessbuddy.api.auth.UserState
 import com.project.fitnessbuddy.database.entity.Exercise
 import com.project.fitnessbuddy.navigation.CreateButton
 import com.project.fitnessbuddy.navigation.MediumTextWidget
+import com.project.fitnessbuddy.navigation.MoreVertButton
 import com.project.fitnessbuddy.navigation.NavigationEvent
 import com.project.fitnessbuddy.navigation.NavigationState
 import com.project.fitnessbuddy.navigation.NavigationViewModel
@@ -79,6 +80,16 @@ fun ExercisesScreen(
                     onClick = {
                         exercisesViewModel.onEvent(ExercisesEvent.SetSelectedExercise(Exercise(userId = userState.user.userId)))
                         navigationState.navController?.navigate(context.getString(R.string.add_edit_exercise_route))
+                    }
+                )
+
+                MoreVertButton(
+                    options = listOf("Add Exercise From Code"),
+                    onOptionSelected = {
+                        if(it == "Add Exercise From Code") {
+                            exercisesViewModel.onEvent(ExercisesEvent.ResetFetching)
+                            navigationState.navController?.navigate(context.getString(R.string.add_exercise_code_route))
+                        }
                     }
                 )
             })

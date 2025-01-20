@@ -7,6 +7,11 @@ import com.project.fitnessbuddy.api.auth.AuthViewModel
 import com.project.fitnessbuddy.api.user.ShareExerciseDTO
 import com.project.fitnessbuddy.api.user.TokenResponseDTO
 import com.project.fitnessbuddy.database.dao.ExerciseDao
+import com.project.fitnessbuddy.database.entity.Exercise
+import com.project.fitnessbuddy.database.entity.enums.Category
+import com.project.fitnessbuddy.database.entity.enums.CustomState
+import com.project.fitnessbuddy.database.entity.enums.Language
+import com.project.fitnessbuddy.database.entity.enums.ShareType
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -22,7 +27,7 @@ class ExercisesViewModel(
 
     private val exerciseDao: ExerciseDao,
 
-    authViewModel: AuthViewModel
+    private val authViewModel: AuthViewModel
 ) : AndroidViewModel(application) {
     private val _sortType = MutableStateFlow(SortType.NAME)
     private val _searchValue = MutableStateFlow("")
@@ -117,6 +122,52 @@ class ExercisesViewModel(
                 }
             }
 
+            is ExercisesEvent.SetFetchedExerciseToken -> {
+                _state.update {
+                    it.copy(
+                        fetchedExerciseToken = exercisesEvent.fetchedExerciseToken
+                    )
+                }
+            }
+
+            is ExercisesEvent.FetchExerciseByToken -> {
+                viewModelScope.launch {
+                    try {
+                        val sharedExerciseDTO: ShareExerciseDTO = RetrofitInstance.exerciseApi.getSharedExercise(_state.value.fetchedExerciseToken)
+
+                        _state.update {
+                            it.copy(
+                                selectedExercise = Exercise(
+                                    name = sharedExerciseDTO.name ?: "",
+                                    instructions = sharedExerciseDTO.instructions ?: "",
+                                    videoLink = sharedExerciseDTO.videoLink ?: "",
+                                    category = sharedExerciseDTO.category ?: Category.ARMS,
+                                    shareType = ShareType.PRIVATE,
+                                    language = Language.ENGLISH
+                                ),
+                                exerciseFetched = CustomState.TRUE
+                            )
+                        }
+                    } catch(e: Exception) {
+                        _state.update {
+                            it.copy(
+                                exerciseFetched = CustomState.FALSE
+                            )
+                        }
+                    }
+                }
+            }
+
+            is ExercisesEvent.ResetFetching -> {
+                _state.update {
+                    it.copy(
+                        exerciseFetched = CustomState.NONE,
+                        fetchedExerciseToken = ""
+                    )
+                }
+                onEvent(ExercisesEvent.SetSelectedExercise(Exercise()))
+            }
+
             is ExercisesEvent.DeleteExercise -> {
                 viewModelScope.launch {
                     exerciseDao.delete(exercisesEvent.exercise)
@@ -126,9 +177,15 @@ class ExercisesViewModel(
             is ExercisesEvent.UpsertExercise -> {
                 if (_state.value.selectedExercise.name.isBlank()) {
                     return false
+                } else {
+                    _state.update {
+                        it.copy(
+                            selectedExercise = _state.value.selectedExercise.copy(
+                                userId = authViewModel.userState.value.user.userId
+                            )
+                        )
+                    }
                 }
-
-                println(_state.value.selectedExercise)
 
                 viewModelScope.launch {
                     exerciseDao.upsert(_state.value.selectedExercise)

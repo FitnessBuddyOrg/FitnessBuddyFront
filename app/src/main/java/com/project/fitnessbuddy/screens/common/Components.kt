@@ -68,9 +68,9 @@ import com.project.fitnessbuddy.screens.exercises.SortType
 import androidx.compose.ui.text.TextStyle
 
 @Composable
-fun DefaultTextField(label: String, value: String, onValueChange: (String) -> Unit) {
+fun DefaultTextField(label: String, value: String, onValueChange: (String) -> Unit, modifier: Modifier = Modifier.fillMaxWidth()) {
     TextField(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = modifier,
         value = value,
         onValueChange = onValueChange,
         label = {

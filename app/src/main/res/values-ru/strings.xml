@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">FitnessBuddy</string>
     <string name="home">Главная</string>
@@ -109,4 +110,8 @@
     <string name="profile_picture">Profile Picture</string>
     <string name="edit_name">Edit Name</string>
     <string name="cache_directory_not_found">Cache directory not found</string>
+    <string name="add_exercise_from_code">Add exercise from code</string>
+    <string name="exercise_code">Exercise Code</string>
+    <string name="fetched_exercise">Fetched Exercise</string>
+    <string name="no_exercise_fetched">Could not find exercise</string>
 </resources>
