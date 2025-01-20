@@ -1,5 +1,6 @@
 package com.project.fitnessbuddy.screens.routines
 
+import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.widget.Toast
@@ -105,6 +106,22 @@ fun MainTab(
     val startDate by remember { mutableStateOf(routinesState.selectedRoutineDTO.routine.startDate) }
 
     LaunchedEffect(Unit) {
+//        val activity = context as? Activity
+//        val intent = activity?.intent
+//        val extraAction = intent?.getStringExtra(EXTRA_ACTION)
+//
+//        if(extraAction == FINISHED_ROUTINE) {
+//            routinesViewModel.onEvent(RoutinesEvent.CompleteRoutine)
+//            navigationState.navController?.navigate(context.getString(R.string.completed_routine_route))
+//        } else if(extraAction == UNFINISHED_ROUTINE) {
+//            Toast.makeText(
+//                context,
+//                R.string.complete_all_sets_toast,
+//                Toast.LENGTH_SHORT
+//            ).show()
+//        }
+//        intent?.removeExtra(EXTRA_ACTION)
+
         while (true) {
             delay(1000L)
             elapsedSeconds = startDate?.let {
@@ -158,7 +175,6 @@ fun MainTab(
                         onClick = {
                             if (allChecked.value) {
                                 routinesViewModel.onEvent(RoutinesEvent.CompleteRoutine)
-
                                 navigationState.navController?.navigate(context.getString(R.string.completed_routine_route))
                             } else {
                                 Toast.makeText(

@@ -24,7 +24,12 @@ const val STOP_TIMER = "STOP_TIMER"
 
 const val ROUTINE_UPDATE = "ROUTINE_UPDATE"
 const val SELECTED_ROUTINE_DTO = "SELECTED_ROUTINE_DTO"
+
 const val DESTINATION = "DESTINATION"
+const val EXTRA_ACTION = "EXTRA_ACTION"
+const val FINISHED_ROUTINE = "FINISHED_ROUTINE"
+const val UNFINISHED_ROUTINE = "UNFINISHED_ROUTINE"
+const val NONE = "NONE"
 
 
 class StartRoutineServiceNotification : Service() {
@@ -82,10 +87,21 @@ class StartRoutineServiceNotification : Service() {
     override fun onBind(intent: Intent?): IBinder? = null
 
     private fun createNotification(): Notification {
+//        val cancelRoutine = Intent(this, StartRoutineServiceNotification::class.java).apply {
+//            action = STOP_TIMER
+//        }
+//        val cancelRoutinePendingIntent = PendingIntent.getService(
+//            this,
+//            0,
+//            cancelRoutine,
+//            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+//        )
+
         val returnToRoutineIntent = Intent(this, MainActivity::class.java).apply {
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
             putExtra(DESTINATION, getString(R.string.start_routine_route))
             putExtra(SELECTED_ROUTINE_DTO, Gson().toJson(routineDTO))
+            putExtra(EXTRA_ACTION, NONE)
         }
 
         val returnToRoutinePendingIntent = PendingIntent.getActivity(
@@ -95,25 +111,28 @@ class StartRoutineServiceNotification : Service() {
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
 
-        val completeRoutineIntent = Intent(this, MainActivity::class.java).apply {
-            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-
-            val allChecked = routineDTO.routineExerciseDTOs.all{ it.routineExerciseSetDTOs.all{ it2 -> it2.checked}}
-            if(allChecked) {
-                putExtra(DESTINATION, getString(R.string.completed_routine_route))
-            } else {
-                putExtra(DESTINATION, getString(R.string.start_routine_route))
-            }
-
-            putExtra(SELECTED_ROUTINE_DTO, Gson().toJson(routineDTO))
-        }
-
-        val completeRoutinePendingIntent = PendingIntent.getActivity(
-            this,
-            0,
-            completeRoutineIntent,
-            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-        )
+//        val completeRoutineIntent = Intent(this, MainActivity::class.java).apply {
+//            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+//
+//            val allChecked =
+//                routineDTO.routineExerciseDTOs.all { it.routineExerciseSetDTOs.all { it2 -> it2.checked } }
+//            if (allChecked) {
+//                putExtra(DESTINATION, getString(R.string.start_routine_route))
+//                putExtra(EXTRA_ACTION, FINISHED_ROUTINE)
+//            } else {
+//                putExtra(DESTINATION, getString(R.string.start_routine_route))
+//                putExtra(EXTRA_ACTION, UNFINISHED_ROUTINE)
+//            }
+//
+//            putExtra(SELECTED_ROUTINE_DTO, Gson().toJson(routineDTO))
+//        }
+//
+//        val completeRoutinePendingIntent = PendingIntent.getActivity(
+//            this,
+//            0,
+//            completeRoutineIntent,
+//            PendingIntent.FLAG_ONE_SHOT or PendingIntent.FLAG_IMMUTABLE
+//        )
 
         val firstUncheckedExerciseDTO =
             routineDTO.routineExerciseDTOs.find { it.routineExerciseSetDTOs.find { it2 -> !it2.checked } != null }
@@ -134,11 +153,16 @@ class StartRoutineServiceNotification : Service() {
                     .addLine("${getString(R.string.current_set)}: ${firstUncheckedExerciseSetDTO?.reps} × ${firstUncheckedExerciseSetDTO?.weight} kg")
             )
             .setContentIntent(returnToRoutinePendingIntent)
-            .addAction(
-                android.R.drawable.ic_delete,
-                getString(R.string.complete_routine),
-                completeRoutinePendingIntent
-            )
+//            .addAction(
+//                android.R.drawable.ic_delete,
+//                getString(R.string.complete_routine),
+//                completeRoutinePendingIntent
+//            )
+//            .addAction(
+//                android.R.drawable.ic_delete,
+//                getString(R.string.cancel_routine),
+//                cancelRoutinePendingIntent
+//            )
             .setOngoing(true)
             .build()
     }

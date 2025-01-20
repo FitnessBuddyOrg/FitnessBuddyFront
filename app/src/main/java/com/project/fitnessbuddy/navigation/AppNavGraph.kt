@@ -130,7 +130,6 @@ fun AppNavGraph(
     LaunchedEffect(Unit) {
         val activity = context as? Activity
         val intent = activity?.intent
-        val destination = intent?.getStringExtra(DESTINATION)
 
         context.stopService(
             Intent(
@@ -139,6 +138,7 @@ fun AppNavGraph(
             )
         )
 
+        val destination = intent?.getStringExtra(DESTINATION)
         if (destination != null) {
             navController.navigate(destination)
         }

@@ -104,11 +104,6 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-
-//    private val navigationViewModel: NavigationViewModel by lazy {
-//        ViewModelProvider(this)[NavigationViewModel::class.java]
-//    }
-
     private val navigationViewModel by viewModels<NavigationViewModel>(
         factoryProducer = {
             object : ViewModelProvider.Factory {
