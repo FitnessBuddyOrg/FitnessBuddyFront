@@ -137,7 +137,6 @@ fun ExercisesGroupedList(
                 selectionEnabled = selectionEnabled
             )
         },
-        parametersState = parametersState,
         header = {
             Row(
                 modifier = Modifier
@@ -186,6 +185,9 @@ fun ExercisesGroupedList(
                 SortType.NAME -> it.name.first().uppercase()
                 SortType.CATEGORY -> context.getString(it.category.resourceId)
             }
+        },
+        predicate = {
+            (it.language.name == parametersState.languageParameter.value) || it.language.isCustom
         },
         floatingActionButton = floatingActionButton
     )

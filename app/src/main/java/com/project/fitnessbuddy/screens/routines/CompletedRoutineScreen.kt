@@ -1,6 +1,9 @@
 package com.project.fitnessbuddy.screens.routines
 
 import android.content.Context
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -38,6 +41,7 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import com.project.fitnessbuddy.R
+import com.project.fitnessbuddy.database.dto.RoutineDTO
 import com.project.fitnessbuddy.navigation.MediumTextWidget
 import com.project.fitnessbuddy.navigation.NavigationEvent
 import com.project.fitnessbuddy.navigation.NavigationState
@@ -110,17 +114,6 @@ fun WorkoutSummaryScreen(
     routinesState: RoutinesState,
     context: Context
 ) {
-
-    val finishDate =
-        routinesState.selectedRoutineDTO.routine.startDate?.format("MMMM dd").toString()
-    val duration =
-        routinesState.selectedRoutineDTO.routine.startDate?.timeInLetters(context).toString()
-    val totalWeight =
-        routinesState.selectedRoutineDTO.routineExerciseDTOs.sumOf { it -> it.routineExerciseSetDTOs.sumOf { it.weight * it.reps } }
-            .toString()
-
-
-
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -148,94 +141,10 @@ fun WorkoutSummaryScreen(
 
             Spacer(modifier = Modifier.height(20.dp))
 
-            Card(
-                shape = RoundedCornerShape(12.dp),
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Column(
-                    modifier = Modifier.padding(16.dp)
-                ) {
-                    Text(
-                        text = routinesState.selectedRoutineDTO.name,
-                        style = MaterialTheme.typography.labelMedium
-                    )
-
-                    Text(
-                        text = finishDate,
-                        style = MaterialTheme.typography.labelMedium.copy(
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                    )
-
-                    Spacer(modifier = Modifier.height(10.dp))
-
-                    // Stats Row
-                    Row(
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
-                        WorkoutStat(Icons.Default.Timer, duration)
-                        WorkoutStat(
-                            Icons.Default.FitnessCenter,
-                            "$totalWeight ${context.getString(R.string.kg)}"
-                        )
-                    }
-
-                    Spacer(modifier = Modifier.height(10.dp))
-                    HorizontalDivider(thickness = 1.dp, color = Color.Gray)
-                    Spacer(modifier = Modifier.height(10.dp))
-
-                    Row(
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
-                        Text(
-                            text = stringResource(R.string.exercises),
-                            style = MaterialTheme.typography.labelMedium
-                        )
-                        Text(
-                            text = stringResource(R.string.best_set),
-                            style = MaterialTheme.typography.labelMedium
-                        )
-                    }
-                    Spacer(modifier = Modifier.height(10.dp))
-
-                    LazyColumn(
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
-                        items(routinesState.selectedRoutineDTO.routineExerciseDTOs) { routineExerciseDTO ->
-                            val bestRoutineExerciseSetDTOWeight =
-                                routineExerciseDTO.routineExerciseSetDTOs.maxOf { (it.weight * it.reps) }
-                            val bestRoutineExerciseSetDTO =
-                                routineExerciseDTO.routineExerciseSetDTOs.find { (it.weight * it.reps) == bestRoutineExerciseSetDTOWeight }
-
-                            Row(
-                                horizontalArrangement = Arrangement.SpaceBetween,
-                                modifier = Modifier.fillMaxWidth()
-                            ) {
-                                Text(
-                                    text = routineExerciseDTO.exercise.name,
-                                    style = MaterialTheme.typography.labelMedium.copy(
-                                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                                    ),
-                                )
-                                Text(
-                                    text = "${bestRoutineExerciseSetDTO?.weight} ${
-                                        context.getString(
-                                            R.string.kg
-                                        )
-                                    } × ${bestRoutineExerciseSetDTO?.reps}",
-                                    style = MaterialTheme.typography.labelMedium.copy(
-                                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                                    ),
-                                )
-                            }
-                            Spacer(modifier = Modifier.height(5.dp))
-                        }
-
-                    }
-                }
-            }
+            RoutineSummaryCard(
+                routineDTO = routinesState.selectedRoutineDTO,
+                context = context
+            )
         }
     }
 }
@@ -251,6 +160,118 @@ fun WorkoutStat(icon: ImageVector, text: String) {
         )
         Spacer(modifier = Modifier.width(4.dp))
         Text(text, color = Color.White, fontSize = 14.sp)
+    }
+}
+
+@Composable
+fun RoutineSummaryCard(
+    routineDTO: RoutineDTO,
+    context: Context,
+    modifier: Modifier = Modifier
+) {
+    val finishDate =
+        routineDTO.routine.startDate?.format("MMMM dd").toString()
+    val duration =
+        routineDTO.routine.startDate?.timeInLetters(context).toString()
+    val totalWeight =
+        routineDTO.routineExerciseDTOs.sumOf { it -> it.routineExerciseSetDTOs.sumOf { it.weight * it.reps } }
+            .toString()
+
+    Box(
+        modifier = modifier
+            .fillMaxWidth()
+            .border(1.dp, MaterialTheme.colorScheme.onSurfaceVariant, RoundedCornerShape(8.dp))
+            .clickable(
+                onClick = {
+
+                }
+            ),
+        contentAlignment = Alignment.Center
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp)
+        ) {
+            Text(
+                text = routineDTO.name,
+                style = MaterialTheme.typography.labelMedium
+            )
+
+            Text(
+                text = finishDate,
+                style = MaterialTheme.typography.labelMedium.copy(
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            )
+
+            Spacer(modifier = Modifier.height(10.dp))
+
+            Row(
+                horizontalArrangement = Arrangement.SpaceBetween,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                WorkoutStat(Icons.Default.Timer, duration)
+                WorkoutStat(
+                    Icons.Default.FitnessCenter,
+                    "$totalWeight ${context.getString(R.string.kg)}"
+                )
+            }
+
+            Spacer(modifier = Modifier.height(10.dp))
+            HorizontalDivider(thickness = 1.dp, color = Color.Gray)
+            Spacer(modifier = Modifier.height(10.dp))
+
+            Row(
+                horizontalArrangement = Arrangement.SpaceBetween,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text(
+                    text = stringResource(R.string.exercises),
+                    style = MaterialTheme.typography.labelMedium
+                )
+                Text(
+                    text = stringResource(R.string.best_set),
+                    style = MaterialTheme.typography.labelMedium
+                )
+            }
+            Spacer(modifier = Modifier.height(10.dp))
+
+            Column(
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                routineDTO.routineExerciseDTOs.forEach { routineExerciseDTO ->
+                    val bestRoutineExerciseSetDTOWeight =
+                        routineExerciseDTO.routineExerciseSetDTOs.maxOf { (it.weight * it.reps) }
+                    val bestRoutineExerciseSetDTO =
+                        routineExerciseDTO.routineExerciseSetDTOs.find { (it.weight * it.reps) == bestRoutineExerciseSetDTOWeight }
+
+                    Row(
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Text(
+                            text = routineExerciseDTO.exercise.name,
+                            style = MaterialTheme.typography.labelMedium.copy(
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            ),
+                        )
+                        Text(
+                            text = "${bestRoutineExerciseSetDTO?.weight} ${
+                                context.getString(
+                                    R.string.kg
+                                )
+                            } × ${bestRoutineExerciseSetDTO?.reps}",
+                            style = MaterialTheme.typography.labelMedium.copy(
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            ),
+                        )
+                    }
+                    Spacer(modifier = Modifier.height(5.dp))
+                }
+
+            }
+        }
     }
 }
 

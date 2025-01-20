@@ -329,7 +329,14 @@ fun AppNavGraph(
             icon = { Icon(imageVector = Icons.Default.History, contentDescription = null) },
             screen = {
                 HistoryScreen(
+                    navigationState = navigationState,
+                    navigationViewModel = navigationViewModel,
 
+                    routinesState = routinesState,
+                    routinesViewModel = routinesViewModel,
+
+                    parametersState = parametersState,
+                    parametersViewModel = parametersViewModel
                 )
             }
         ),

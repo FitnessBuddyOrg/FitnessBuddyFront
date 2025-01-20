@@ -422,13 +422,13 @@ class StoredLanguageValue<T>(
 fun <T : ListedEntity> GroupedWidgetList(
     itemsList: List<T>,
     widget: @Composable (T) -> Unit,
-    parametersState: ParametersState,
 
     header : @Composable () -> Unit = {},
     floatingActionButton: @Composable () -> Unit = {},
     verticalArrangement: Arrangement.Vertical = Arrangement.spacedBy(0.dp),
 
-    keySelector: (T) -> String = { it.name.first().uppercase() }
+    keySelector: (T) -> String = { it.name.first().uppercase() },
+    predicate: (T) -> Boolean = { true }
 ) {
     Scaffold(
         modifier = Modifier
@@ -445,7 +445,7 @@ fun <T : ListedEntity> GroupedWidgetList(
             }
 
             itemsList
-                .filter { (it.language.name == parametersState.languageParameter.value) || it.language.isCustom }
+                .filter (predicate)
                 .groupBy (keySelector)
                 .toSortedMap()
                 .forEach { (header, items) ->

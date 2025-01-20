@@ -102,10 +102,12 @@ fun RoutinesScreen(
                 routinesViewModel = routinesViewModel
             )
         },
-        parametersState = parametersState,
         verticalArrangement = Arrangement.spacedBy(8.dp),
 
-        keySelector = { it.name.first().uppercase() }
+        keySelector = { it.name.first().uppercase() },
+        predicate = {
+            (it.language.name == parametersState.languageParameter.value) || it.language.isCustom
+        },
     )
 }
 
