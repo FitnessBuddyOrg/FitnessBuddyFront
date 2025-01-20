@@ -1,5 +1,6 @@
 package com.project.fitnessbuddy.navigation
 
+
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
@@ -35,9 +36,12 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.navigation
 import androidx.navigation.compose.rememberNavController
 import com.project.fitnessbuddy.R
-import com.project.fitnessbuddy.auth.AuthViewModel
-import com.project.fitnessbuddy.auth.UserState
+import com.project.fitnessbuddy.api.auth.AuthViewModel
+import com.project.fitnessbuddy.api.auth.UserState
+import com.project.fitnessbuddy.api.statistics.StatisticsViewModel
+import com.project.fitnessbuddy.api.user.ProfileViewModel
 import com.project.fitnessbuddy.screens.HomeScreen
+import com.project.fitnessbuddy.screens.profile.ProfileScreen
 import com.project.fitnessbuddy.screens.ProgressCalendarScreen
 import com.project.fitnessbuddy.screens.StatisticsScreen
 import com.project.fitnessbuddy.screens.auth.LoginScreen
@@ -50,7 +54,6 @@ import com.project.fitnessbuddy.screens.exercises.ExercisesScreen
 import com.project.fitnessbuddy.screens.exercises.ExercisesState
 import com.project.fitnessbuddy.screens.exercises.ExercisesViewModel
 import com.project.fitnessbuddy.screens.exercises.ViewExerciseScreen
-import com.project.fitnessbuddy.screens.profile.ProfileScreen
 import com.project.fitnessbuddy.screens.routines.RoutinesScreen
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -70,6 +73,8 @@ fun AppNavGraph(
     parametersViewModel: ParametersViewModel,
 
     authViewModel: AuthViewModel,
+    profileViewModel: ProfileViewModel,
+    statisticsViewModel: StatisticsViewModel,
     userState: UserState,
 
     navController: NavHostController = rememberNavController(),
@@ -105,29 +110,24 @@ fun AppNavGraph(
             routeName = homeRoute,
             name = stringResource(id = R.string.home),
             icon = { Icon(imageVector = Icons.Default.Home, contentDescription = null) },
-            screen = {
-                HomeScreen(
-                    navigationState = navigationState,
-                    navigationViewModel = navigationViewModel,
-                )
-            }
+            screen = { HomeScreen(
+                navController = navController,
+                navigationViewModel = navigationViewModel
+            ) }
         ),
         AppRoute(
             routeName = profileRoute,
             name = stringResource(id = R.string.profile),
             icon = { Icon(imageVector = Icons.Default.Person, contentDescription = null) },
-            screen = {
-                ProfileScreen(
-                    navigationState = navigationState,
-                    navigationViewModel = navigationViewModel,
-
-                    parametersState = parametersState,
-                    parametersViewModel = parametersViewModel,
-
-                    userState = userState,
-                    authViewModel = authViewModel,
-                )
-            }
+            screen = { ProfileScreen(
+                userState = userState,
+                navController = navController,
+                navigationViewModel = navigationViewModel,
+                profileViewModel = profileViewModel,
+                authViewModel = authViewModel,
+                parametersState = parametersState,
+                parametersViewModel = parametersViewModel,
+            ) }
         ),
         AppRoute(
             routeName = exercisesOverviewRoute,
@@ -194,11 +194,15 @@ fun AppNavGraph(
                     contentDescription = null
                 )
             },
-            screen = { StatisticsScreen() }
+            screen = { StatisticsScreen(
+                statisticsViewModel = statisticsViewModel,
+                userState = userState,
+                navigationViewModel = navigationViewModel
+            ) }
         ),
     )
 
-    if (userState.isLoggedIn || bypassLogin) {
+    if (userState.isLoggedIn) {
         ModalNavigationDrawer(drawerContent = {
             AppDrawer(
                 route = currentRoute,
@@ -206,7 +210,8 @@ fun AppNavGraph(
                 appRoutes = appRoutes,
                 navController = navController,
                 modifier = Modifier,
-                userState = userState
+                userState = userState,
+                authViewModel = authViewModel,
             )
         }, drawerState = drawerState) {
             Scaffold(
@@ -304,7 +309,6 @@ fun AppNavGraph(
                             }
                         }
                     }
-
                 }
             }
         }
@@ -340,4 +344,3 @@ fun AppNavGraph(
         }
     }
 }
-

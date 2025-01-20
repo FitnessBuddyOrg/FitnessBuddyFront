@@ -1,9 +1,9 @@
 MUST:
 - [ ] notification 
-- [ ] handle errors in login and registration
+- [x] handle errors in login and registration
 - [ ] users statistics for admin
-- [ ] user statistics for user (including screen time)
-- [ ] user profile page
+- [x] user statistics for user (including screen time)
+- [x] user profile page
 - [ ] sharing exercises with other users
 - [ ] changing languages
 - [ ] unit test
@@ -11,9 +11,9 @@ MUST:
 SHOULD:
 
 - [ ] password reset
-- [ ] pfp
+- [x] pfp
 - [ ] sharing routines with other users
-- [ ] design a cool home page with links to other pages
+- [x] design a cool home page with links to other pages
 
 COULD:
 

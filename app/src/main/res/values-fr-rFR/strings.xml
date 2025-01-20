@@ -15,7 +15,7 @@
     <string name="already_have_account">Vous avez déjà un compte? Connexion</string>
     <string name="login">Connexion</string>
     <string name="dont_have_account">Vous n\'avez pas de compte? S\'inscrire</string>
-    <string name="welcome">Bienvenue, %1$s</string>
+    <string name="welcome">Bienvenue</string>
     <string name="logout">Déconnexion</string>
     <string name="add_edit_exercise">Rajouter Editer Un Exercice</string>
     <string name="exercises_overview">Aperçu des exercices</string>
@@ -47,4 +47,8 @@
     <string name="french">Français</string>
     <string name="russian">Russe</string>
     <string name="ok">Ok</string>
+    <string name="no_data">Pas de données</string>
+    <string name="google_sign_in">Se connecter avec Google</string>
+    <string name="github_sign_in">Se connecter avec Github</string>
+    <string name="save_changes">Sauvegarder les modifications</string>
 </resources>

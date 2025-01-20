@@ -1,15 +1,22 @@
-package com.project.fitnessbuddy.auth
+package com.project.fitnessbuddy.api.auth
 
 import com.google.gson.annotations.SerializedName
 import retrofit2.http.Body
 import retrofit2.http.POST
 
 data class LoginRequest(val email: String, val password: String)
+
 data class RegisterRequest(val email: String, val password: String, val confirmPassword: String)
-data class GoogleLoginRequest(val idToken: String)
+
+data class GoogleLoginRequest(
+    val idToken: String,
+    val profilePictureUrl: String,
+)
+
 data class UserResponse(
     @SerializedName("accessToken") val accessToken: String,
-    val email: String
+    val email: String,
+    val id : Long
 )
 data class GitHubTokenRequestDTO(val code: String)
 

@@ -33,6 +33,9 @@ private val LightColorScheme = lightColorScheme(
     onSurface = Color(0xFF1C1B1F),
 )
 
+
+
+
 @Composable
 fun FitnessBuddyTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
@@ -55,3 +58,4 @@ fun FitnessBuddyTheme(
         content = content
     )
 }
+

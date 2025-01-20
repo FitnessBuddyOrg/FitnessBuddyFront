@@ -91,10 +91,17 @@ dependencies {
 
     implementation(libs.play.services.auth)
     implementation(libs.androidx.credentials)
-    implementation (libs.googleid)
-    implementation (libs.androidx.credentials.play.services.auth)
+    implementation(libs.googleid)
+    implementation(libs.androidx.credentials.play.services.auth)
 
-    
+    implementation(libs.mpandroidchart)
+
+    implementation(libs.coil.compose)
+
+    implementation (libs.ucrop)
+
+
+
     ksp(libs.hilt.android.compiler)
     ksp(libs.androidx.hilt.compiler)
     ksp(libs.androidx.room.compiler)

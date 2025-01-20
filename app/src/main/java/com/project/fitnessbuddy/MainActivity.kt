@@ -13,9 +13,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.room.Room
-import com.project.fitnessbuddy.auth.AuthViewModel
-import com.project.fitnessbuddy.auth.GitHubTokenRequestDTO
-import com.project.fitnessbuddy.auth.RetrofitInstance
+import com.project.fitnessbuddy.api.auth.AuthViewModel
+import com.project.fitnessbuddy.api.auth.GitHubTokenRequestDTO
+import com.project.fitnessbuddy.api.statistics.StatisticsViewModel
 import com.project.fitnessbuddy.database.FitnessBuddyDatabase
 import com.project.fitnessbuddy.navigation.AppNavGraph
 import com.project.fitnessbuddy.navigation.NavigationViewModel
@@ -23,6 +23,9 @@ import com.project.fitnessbuddy.screens.common.ParametersViewModel
 import com.project.fitnessbuddy.screens.exercises.ExercisesViewModel
 import com.project.fitnessbuddy.ui.theme.FitnessBuddyTheme
 import kotlinx.coroutines.launch
+import com.github.mikephil.charting.utils.Utils
+import com.project.fitnessbuddy.api.user.ProfileViewModel
+
 
 class MainActivity : ComponentActivity() {
     private val authViewModel by viewModels<AuthViewModel> {
@@ -65,12 +68,12 @@ class MainActivity : ComponentActivity() {
                     }
                 }
 
-                // Handle custom scheme redirection (fitnessbuddy://auth)
                 data.toString().startsWith("fitnessbuddy://auth") -> {
                     val token = data.getQueryParameter("token")
                     val email = data.getQueryParameter("email")
-                    if (token != null && email != null) {
-                        authViewModel.handleSuccessfulLogin(token, email)
+                    val id = data.getQueryParameter("id")
+                    if (token != null && email != null && id != null) {
+                        authViewModel.handleSuccessfulLogin(token, email, id.toLong())
                         Log.d("GitHubAuth", "Token received: $token, Email: $email")
                     } else {
                         Log.e("GitHubAuth", "Missing token or email in custom scheme redirect.")
@@ -80,38 +83,32 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-
     private fun exchangeCodeForToken(code: String) {
         lifecycleScope.launch {
             try {
                 val response = RetrofitInstance.authService.githubLogin(GitHubTokenRequestDTO(code))
-                authViewModel.handleSuccessfulLogin(response.accessToken, response.email)
+                authViewModel.handleSuccessfulLogin(response.accessToken, response.email, response.id)
             } catch (e: Exception) {
                 Log.e("GitHubAuth", "Failed to exchange code for token: ${e.localizedMessage}", e)
             }
         }
     }
 
-
-//    private val navigationViewModel: NavigationViewModel by lazy {
-//        ViewModelProvider(this)[NavigationViewModel::class.java]
-//    }
-
-    private val navigationViewModel by viewModels<NavigationViewModel>(
-        factoryProducer = {
-            object : ViewModelProvider.Factory {
-                override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                    return NavigationViewModel() as T
-                }
-            }
-        }
-    )
-
     private val exercisesViewModel by viewModels<ExercisesViewModel>(
         factoryProducer = {
             object : ViewModelProvider.Factory {
                 override fun <T : ViewModel> create(modelClass: Class<T>): T {
                     return ExercisesViewModel(db.exerciseDao) as T
+                }
+            }
+        }
+    )
+
+    private val navigationViewModel by viewModels<NavigationViewModel> (
+        factoryProducer = {
+            object : ViewModelProvider.Factory {
+                override fun <T : ViewModel> create(modelClass: Class<T>): T {
+                    return NavigationViewModel() as T
                 }
             }
         }
@@ -127,9 +124,32 @@ class MainActivity : ComponentActivity() {
         }
     )
 
+    private val statisticsViewModel by viewModels<StatisticsViewModel> {
+        object : ViewModelProvider.Factory {
+            override fun <T : ViewModel> create(modelClass: Class<T>): T {
+                @Suppress("UNCHECKED_CAST")
+                return StatisticsViewModel(RetrofitInstance.userApi) as T
+            }
+        }
+    }
+
+    private val profileViewModel by viewModels<ProfileViewModel> {
+        object : ViewModelProvider.Factory {
+            override fun <T : ViewModel> create(modelClass: Class<T>): T {
+                @Suppress("UNCHECKED_CAST")
+                return ProfileViewModel(RetrofitInstance.userApi) as T
+            }
+        }
+    }
+
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        Utils.init(this)
         authViewModel.loadToken()
+        RetrofitInstance.initialize {
+            authViewModel.userState.value.accessToken
+        }
         setContent {
             FitnessBuddyTheme {
                 val navigationState by navigationViewModel.state.collectAsState()
@@ -148,11 +168,26 @@ class MainActivity : ComponentActivity() {
                     parametersViewModel = parametersViewModel,
 
                     userState = userState,
-                    authViewModel = authViewModel
+                    authViewModel = authViewModel,
+
+                    statisticsViewModel = statisticsViewModel,
+
+                    profileViewModel = profileViewModel
                 )
             }
         }
+        if (authViewModel.userState.value.isLoggedIn) {
+            lifecycleScope.launch {
+                try {
+                    RetrofitInstance.userApi.incrementAppOpen()
+                } catch (e: Exception) {
+                    Log.e("MainActivity", "Failed to increment app open count: ${e.localizedMessage}", e)
+                }
+            }
+        }
     }
+
+
 }
 
 
