@@ -1,9 +1,12 @@
 package com.project.fitnessbuddy.screens.exercises
 
-import androidx.lifecycle.ViewModel
+import android.app.Application
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import com.project.fitnessbuddy.api.auth.AuthViewModel
+import com.project.fitnessbuddy.api.user.ShareExerciseDTO
+import com.project.fitnessbuddy.api.user.TokenResponseDTO
 import com.project.fitnessbuddy.database.dao.ExerciseDao
-import com.project.fitnessbuddy.database.entity.Exercise
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -15,18 +18,35 @@ import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class ExercisesViewModel(
+    application: Application,
+
     private val exerciseDao: ExerciseDao,
-) : ViewModel() {
+
+    authViewModel: AuthViewModel
+) : AndroidViewModel(application) {
     private val _sortType = MutableStateFlow(SortType.NAME)
     private val _searchValue = MutableStateFlow("")
 
+    private val appContext = application.applicationContext
+
     private val _exercises = combine(
         _sortType,
-        _searchValue
-    ) { sortType, searchValue ->
-        when (sortType) {
-            SortType.NAME -> exerciseDao.getExercisesOrderedByName(searchValue)
-            SortType.CATEGORY -> exerciseDao.getExercisesOrderedByCategory(searchValue)
+        _searchValue,
+        authViewModel.userState
+    ) { sortType, searchValue, userState ->
+        if (userState.user.userId == null) {
+            MutableStateFlow(emptyList())
+        } else {
+            when (sortType) {
+                SortType.NAME -> exerciseDao.getExercisesOrderedByName(
+                    searchValue,
+                    userState.user.userId
+                )
+                SortType.CATEGORY -> exerciseDao.getExercisesOrderedByCategory(
+                    searchValue,
+                    userState.user.userId
+                )
+            }
         }
     }
         .flatMapLatest { it }
@@ -65,6 +85,34 @@ class ExercisesViewModel(
                 _state.update {
                     it.copy(
                         editType = exercisesEvent.editType
+                    )
+                }
+            }
+
+            is ExercisesEvent.ShareSelectedExercise -> {
+                val sharedExerciseDTO = ShareExerciseDTO(
+                    name = _state.value.selectedExercise.name,
+                    instructions = _state.value.selectedExercise.instructions,
+                    videoLink = _state.value.selectedExercise.videoLink,
+                    category = _state.value.selectedExercise.category
+                )
+
+                viewModelScope.launch {
+                    println(sharedExerciseDTO)
+                    val tokenResponseDTO: TokenResponseDTO = RetrofitInstance.exerciseApi.shareExercise(sharedExerciseDTO)
+
+                    _state.update {
+                        it.copy (
+                            sharedExerciseToken = tokenResponseDTO.token
+                        )
+                    }
+                }
+            }
+
+            is ExercisesEvent.ClearSharedExerciseToken -> {
+                _state.update {
+                    it.copy(
+                        sharedExerciseToken = ""
                     )
                 }
             }

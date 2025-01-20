@@ -21,9 +21,9 @@ interface RoutineDao {
     @Delete
     suspend fun delete(routine: Routine)
 
-    @Query("SELECT * FROM routine WHERE name LIKE '%' || :searchValue || '%' AND is_completed = 0")
-    fun getTemplateRoutineDTOs(searchValue: String): Flow<List<RoutineDTO>>
+    @Query("SELECT * FROM routine WHERE user_id = :userId AND name LIKE '%' || :searchValue || '%' AND is_completed = 0")
+    fun getTemplateRoutineDTOs(searchValue: String, userId: Long): Flow<List<RoutineDTO>>
 
-    @Query("SELECT * FROM routine WHERE  is_completed = 1")
-    fun getCompletedRoutineDTOs(): Flow<List<RoutineDTO>>
+    @Query("SELECT * FROM routine WHERE user_id = :userId AND is_completed = 1")
+    fun getCompletedRoutineDTOs(userId: Long): Flow<List<RoutineDTO>>
 }

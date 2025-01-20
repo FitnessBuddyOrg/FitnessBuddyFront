@@ -11,10 +11,10 @@ import com.project.fitnessbuddy.database.entity.User
 interface UserDao {
 
     @Upsert
-    suspend fun upsert(exercise: Exercise): Long
+    suspend fun upsert(user: User): Long
 
     @Delete
-    suspend fun delete(exercise: Exercise)
+    suspend fun delete(user: User)
 
     @Query("SELECT * FROM user WHERE user_id = :userId")
     fun getUser(userId: Long): User

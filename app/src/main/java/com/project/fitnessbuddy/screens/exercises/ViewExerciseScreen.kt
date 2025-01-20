@@ -1,6 +1,7 @@
 package com.project.fitnessbuddy.screens.exercises
 
 import android.content.Context
+import android.content.Intent
 import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -14,6 +15,7 @@ import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
@@ -27,10 +29,13 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.viewModelScope
 import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.YouTubePlayer
 import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.listeners.AbstractYouTubePlayerListener
 import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.views.YouTubePlayerView
 import com.project.fitnessbuddy.R
+import com.project.fitnessbuddy.api.user.ShareExerciseDTO
+import com.project.fitnessbuddy.api.user.TokenResponseDTO
 import com.project.fitnessbuddy.navigation.DeleteButton
 import com.project.fitnessbuddy.navigation.EditButton
 import com.project.fitnessbuddy.navigation.EditType
@@ -39,6 +44,7 @@ import com.project.fitnessbuddy.navigation.MediumTextWidget
 import com.project.fitnessbuddy.navigation.NavigationEvent
 import com.project.fitnessbuddy.navigation.NavigationState
 import com.project.fitnessbuddy.navigation.NavigationViewModel
+import com.project.fitnessbuddy.navigation.ShareButton
 import com.project.fitnessbuddy.screens.common.StoredValue
 import kotlinx.coroutines.launch
 
@@ -68,6 +74,11 @@ fun ViewExerciseScreen(
             })
 
             navigationViewModel.onEvent(NavigationEvent.AddTopBarActions {
+                ShareButton(
+                    onClick = {
+                        exercisesViewModel.onEvent(ExercisesEvent.ShareSelectedExercise)
+                    }
+                )
                 EditButton(
                     onClick = {
                         exercisesViewModel.onEvent(ExercisesEvent.SetEditType(EditType.EDIT))
@@ -96,6 +107,21 @@ fun ViewExerciseScreen(
         exercisesState = exercisesState,
         exercisesViewModel = exercisesViewModel
     )
+
+    LaunchedEffect(exercisesState.sharedExerciseToken) {
+        if(exercisesState.sharedExerciseToken != "") {
+            val message = ""
+            
+            val sendIntent = Intent().apply {
+                flags = Intent.FLAG_ACTIVITY_NEW_TASK
+                action = Intent.ACTION_SEND
+                putExtra(Intent.EXTRA_TEXT, exercisesState.sharedExerciseToken)
+                type = "text/plain"
+            }
+            context.startActivity(Intent.createChooser(sendIntent, "Share via"))
+            exercisesViewModel.onEvent(ExercisesEvent.ClearSharedExerciseToken)
+        }
+    }
 }
 
 fun onDeleteExercise(
@@ -166,7 +192,7 @@ fun AboutTab(
     ) {
         if (exercisesState.selectedExercise.videoLink.isNotEmpty() && isValidYtLink(exercisesState.selectedExercise.videoLink)) {
             val videoId = extractIdFromYtLink(exercisesState.selectedExercise.videoLink)
-            LiveTvScreen(videoId)
+//            LiveTvScreen(videoId)
         } else {
             Text(
                 modifier = Modifier

@@ -106,9 +106,6 @@ fun AppNavGraph(
     navigationViewModel.onEvent(NavigationEvent.SetNavController(navController))
     parametersViewModel.onEvent(ParametersEvent.InitializeParameters)
 
-    // TODO - REMOVE THIS FOR PRODUCTION
-    val bypassLogin = false
-
     val loginRoute = stringResource(id = R.string.login_route)
     val registerRoute = stringResource(id = R.string.register_route)
 

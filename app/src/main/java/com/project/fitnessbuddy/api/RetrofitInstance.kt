@@ -1,4 +1,5 @@
 import com.project.fitnessbuddy.api.auth.AuthService
+import com.project.fitnessbuddy.api.user.ExerciseApi
 import com.project.fitnessbuddy.api.user.UserApi
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
@@ -43,5 +44,14 @@ object RetrofitInstance {
             .addConverterFactory(GsonConverterFactory.create())
             .build()
             .create(UserApi::class.java)
+    }
+
+    val exerciseApi: ExerciseApi by lazy {
+        Retrofit.Builder()
+            .baseUrl(BASE_URL)
+            .client(client)
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
+            .create(ExerciseApi::class.java)
     }
 }

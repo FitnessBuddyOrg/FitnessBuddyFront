@@ -18,13 +18,17 @@ import androidx.credentials.exceptions.GetCredentialException
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.android.libraries.identity.googleid.GetGoogleIdOption
+import com.project.fitnessbuddy.database.dao.UserDao
 import com.project.fitnessbuddy.database.entity.User
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import org.json.JSONObject
 
-class AuthViewModel(application: Application) : AndroidViewModel(application) {
+class AuthViewModel(
+    application: Application,
+    private val userDao: UserDao
+) : AndroidViewModel(application) {
 
     private val _userState = MutableStateFlow(UserState())
     val userState: StateFlow<UserState> = _userState
@@ -52,6 +56,7 @@ class AuthViewModel(application: Application) : AndroidViewModel(application) {
                 )
                 _error.value = null
                 saveToken(response.accessToken, email, response.id)
+                onEvent(AuthEvent.UpsertUser)
             } catch (e: Exception) {
                 _error.value = "Login failed: ${e.localizedMessage}"
                 Toast.makeText(appContext, "Login failed: ${e.localizedMessage}", Toast.LENGTH_LONG)
@@ -85,6 +90,7 @@ class AuthViewModel(application: Application) : AndroidViewModel(application) {
                     isLoggedIn = true
                 )
                 Toast.makeText(appContext, "Registration successful", Toast.LENGTH_LONG).show()
+                onEvent(AuthEvent.UpsertUser)
             } catch (e: Exception) {
                 _error.value = "Registration failed: ${e.localizedMessage}"
                 Toast.makeText(
@@ -161,6 +167,7 @@ class AuthViewModel(application: Application) : AndroidViewModel(application) {
                             isLoggedIn = true
                         )
                         saveToken(userResponse.accessToken, userResponse.email, userResponse.id)
+                        onEvent(AuthEvent.UpsertUser)
                     } catch (e: Exception) {
                         Log.e("AuthViewModel", "Google Sign-In failed: ${e.localizedMessage}", e)
                     } finally {
@@ -194,6 +201,7 @@ class AuthViewModel(application: Application) : AndroidViewModel(application) {
             isLoggedIn = true
         )
         saveToken(accessToken, email, id)
+        onEvent(AuthEvent.UpsertUser)
     }
 
     private fun saveToken(token: String, email: String, id: Long) {
@@ -221,6 +229,7 @@ class AuthViewModel(application: Application) : AndroidViewModel(application) {
                 ),
                 isLoggedIn = true
             )
+            onEvent(AuthEvent.UpsertUser)
         }
     }
 
@@ -239,6 +248,17 @@ class AuthViewModel(application: Application) : AndroidViewModel(application) {
             json.put(key, bundle.get(key))
         }
         return json.toString()
+    }
+
+    fun onEvent(authEvent: AuthEvent) {
+        when(authEvent) {
+            is AuthEvent.UpsertUser -> {
+                println("logged in user: ${_userState.value.user}")
+                viewModelScope.launch {
+                    userDao.upsert(_userState.value.user)
+                }
+            }
+        }
     }
 }
 

@@ -25,4 +25,7 @@ sealed interface ExercisesEvent {
     data class SetSearchValue(val searchValue: String) : ExercisesEvent
 
     data class SetEditType(val editType: EditType) : ExercisesEvent
+
+    data object ShareSelectedExercise : ExercisesEvent
+    data object ClearSharedExerciseToken: ExercisesEvent
 }

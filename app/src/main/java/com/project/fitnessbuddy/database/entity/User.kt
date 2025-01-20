@@ -15,7 +15,7 @@ data class User (
 
     val email: String? = null,
 
-    @PrimaryKey(autoGenerate = true)
+    @PrimaryKey
     @ColumnInfo(name = "user_id")
     val userId: Long? = null
 )

@@ -1,14 +1,15 @@
 package com.project.fitnessbuddy.screens.routines
 
+import android.app.Application
 import android.content.Context
 import android.content.Intent
-import androidx.lifecycle.ViewModel
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.gson.Gson
+import com.project.fitnessbuddy.api.auth.AuthViewModel
 import com.project.fitnessbuddy.database.dao.RoutineDao
 import com.project.fitnessbuddy.database.dao.RoutineExerciseDao
 import com.project.fitnessbuddy.database.dao.RoutineExerciseSetDao
-import com.project.fitnessbuddy.database.dto.RoutineDTO
 import com.project.fitnessbuddy.database.dto.RoutineExerciseDTO
 import com.project.fitnessbuddy.database.dto.RoutineExerciseSetDTO
 import com.project.fitnessbuddy.database.entity.RoutineExercise
@@ -26,23 +27,41 @@ import java.util.Date
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class RoutinesViewModel(
+    application: Application,
+
     private val routineDao: RoutineDao,
     private val routineExerciseDao: RoutineExerciseDao,
-    private val routineExerciseSetDao: RoutineExerciseSetDao
-) : ViewModel() {
+    private val routineExerciseSetDao: RoutineExerciseSetDao,
+
+    authViewModel: AuthViewModel
+
+) : AndroidViewModel(application) {
     private val _searchValue = MutableStateFlow("")
 
     private val _templateRoutineDTOs = combine(
-        _searchValue
-    ) { (searchValue) ->
-        routineDao.getTemplateRoutineDTOs(searchValue)
+        _searchValue,
+        authViewModel.userState
+    ) { searchValue, userState ->
+        if (userState.user.userId == null) {
+            MutableStateFlow(emptyList())
+        } else {
+            routineDao.getTemplateRoutineDTOs(searchValue, userState.user.userId)
+        }
     }
         .flatMapLatest { it }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), emptyList())
 
-    private val _completedRoutineDTOs =
-        routineDao.getCompletedRoutineDTOs()
-            .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), emptyList())
+    private val _completedRoutineDTOs = combine(
+        authViewModel.userState
+    ) { (userState) ->
+        if (userState.user.userId == null) {
+            MutableStateFlow(emptyList())
+        } else {
+            routineDao.getCompletedRoutineDTOs(userState.user.userId)
+        }
+    }
+        .flatMapLatest { it }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), emptyList())
 
     private val _state = MutableStateFlow(RoutinesState())
     val state = combine(

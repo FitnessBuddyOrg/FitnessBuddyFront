@@ -1,27 +1,46 @@
 package com.project.fitnessbuddy.screens.statistics
 
-import androidx.lifecycle.ViewModel
+import android.app.Application
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import com.project.fitnessbuddy.api.auth.AuthViewModel
 import com.project.fitnessbuddy.api.user.UserApi
 import com.project.fitnessbuddy.database.dao.RoutineDao
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 import java.time.LocalDateTime
 
 class StatisticsViewModel(
+    application: Application,
+
     private val userApi: UserApi,
-    private val routineDao: RoutineDao
-) : ViewModel() {
+    private val routineDao: RoutineDao,
+
+    authViewModel: AuthViewModel
+) : AndroidViewModel(application) {
 
     private val _appOpenData = MutableStateFlow<Map<LocalDate, Int>>(emptyMap())
     val appOpenData: StateFlow<Map<LocalDate, Int>> = _appOpenData
 
-    private val _completedRoutineDTOs = routineDao.getCompletedRoutineDTOs()
+    @OptIn(ExperimentalCoroutinesApi::class)
+    private val _completedRoutineDTOs = combine(
+        authViewModel.userState
+    ) { (userState) ->
+        if (userState.user.userId == null) {
+            MutableStateFlow(emptyList())
+        } else {
+            routineDao.getCompletedRoutineDTOs(userState.user.userId)
+        }
+    }
+        .flatMapLatest { it }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), emptyList())
 
     private val _state = MutableStateFlow(StatisticsState())
     val state = combine(

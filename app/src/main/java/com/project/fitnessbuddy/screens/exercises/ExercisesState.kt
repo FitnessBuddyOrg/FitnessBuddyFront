@@ -13,4 +13,6 @@ data class ExercisesState(
 
     override val sortType: SortType = SortType.NAME,
     val searchValue: String = "",
+
+    val sharedExerciseToken: String = "",
 ): SortingState

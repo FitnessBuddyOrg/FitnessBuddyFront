@@ -29,15 +29,6 @@ import com.project.fitnessbuddy.api.user.ProfileViewModel
 
 
 class MainActivity : ComponentActivity() {
-    private val authViewModel by viewModels<AuthViewModel> {
-        object : ViewModelProvider.Factory {
-            override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                @Suppress("UNCHECKED_CAST")
-                return AuthViewModel(application) as T
-            }
-        }
-    }
-
     private val db by lazy {
         Room.databaseBuilder(
             applicationContext,
@@ -51,6 +42,15 @@ class MainActivity : ComponentActivity() {
     override fun onStart() {
         super.onStart()
         handleRedirect(intent)
+    }
+
+    private val authViewModel by viewModels<AuthViewModel> {
+        object : ViewModelProvider.Factory {
+            override fun <T : ViewModel> create(modelClass: Class<T>): T {
+                @Suppress("UNCHECKED_CAST")
+                return AuthViewModel(application, db.userDao) as T
+            }
+        }
     }
 
     private fun handleRedirect(intent: Intent?) {
@@ -100,8 +100,9 @@ class MainActivity : ComponentActivity() {
     private val exercisesViewModel by viewModels<ExercisesViewModel>(
         factoryProducer = {
             object : ViewModelProvider.Factory {
+                @Suppress("UNCHECKED_CAST")
                 override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                    return ExercisesViewModel(db.exerciseDao) as T
+                    return ExercisesViewModel(application, db.exerciseDao, authViewModel) as T
                 }
             }
         }
@@ -110,6 +111,7 @@ class MainActivity : ComponentActivity() {
     private val navigationViewModel by viewModels<NavigationViewModel> (
         factoryProducer = {
             object : ViewModelProvider.Factory {
+                @Suppress("UNCHECKED_CAST")
                 override fun <T : ViewModel> create(modelClass: Class<T>): T {
                     return NavigationViewModel() as T
                 }
@@ -121,10 +123,13 @@ class MainActivity : ComponentActivity() {
         factoryProducer = {
             object : ViewModelProvider.Factory {
                 override fun <T : ViewModel> create(modelClass: Class<T>): T {
+                    @Suppress("UNCHECKED_CAST")
                     return RoutinesViewModel(
+                        application = application,
                         routineDao = db.routineDao,
                         routineExerciseDao = db.routineExerciseDao,
                         routineExerciseSetDao = db.routineExerciseSetDao,
+                        authViewModel = authViewModel
                     ) as T
                 }
             }
@@ -134,6 +139,7 @@ class MainActivity : ComponentActivity() {
     private val parametersViewModel by viewModels<ParametersViewModel>(
         factoryProducer = {
             object : ViewModelProvider.Factory {
+                @Suppress("UNCHECKED_CAST")
                 override fun <T : ViewModel> create(modelClass: Class<T>): T {
                     return ParametersViewModel(db.parameterDao) as T
                 }
@@ -145,7 +151,12 @@ class MainActivity : ComponentActivity() {
         object : ViewModelProvider.Factory {
             override fun <T : ViewModel> create(modelClass: Class<T>): T {
                 @Suppress("UNCHECKED_CAST")
-                return StatisticsViewModel(RetrofitInstance.userApi, db.routineDao) as T
+                return StatisticsViewModel(
+                    application = application,
+                    userApi = RetrofitInstance.userApi,
+                    routineDao = db.routineDao,
+                    authViewModel = authViewModel
+                ) as T
             }
         }
     }
