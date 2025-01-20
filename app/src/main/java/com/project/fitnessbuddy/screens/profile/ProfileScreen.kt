@@ -34,6 +34,7 @@ import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -201,7 +202,11 @@ fun ProfileScreen(
                     contentAlignment = Alignment.Center
                 ) {
                     Image(
-                        painter = rememberAsyncImagePainter(userState.profilePictureUrl ?: ""),
+                        painter = if (userState.profilePictureUrl.isNullOrEmpty()) {
+                            painterResource(id = R.drawable.profile_picture)
+                        } else {
+                            rememberAsyncImagePainter(userState.profilePictureUrl)
+                        },
                         contentDescription = stringResource(R.string.profile_picture),
                         modifier = Modifier
                             .size(200.dp)

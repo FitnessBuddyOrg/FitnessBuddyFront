@@ -1,14 +1,15 @@
 MUST:
 - [x] notification 
 - [x] handle errors in login and registration
-- [ ] users statistics for admin
 - [x] user statistics for user (including screen time)
 - [x] user profile page
 - [x] sharing exercises with other users
 - [x] changing languages
-- [ ] unit test
 - [x] exercises screen and all that comes with it
 - [x] routines screen and all that comes with it
+- [ ] admin stats
+- [ ] online routine
+- [ ] unit test
 
 SHOULD:
 

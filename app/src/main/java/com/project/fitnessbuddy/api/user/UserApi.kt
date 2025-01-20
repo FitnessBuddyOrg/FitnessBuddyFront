@@ -56,5 +56,10 @@ interface UserApi {
         @Part file: MultipartBody.Part
     ): ProfilePictureDTO
 
+    @GET("user/app-open-count/all")
+    suspend fun getAllAppOpenCount(): List<AppOpenDTO>
+
+
+
 
 }
