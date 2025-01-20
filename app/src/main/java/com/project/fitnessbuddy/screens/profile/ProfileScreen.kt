@@ -97,16 +97,18 @@ fun ProfileScreen(
     }
 
     val cacheDir =
-        context.externalCacheDir ?: throw IllegalStateException("Cache directory not found")
+        context.externalCacheDir ?: throw IllegalStateException(stringResource(R.string.cache_directory_not_found))
     val croppedFile = File(cacheDir, "cropped_${System.currentTimeMillis()}.jpg")
 
     val cropLauncher =
         rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             if (result.resultCode == Activity.RESULT_OK) {
-                Toast.makeText(context, "Image cropped successfully!", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context,
+                    context.getString(R.string.image_cropped_successfully), Toast.LENGTH_SHORT).show()
                 profileViewModel.updateProfilePicture(croppedFile)
             } else {
-                Toast.makeText(context, "Image cropping canceled.", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context,
+                    context.getString(R.string.image_cropping_canceled), Toast.LENGTH_SHORT).show()
             }
         }
 
@@ -124,7 +126,8 @@ fun ProfileScreen(
                     .getIntent(context)
                 cropLauncher.launch(uCropIntent)
             } else {
-                Toast.makeText(context, "No image selected.", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context,
+                    context.getString(R.string.no_image_selected), Toast.LENGTH_SHORT).show()
             }
         }
 
@@ -133,7 +136,8 @@ fun ProfileScreen(
             if (isGranted) {
                 imagePickerLauncher.launch("image/*")
             } else {
-                Toast.makeText(context, "Storage permission denied.", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context,
+                    context.getString(R.string.storage_permission_denied), Toast.LENGTH_SHORT).show()
             }
         }
 
@@ -190,7 +194,7 @@ fun ProfileScreen(
                 )
                 Box(
                     modifier = Modifier
-                        .size(120.dp)
+                        .size(200.dp)
                         .clip(CircleShape)
                         .background(MaterialTheme.colorScheme.primary)
                         .clickable { handleImagePickerClick() },
@@ -198,23 +202,23 @@ fun ProfileScreen(
                 ) {
                     Image(
                         painter = rememberAsyncImagePainter(userState.profilePictureUrl ?: ""),
-                        contentDescription = "Profile Picture",
+                        contentDescription = stringResource(R.string.profile_picture),
                         modifier = Modifier
-                            .size(120.dp)
+                            .size(200.dp)
                             .clip(CircleShape),
                         contentScale = ContentScale.Crop
                     )
                     Text(
                         text = stringResource(R.string.edit),
                         color = Color.White,
-                        modifier = Modifier.align(Alignment.BottomCenter),
+                        modifier = Modifier.align(Alignment.BottomCenter).padding(bottom = 8.dp),
                         style = TextStyle(
                             fontSize = 16.sp,
                             fontWeight = FontWeight.Bold,
                             background = Color.Transparent,
                             shadow = Shadow(
                                 color = Color.Black,
-                                offset = Offset(1f, 1f),
+                                offset = Offset(2f, 2f),
                                 blurRadius = 5f
                             ),
                         )
@@ -282,7 +286,7 @@ fun ProfileScreen(
                             IconButton(onClick = { isEditing = true }) {
                                 Icon(
                                     imageVector = Icons.Default.Edit,
-                                    contentDescription = "Edit Name",
+                                    contentDescription = stringResource(R.string.edit_name),
                                     tint = MaterialTheme.colorScheme.primary
                                 )
                             }

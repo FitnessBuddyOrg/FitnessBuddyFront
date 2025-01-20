@@ -122,4 +122,11 @@
     <string name="weekly_app_open_statistics">Weekly App Open Statistics</string>
     <string name="completed_routines">Completed Routines</string>
     <string name="user_profile">User Profile</string>
+    <string name="no_image_selected">No image selected.</string>
+    <string name="image_cropped_successfully">Image cropped successfully!</string>
+    <string name="image_cropping_canceled">Image cropping canceled.</string>
+    <string name="storage_permission_denied">Storage permission denied.</string>
+    <string name="profile_picture">Profile Picture</string>
+    <string name="edit_name">Edit Name</string>
+    <string name="cache_directory_not_found">Cache directory not found</string>
 </resources>
