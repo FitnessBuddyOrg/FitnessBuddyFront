@@ -397,10 +397,4 @@ fun changeLocales(context: Context, localeString: String) {
     }
 }
 
-private fun launchImagePicker(context: android.content.Context, croppedFile: File) {
-    val intent = Intent(Intent.ACTION_GET_CONTENT).apply {
-        type = "image/*"
-    }
-    ContextCompat.startActivity(context, intent, null)
-}
 
