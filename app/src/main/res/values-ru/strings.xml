@@ -100,7 +100,7 @@
     <string name="kg">кг</string>
     <string name="no_data">Нет данных</string>
     <string name="google_sign_in">Войти через Google</string>
-    <string name="weekly_app_open_statistics">Еженедельная Статистика Открытия Приложения</string>
+    <string name="weekly_app_open_statistics">Еженедельная Статистика Открытия</string>
     <string name="completed_routines">Завершенные Рутины</string>
     <string name="user_profile">Профиль Пользователя</string>
     <string name="no_image_selected">No image selected.</string>
@@ -114,4 +114,5 @@
     <string name="exercise_code">Exercise Code</string>
     <string name="fetched_exercise">Fetched Exercise</string>
     <string name="no_exercise_fetched">Could not find exercise</string>
+    <string name="connected_as_admin">Connected as Admin</string>
 </resources>

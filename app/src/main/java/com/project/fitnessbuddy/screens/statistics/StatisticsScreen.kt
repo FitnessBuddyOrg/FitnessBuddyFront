@@ -82,7 +82,7 @@ fun StatisticsScreen(
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Text(
-                    text = "Connected as Admin",
+                    text = stringResource(R.string.connected_as_admin),
                     style = MaterialTheme.typography.bodyLarge,
                     modifier = Modifier
                         .padding(end = 8.dp)
@@ -110,9 +110,9 @@ fun StatisticsScreen(
                     AppOpenChart(
                         data = appOpenData,
                         title = if (adminView && isAdmin)
-                            "Weekly App Open (All Users)"
+                            "${stringResource(R.string.weekly_app_open_statistics)} (All Users)"
                         else
-                            "Weekly App Open"
+                            stringResource(R.string.weekly_app_open_statistics)
                     )
                 }
             }
@@ -121,9 +121,9 @@ fun StatisticsScreen(
                     AppOpenChart(
                         data = completedRoutinesData,
                         title = if (adminView && isAdmin)
-                            "Completed Routines (All Users)"
+                            "${stringResource(R.string.completed_routines)} (All Users)"
                         else
-                            "Completed Routines"
+                            stringResource(R.string.completed_routines)
                     )
                 }
             }

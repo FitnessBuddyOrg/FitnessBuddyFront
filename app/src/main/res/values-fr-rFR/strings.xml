@@ -100,7 +100,7 @@
     <string name="years" >years</string>
     <string name="best_set">Best set</string>
     <string name="kg">kg</string>
-    <string name="weekly_app_open_statistics">Weekly App Open Statistics</string>
+    <string name="weekly_app_open_statistics">Weekly App Open</string>
     <string name="completed_routines">Completed Routines</string>
     <string name="user_profile">Profil Utilisateur</string>
     <string name="no_image_selected">No image selected.</string>
@@ -114,4 +114,5 @@
     <string name="exercise_code">Exercise Code</string>
     <string name="fetched_exercise">Fetched Exercise</string>
     <string name="no_exercise_fetched">Could not find exercise</string>
+    <string name="connected_as_admin">Connected as Admin</string>
 </resources>
