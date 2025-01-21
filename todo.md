@@ -15,7 +15,7 @@ SHOULD:
 
 - [ ] password reset
 - [x] pfp
-- [ ] sharing routines with other users
+- [x] sharing exercices with other users
 - [x] design a cool home page with links to other pages
 
 COULD:
