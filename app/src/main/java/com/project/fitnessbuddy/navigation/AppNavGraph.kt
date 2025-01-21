@@ -41,7 +41,7 @@ import com.google.gson.Gson
 import com.project.fitnessbuddy.R
 import com.project.fitnessbuddy.api.auth.AuthViewModel
 import com.project.fitnessbuddy.api.auth.UserState
-import com.project.fitnessbuddy.api.user.ProfileViewModel
+import com.project.fitnessbuddy.screens.profile.ProfileViewModel
 import com.project.fitnessbuddy.database.dto.RoutineDTO
 import com.project.fitnessbuddy.screens.HomeScreen
 import com.project.fitnessbuddy.screens.auth.LoginScreen
@@ -70,7 +70,6 @@ import com.project.fitnessbuddy.screens.routines.StartRoutineScreen
 import com.project.fitnessbuddy.screens.routines.StartRoutineServiceNotification
 import com.project.fitnessbuddy.screens.routines.ViewRoutineScreen
 import com.project.fitnessbuddy.screens.statistics.StatisticsScreen
-import com.project.fitnessbuddy.screens.statistics.StatisticsState
 import com.project.fitnessbuddy.screens.statistics.StatisticsViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch

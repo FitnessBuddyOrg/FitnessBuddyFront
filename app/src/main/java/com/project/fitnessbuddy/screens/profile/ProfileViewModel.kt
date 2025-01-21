@@ -1,8 +1,11 @@
-package com.project.fitnessbuddy.api.user
+package com.project.fitnessbuddy.screens.profile
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.project.fitnessbuddy.api.auth.AuthViewModel
+import com.project.fitnessbuddy.api.user.UpdateUser
+import com.project.fitnessbuddy.api.user.UserApi
+import com.project.fitnessbuddy.api.user.UserDTO
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch

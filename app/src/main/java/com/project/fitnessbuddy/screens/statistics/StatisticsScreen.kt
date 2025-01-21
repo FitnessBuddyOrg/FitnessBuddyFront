@@ -43,7 +43,11 @@ fun StatisticsScreen(
     val userId = userState.user.userId ?: return
     val isAdmin = remember { authViewModel.hasRole(userState, "ROLE_ADMIN") }
     var adminView by remember { mutableStateOf(false) }
-
+    val context = LocalContext.current
+    val lifecycleOwner = LocalLifecycleOwner.current
+    val coroutineScope = remember {
+        lifecycleOwner.lifecycleScope
+    }
     val appOpenData by if (adminView && isAdmin) {
         statisticsViewModel.allAppOpenData.collectAsState()
     } else {
@@ -55,7 +59,20 @@ fun StatisticsScreen(
     } else {
         statisticsViewModel.completedRoutinesData.collectAsState()
     }
+    DisposableEffect(Unit) {
+        val job = coroutineScope.launch {
+            navigationViewModel.onEvent(NavigationEvent.ClearTopBarActions)
+            navigationViewModel.onEvent(NavigationEvent.DisableCustomButton)
 
+            navigationViewModel.onEvent(NavigationEvent.UpdateTitleWidget {
+                MediumTextWidget(context.getString(R.string.statistics))
+            })
+        }
+
+        onDispose {
+            job.cancel()
+        }
+    }
     LaunchedEffect(userId, adminView) {
         if (adminView && isAdmin) {
             statisticsViewModel.fetchAllAppOpenData()

@@ -25,7 +25,7 @@ import com.project.fitnessbuddy.screens.routines.RoutinesViewModel
 import com.project.fitnessbuddy.ui.theme.FitnessBuddyTheme
 import kotlinx.coroutines.launch
 import com.github.mikephil.charting.utils.Utils
-import com.project.fitnessbuddy.api.user.ProfileViewModel
+import com.project.fitnessbuddy.screens.profile.ProfileViewModel
 
 
 class MainActivity : ComponentActivity() {
