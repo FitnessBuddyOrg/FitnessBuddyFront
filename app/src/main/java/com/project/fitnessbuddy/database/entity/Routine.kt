@@ -3,6 +3,7 @@ package com.project.fitnessbuddy.database.entity
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.ForeignKey
+import androidx.room.Index
 import androidx.room.PrimaryKey
 import com.project.fitnessbuddy.database.entity.enums.Frequency
 import com.project.fitnessbuddy.database.entity.enums.Language
@@ -18,6 +19,9 @@ import java.util.Date
             childColumns = ["user_id"],
             onDelete = ForeignKey.CASCADE
         )
+    ],
+    indices = [
+        Index(value = ["user_id"])
     ]
 )
 data class Routine(

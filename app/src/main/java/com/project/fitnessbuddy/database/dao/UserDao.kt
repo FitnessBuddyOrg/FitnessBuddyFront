@@ -3,6 +3,7 @@ package com.project.fitnessbuddy.database.dao
 import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Query
+import androidx.room.Transaction
 import androidx.room.Upsert
 import com.project.fitnessbuddy.database.entity.Exercise
 import com.project.fitnessbuddy.database.entity.User
@@ -16,6 +17,7 @@ interface UserDao {
     @Delete
     suspend fun delete(user: User)
 
+    @Transaction
     @Query("SELECT * FROM user WHERE user_id = :userId")
     fun getUser(userId: Long): User
 }

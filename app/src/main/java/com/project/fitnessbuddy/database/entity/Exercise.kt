@@ -3,6 +3,7 @@ package com.project.fitnessbuddy.database.entity
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.ForeignKey
+import androidx.room.Index
 import androidx.room.PrimaryKey
 import com.project.fitnessbuddy.database.entity.abstracts.ListedEntity
 import com.project.fitnessbuddy.database.entity.enums.Category
@@ -18,6 +19,9 @@ import com.project.fitnessbuddy.database.entity.enums.Language
             childColumns = ["user_id"],
             onDelete = ForeignKey.CASCADE
         )
+    ],
+    indices = [
+        Index(value = ["user_id"])
     ]
 )
 data class Exercise(
