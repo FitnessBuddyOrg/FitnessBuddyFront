@@ -32,6 +32,16 @@ data class ProfilePictureDTO (
     val url: String
 )
 
+data class CompletedRoutineDTO (
+    val id: Long,
+    val userId: Long,
+    val completedTime: String
+){
+    fun getParsedCompletedTime(): LocalDateTime {
+        return LocalDateTime.parse(completedTime, DateTimeFormatter.ISO_DATE_TIME)
+    }
+}
+
 
 interface UserApi {
 
@@ -40,6 +50,9 @@ interface UserApi {
 
     @GET("user/app-open-count/{userId}")
     suspend fun getAppOpenCount(@Path("userId") userId: Long): List<AppOpenDTO>
+
+    @GET("user/app-open-count/all")
+    suspend fun getAllAppOpenCount(): List<AppOpenDTO>
 
     @GET("user/me")
     suspend fun getMe(): UserDTO
@@ -56,8 +69,16 @@ interface UserApi {
         @Part file: MultipartBody.Part
     ): ProfilePictureDTO
 
-    @GET("user/app-open-count/all")
-    suspend fun getAllAppOpenCount(): List<AppOpenDTO>
+
+    @POST("user/add-completed-routine")
+    suspend fun addCompletedRoutine()
+
+    @GET("user/completed-routines")
+    suspend fun getCompletedRoutine(): List<CompletedRoutineDTO>
+
+    @GET("user/completed-routines/all")
+    suspend fun getAllCompletedRoutine(): List<CompletedRoutineDTO>
+
 
 
 

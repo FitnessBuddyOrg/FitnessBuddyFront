@@ -7,8 +7,8 @@ MUST:
 - [x] changing languages
 - [x] exercises screen and all that comes with it
 - [x] routines screen and all that comes with it
-- [ ] admin stats
-- [ ] online routine
+- [x] admin stats "if the user is an admin, he must be able to switch to admin view"
+- [x] online routine
 - [ ] unit test
 
 SHOULD:

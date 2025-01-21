@@ -94,7 +94,11 @@ fun RegisterScreen(
                         onClick = { navController.navigate(context.getString(R.string.login_route)) },
                         modifier = Modifier.fillMaxWidth()
                     ) {
-                        Text(stringResource(id = R.string.already_have_account))
+                        Text(
+                            text=stringResource(id = R.string.already_have_account),
+                            style = MaterialTheme.typography.bodyLarge,
+
+                            )
                     }
 
                     if (userState.isLoggedIn) {

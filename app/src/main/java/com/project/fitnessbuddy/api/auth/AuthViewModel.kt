@@ -275,10 +275,11 @@ class AuthViewModel(
         for (i in 0 until roles.length()) {
             rolesList.add(roles.getString(i))
         }
+        Log.d("AuthViewModel", "Roles: $rolesList")
         return rolesList
     }
 
-    private fun hasRole(userState: UserState, role: String): Boolean {
+    fun hasRole(userState: UserState, role: String): Boolean {
         return getRolesFromToken(userState.user.accessToken.orEmpty()).contains(role)
     }
 }

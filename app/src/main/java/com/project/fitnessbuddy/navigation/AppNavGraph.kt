@@ -95,7 +95,6 @@ fun AppNavGraph(
     authViewModel: AuthViewModel,
     profileViewModel: ProfileViewModel,
 
-    statisticsState: StatisticsState,
     statisticsViewModel: StatisticsViewModel,
 
     userState: UserState,
@@ -370,10 +369,10 @@ fun AppNavGraph(
             screen = {
                 StatisticsScreen(
                     statisticsViewModel = statisticsViewModel,
-                    statisticsState = statisticsState,
-
                     userState = userState,
-                    navigationViewModel = navigationViewModel
+                    navigationViewModel = navigationViewModel,
+
+                    authViewModel = authViewModel
                 )
             }
         ),

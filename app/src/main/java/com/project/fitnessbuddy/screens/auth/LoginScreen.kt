@@ -88,7 +88,11 @@ fun LoginScreen(
                         onClick = { navController.navigate(context.getString(R.string.register_route)) },
                         modifier = Modifier.fillMaxWidth()
                     ) {
-                        Text(stringResource(id = R.string.dont_have_account))
+                        Text(
+                            text=stringResource(id = R.string.dont_have_account),
+                            style=MaterialTheme.typography.bodyLarge,
+                            )
+
                     }
 
                     HorizontalDivider()

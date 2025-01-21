@@ -6,64 +6,41 @@ import androidx.lifecycle.viewModelScope
 import com.project.fitnessbuddy.api.auth.AuthViewModel
 import com.project.fitnessbuddy.api.user.UserApi
 import com.project.fitnessbuddy.database.dao.RoutineDao
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.flatMapLatest
-import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 import java.time.LocalDateTime
 
 class StatisticsViewModel(
     application: Application,
-
     private val userApi: UserApi,
     private val routineDao: RoutineDao,
-
-    authViewModel: AuthViewModel
+    private val authViewModel: AuthViewModel
 ) : AndroidViewModel(application) {
 
     private val _appOpenData = MutableStateFlow<Map<LocalDate, Int>>(emptyMap())
     val appOpenData: StateFlow<Map<LocalDate, Int>> = _appOpenData
 
-    @OptIn(ExperimentalCoroutinesApi::class)
-    private val _completedRoutineDTOs = combine(
-        authViewModel.userState
-    ) { (userState) ->
-        if (userState.user.userId == null) {
-            MutableStateFlow(emptyList())
-        } else {
-            routineDao.getCompletedRoutineDTOs(userState.user.userId)
-        }
-    }
-        .flatMapLatest { it }
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), emptyList())
+    private val _completedRoutinesData = MutableStateFlow<Map<LocalDate, Int>>(emptyMap())
+    val completedRoutinesData: StateFlow<Map<LocalDate, Int>> = _completedRoutinesData
 
-    private val _state = MutableStateFlow(StatisticsState())
-    val state = combine(
-        _state,
-        _completedRoutineDTOs
-    ) { state, completedRoutinesData ->
-        state.copy(
-            completedRoutinesData = completedRoutinesData
-        )
-    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), StatisticsState())
+    private val _allAppOpenData = MutableStateFlow<Map<LocalDate, Int>>(emptyMap())
+    val allAppOpenData: StateFlow<Map<LocalDate, Int>> = _allAppOpenData
+
+    private val _allCompletedRoutinesData = MutableStateFlow<Map<LocalDate, Int>>(emptyMap())
+    val allCompletedRoutinesData: StateFlow<Map<LocalDate, Int>> = _allCompletedRoutinesData
+
 
     fun fetchAppOpenData(userId: Long) {
         viewModelScope.launch {
             try {
                 val data = userApi.getAppOpenCount(userId)
-
                 val startDate = LocalDateTime.now().minusWeeks(1)
                 val groupedData = data
                     .map { it.getParsedOpenTime() to it }
                     .filter { (parsedTime, _) -> parsedTime.isAfter(startDate) }
                     .groupBy { (parsedTime, _) -> parsedTime.toLocalDate() }
                     .mapValues { it.value.size }
-
                 _appOpenData.value = groupedData
             } catch (e: Exception) {
                 println("Error fetching app open data: ${e.message}")
@@ -72,12 +49,53 @@ class StatisticsViewModel(
         }
     }
 
-    fun onEvent(statisticsEvent: StatisticsEvent): Boolean {
-//        when (statisticsEvent) {
-//            is StatisticsEvent.FetchAppOpenData -> {
-//
-//            }
-//        }
-        return false
+    fun fetchAllAppOpenData() {
+        viewModelScope.launch {
+            try {
+                val data = userApi.getAllAppOpenCount()
+                val groupedData = data
+                    .map { it.getParsedOpenTime() to it }
+                    .groupBy { (parsedTime, _) -> parsedTime.toLocalDate() }
+                    .mapValues { it.value.size }
+                _allAppOpenData.value = groupedData
+            } catch (e: Exception) {
+                println("Error fetching all app open data: ${e.message}")
+                _allAppOpenData.value = emptyMap()
+            }
+        }
+    }
+
+    fun fetchCompletedRoutines() {
+        viewModelScope.launch {
+            try {
+                val data = userApi.getCompletedRoutine()
+                val startDate = LocalDateTime.now().minusWeeks(1)
+                val groupedData = data
+                    .map { it.getParsedCompletedTime() to it }
+                    .filter { (parsedTime, _) -> parsedTime.isAfter(startDate) }
+                    .groupBy { (parsedTime, _) -> parsedTime.toLocalDate() }
+                    .mapValues { it.value.size }
+                _completedRoutinesData.value = groupedData
+            } catch (e: Exception) {
+                println("Error fetching routine data: ${e.message}")
+                _completedRoutinesData.value = emptyMap()
+            }
+        }
+    }
+
+    fun fetchAllCompletedRoutines() {
+        viewModelScope.launch {
+            try {
+                val data = userApi.getAllCompletedRoutine()
+                val groupedData = data
+                    .map { it.getParsedCompletedTime() to it }
+                    .groupBy { (parsedTime, _) -> parsedTime.toLocalDate() }
+                    .mapValues { it.value.size }
+                _allCompletedRoutinesData.value = groupedData
+            } catch (e: Exception) {
+                println("Error fetching all completed routines: ${e.message}")
+                _allCompletedRoutinesData.value = emptyMap()
+            }
+        }
     }
 }

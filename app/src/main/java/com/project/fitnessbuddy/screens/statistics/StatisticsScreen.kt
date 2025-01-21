@@ -3,6 +3,8 @@ package com.project.fitnessbuddy.screens.statistics
 import android.graphics.Typeface
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -23,6 +25,7 @@ import com.github.mikephil.charting.data.LineData
 import com.github.mikephil.charting.data.LineDataSet
 import com.github.mikephil.charting.formatter.IndexAxisValueFormatter
 import com.project.fitnessbuddy.R
+import com.project.fitnessbuddy.api.auth.AuthViewModel
 import com.project.fitnessbuddy.api.auth.UserState
 import com.project.fitnessbuddy.navigation.MediumTextWidget
 import com.project.fitnessbuddy.navigation.NavigationEvent
@@ -30,72 +33,105 @@ import com.project.fitnessbuddy.navigation.NavigationViewModel
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
-
 @Composable
 fun StatisticsScreen(
     statisticsViewModel: StatisticsViewModel,
-    statisticsState: StatisticsState,
     navigationViewModel: NavigationViewModel,
     userState: UserState,
+    authViewModel: AuthViewModel
 ) {
-    val appOpenData by statisticsViewModel.appOpenData.collectAsState()
     val userId = userState.user.userId ?: return
+    val isAdmin = remember { authViewModel.hasRole(userState, "ROLE_ADMIN") }
+    var adminView by remember { mutableStateOf(false) }
 
-    val context = LocalContext.current
-    val lifecycleOwner = LocalLifecycleOwner.current
-    val coroutineScope = remember {
-        lifecycleOwner.lifecycleScope
+    val appOpenData by if (adminView && isAdmin) {
+        statisticsViewModel.allAppOpenData.collectAsState()
+    } else {
+        statisticsViewModel.appOpenData.collectAsState()
     }
 
-    DisposableEffect(Unit) {
-        val job = coroutineScope.launch {
-            navigationViewModel.onEvent(NavigationEvent.ClearTopBarActions)
-            navigationViewModel.onEvent(NavigationEvent.DisableCustomButton)
+    val completedRoutinesData by if (adminView && isAdmin) {
+        statisticsViewModel.allCompletedRoutinesData.collectAsState()
+    } else {
+        statisticsViewModel.completedRoutinesData.collectAsState()
+    }
 
-            navigationViewModel.onEvent(NavigationEvent.UpdateTitleWidget {
-                MediumTextWidget(context.getString(R.string.statistics))
-            })
+    LaunchedEffect(userId, adminView) {
+        if (adminView && isAdmin) {
+            statisticsViewModel.fetchAllAppOpenData()
+            statisticsViewModel.fetchAllCompletedRoutines()
+        } else {
+            statisticsViewModel.fetchAppOpenData(userId)
+            statisticsViewModel.fetchCompletedRoutines()
         }
-
-        onDispose {
-            job.cancel()
-        }
     }
 
-    LaunchedEffect(userId) {
-        statisticsViewModel.fetchAppOpenData(userId)
-    }
-
-    LazyColumn(
+    Column(
         modifier = Modifier
             .fillMaxSize()
             .padding(16.dp),
         verticalArrangement = Arrangement.Top,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        item {
-            Spacer(modifier = Modifier.height(16.dp))
-        }
-        item {
-            RoundedChartBox {
-                AppOpenChart(
-                    data = appOpenData,
-                    title = stringResource(R.string.weekly_app_open_statistics)
+        if (isAdmin) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Text(
+                    text = "Connected as Admin",
+                    style = MaterialTheme.typography.bodyLarge,
+                    modifier = Modifier
+                        .padding(end = 8.dp)
+                )
+                Icon(
+                    imageVector = Icons.Default.CheckCircle,
+                    contentDescription = "Admin Role",
+                    tint = MaterialTheme.colorScheme.primary
+                )
+                Spacer(modifier = Modifier.width(8.dp))
+                Switch(
+                    checked = adminView,
+                    onCheckedChange = { adminView = it }
                 )
             }
         }
 
-        item {
-            RoundedChartBox {
-                AppOpenChart(
-                    data = statisticsState.getCompletedRoutinesData(),
-                    title = stringResource(R.string.completed_routines)
-                )
+        LazyColumn(
+            modifier = Modifier.fillMaxSize(),
+            verticalArrangement = Arrangement.Top,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            item {
+                RoundedChartBox {
+                    AppOpenChart(
+                        data = appOpenData,
+                        title = if (adminView && isAdmin)
+                            "Weekly App Open (All Users)"
+                        else
+                            "Weekly App Open"
+                    )
+                }
+            }
+            item {
+                RoundedChartBox {
+                    AppOpenChart(
+                        data = completedRoutinesData,
+                        title = if (adminView && isAdmin)
+                            "Completed Routines (All Users)"
+                        else
+                            "Completed Routines"
+                    )
+                }
             }
         }
-
     }
 }
+
+
 
 @Composable
 fun RoundedChartBox(

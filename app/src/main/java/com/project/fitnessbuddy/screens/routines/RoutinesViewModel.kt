@@ -1,5 +1,6 @@
 package com.project.fitnessbuddy.screens.routines
 
+import RetrofitInstance
 import android.app.Application
 import android.content.Context
 import android.content.Intent
@@ -539,6 +540,9 @@ class RoutinesViewModel(
                             )
                         )
                     )
+                }
+                viewModelScope.launch {
+                    RetrofitInstance.userApi.addCompletedRoutine()
                 }
                 onEvent(RoutinesEvent.UpsertSelectedRoutineDTO)
 

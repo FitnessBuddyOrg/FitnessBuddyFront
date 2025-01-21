@@ -197,7 +197,6 @@ class MainActivity : ComponentActivity() {
                 val navigationState by navigationViewModel.state.collectAsState()
                 val exerciseState by exercisesViewModel.state.collectAsState()
                 val routinesState by routinesViewModel.state.collectAsState()
-                val statisticsState by statisticsViewModel.state.collectAsState()
 
                 val userState by authViewModel.userState.collectAsState()
                 val parametersState by parametersViewModel.state.collectAsState()
@@ -218,7 +217,6 @@ class MainActivity : ComponentActivity() {
                     userState = userState,
                     authViewModel = authViewModel,
 
-                    statisticsState = statisticsState,
                     statisticsViewModel = statisticsViewModel,
 
                     profileViewModel = profileViewModel
