@@ -32,6 +32,8 @@ class ExercisesViewModel(
     private val _sortType = MutableStateFlow(SortType.NAME)
     private val _searchValue = MutableStateFlow("")
 
+    private val appContext = application.applicationContext
+
     private val _exercises = combine(
         _sortType,
         _searchValue,
@@ -145,7 +147,7 @@ class ExercisesViewModel(
                                     videoLink = sharedExerciseDTO.videoLink ?: "",
                                     category = sharedExerciseDTO.category ?: Category.ARMS,
                                     shareType = ShareType.PRIVATE,
-                                    language = Language.CUSTOM
+                                    language = Language.ENGLISH
                                 ),
                                 exerciseFetched = CustomState.TRUE
                             )

@@ -114,18 +114,21 @@ class AuthViewModel(
         clearToken()
     }
 
-    fun loginWithGoogle(activity: Activity) {
+    fun loginWithGoogle(activity: MainActivity) {
+
+        Log.d("AuthViewModel", "loginWithGoogle called")
+
         val googleIdOption = GetGoogleIdOption.Builder()
             .setServerClientId("663662917989-055c6as89abel9k2tb3fvri5kkj552r6.apps.googleusercontent.com")
-            .setFilterByAuthorizedAccounts(false)
-            .setAutoSelectEnabled(false)
+            .setFilterByAuthorizedAccounts(true)
+            .setAutoSelectEnabled(true)
             .build()
 
         val getRequest = GetCredentialRequest.Builder()
             .addCredentialOption(googleIdOption)
             .build()
 
-        val credentialManager = CredentialManager.create(appContext)
+        val credentialManager = CredentialManager.create(activity)
 
         viewModelScope.launch {
             try {
@@ -136,17 +139,27 @@ class AuthViewModel(
                 )
                 handleGoogleLoginSuccess(response)
             } catch (e: GetCredentialException) {
-                _error.value = "Google Sign-In failed: ${e.localizedMessage}"
+                if (e is NoCredentialException) {
+                    Log.e(
+                        "AuthViewModel",
+                        "NoCredentialException occurred. Requesting account addition."
+                    )
+                    activity.launchAddGoogleAccount()
+                } else {
+                    Log.e("AuthViewModel", "Google Sign-In failed: ${e.localizedMessage}", e)
+                    _error.value = "Google Sign-In failed: ${e.localizedMessage}"
+                }
             } catch (e: Exception) {
-                Log.e("AuthViewModel", "An unexpected error occurred: ${e.localizedMessage}", e)
+                Log.e("AuthViewModel", "Unexpected error: ${e.localizedMessage}", e)
                 Toast.makeText(
-                    appContext,
+                    activity,
                     "An unexpected error occurred: ${e.localizedMessage}",
                     Toast.LENGTH_LONG
                 ).show()
             }
         }
     }
+
 
     private fun handleGoogleLoginSuccess(response: GetCredentialResponse) {
         val credential = response.credential
@@ -275,7 +288,7 @@ class AuthViewModel(
                                     instructions = templateExerciseDTO.instructions ?: "",
                                     videoLink = templateExerciseDTO.videoLink ?: "",
                                     category = templateExerciseDTO.category ?: Category.CHEST,
-                                    language = templateExerciseDTO.language ?: Language.CUSTOM,
+                                    language = templateExerciseDTO.language ?: Language.ENGLISH,
                                     userId = userId
                                 )
                                 println("Upserting exercise: $exercise")
