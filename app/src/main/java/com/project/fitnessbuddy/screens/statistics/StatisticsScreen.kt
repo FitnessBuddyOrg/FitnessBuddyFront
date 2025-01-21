@@ -74,12 +74,16 @@ fun StatisticsScreen(
         }
     }
     LaunchedEffect(userId, adminView) {
+        if (!statisticsViewModel.hasUsageStatsPermission(context)) {
+            statisticsViewModel.requestUsageStatsPermission(context)
+        }
         if (adminView && isAdmin) {
             statisticsViewModel.fetchAllAppOpenData()
             statisticsViewModel.fetchAllCompletedRoutines()
         } else {
             statisticsViewModel.fetchAppOpenData(userId)
             statisticsViewModel.fetchCompletedRoutines()
+            statisticsViewModel.fetchTimeSpentData()
         }
     }
 
@@ -140,10 +144,22 @@ fun StatisticsScreen(
                         title = if (adminView && isAdmin)
                             "${stringResource(R.string.completed_routines)} (All Users)"
                         else
-                            stringResource(R.string.completed_routines)
+                            stringResource(R.string.completed_routines))
+                }
+            }
+            if (!adminView){
+            item {
+                RoundedChartBox {
+                    AppOpenChart(
+                        data = statisticsViewModel.timeSpentData.collectAsState().value.mapValues { it.value.toInt() },
+                        title = stringResource(R.string.time_spent_statistics),
+                        suffix = "h"
+
                     )
                 }
             }
+            }
+
         }
     }
 }
@@ -172,7 +188,8 @@ fun RoundedChartBox(
 @Composable
 fun AppOpenChart(
     data: Map<LocalDate, Int>,
-    title: String
+    title: String,
+    suffix: String? = null
 ) {
     val daysOfWeek = List(7) { LocalDate.now().minusDays(6 - it.toLong()) }
     val completeData = daysOfWeek.associateWith { data[it] ?: 0 }
@@ -195,7 +212,7 @@ fun AppOpenChart(
         valueTypeface = Typeface.DEFAULT_BOLD
         valueFormatter = object : com.github.mikephil.charting.formatter.ValueFormatter() {
             override fun getFormattedValue(value: Float): String {
-                return value.toInt().toString()
+                return if (suffix != null) "${value.toInt()}$suffix" else value.toInt().toString()
             }
         }
     }

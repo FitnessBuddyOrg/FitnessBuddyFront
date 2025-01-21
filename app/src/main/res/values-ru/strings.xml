@@ -115,4 +115,4 @@
     <string name="fetched_exercise">Упражнение получено</string>
     <string name="no_exercise_fetched">Не удалось найти упражнение</string>
     <string name="connected_as_admin">Подключен как администратор</string>
-</resources>
+    <string name="time_spent_statistics">Время, проведенное в приложении</string></resources>

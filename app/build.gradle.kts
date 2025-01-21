@@ -93,6 +93,13 @@ dependencies {
     implementation(libs.androidx.lifecycle.process)
 
     testImplementation(libs.junit)
+    testImplementation(libs.junit.jupiter)
+    testImplementation(libs.junit.jupiter.api)
+    testImplementation(libs.mockk)
+    testImplementation(libs.kotlinx.coroutines.test)
+
+
+    testRuntimeOnly(libs.junit.jupiter.engine)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(platform(libs.androidx.compose.bom))
@@ -120,4 +127,14 @@ dependencies {
     ksp(libs.hilt.android.compiler)
     ksp(libs.androidx.hilt.compiler)
     ksp(libs.androidx.room.compiler)
+}
+
+tasks.withType<Test> {
+    useJUnitPlatform()
+    jvmArgs = listOf("-Dnet.bytebuddy.experimental=true", "-XX:+EnableDynamicAgentLoading")
+
+    reports {
+        html.required.set(true)
+        html.outputLocation.set(file("${layout.buildDirectory}/reports/tests"))
+    }
 }

@@ -1,6 +1,11 @@
 package com.project.fitnessbuddy.screens.statistics
 
+import android.app.AppOpsManager
 import android.app.Application
+import android.app.usage.UsageStatsManager
+import android.content.Context
+import android.content.Intent
+import android.provider.Settings
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.project.fitnessbuddy.api.auth.AuthViewModel
@@ -30,6 +35,8 @@ class StatisticsViewModel(
     private val _allCompletedRoutinesData = MutableStateFlow<Map<LocalDate, Int>>(emptyMap())
     val allCompletedRoutinesData: StateFlow<Map<LocalDate, Int>> = _allCompletedRoutinesData
 
+    private val _timeSpentData = MutableStateFlow<Map<LocalDate, Long>>(emptyMap())
+    val timeSpentData: StateFlow<Map<LocalDate, Long>> = _timeSpentData
 
     fun fetchAppOpenData(userId: Long) {
         viewModelScope.launch {
@@ -98,4 +105,45 @@ class StatisticsViewModel(
             }
         }
     }
+
+    fun fetchTimeSpentData() {
+        viewModelScope.launch {
+            try {
+                val usageStatsManager = getApplication<Application>().getSystemService(
+                    UsageStatsManager::class.java)
+                val endTime = System.currentTimeMillis()
+                val startTime = endTime - (7 * 24 * 60 * 60 * 1000)
+                val stats = usageStatsManager.queryUsageStats(
+                    UsageStatsManager.INTERVAL_DAILY,
+                    startTime,
+                    endTime
+                )
+                val groupedData = stats
+                    .filter { it.packageName == getApplication<Application>().packageName }
+                    .groupBy { LocalDate.ofEpochDay(it.firstTimeStamp / (24 * 60 * 60 * 1000)) }
+                    .mapValues { entry -> entry.value.sumOf { it.totalTimeInForeground } / 3600000 }
+                _timeSpentData.value = groupedData
+            } catch (e: Exception) {
+                println("Error fetching time spent data: ${e.message}")
+                _timeSpentData.value = emptyMap()
+            }
+        }
+    }
+
+    fun requestUsageStatsPermission(context: Context) {
+        if (!hasUsageStatsPermission(context)) {
+            context.startActivity(Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS))
+        }
+    }
+
+    fun hasUsageStatsPermission(context: Context): Boolean {
+        val appOps = context.getSystemService(Context.APP_OPS_SERVICE) as AppOpsManager
+        val mode = appOps.checkOpNoThrow(
+            AppOpsManager.OPSTR_GET_USAGE_STATS,
+            android.os.Process.myUid(),
+            context.packageName
+        )
+        return mode == AppOpsManager.MODE_ALLOWED
+    }
+
 }

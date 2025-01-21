@@ -115,4 +115,5 @@
     <string name="fetched_exercise">Exercice récupéré</string>
     <string name="no_exercise_fetched">Impossible de trouver l\'exercice</string>
     <string name="connected_as_admin">Connecté en tant qu\'administrateur</string>
+    <string name="time_spent_statistics">Temps passé sur l'application</string>
 </resources>

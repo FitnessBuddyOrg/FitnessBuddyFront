@@ -135,4 +135,5 @@
     <string name="fetched_exercise">Fetched Exercise</string>
     <string name="no_exercise_fetched">Could not find exercise</string>
     <string name="connected_as_admin">Connected as Admin</string>
+    <string name="time_spent_statistics">Time on the app</string>
 </resources>
