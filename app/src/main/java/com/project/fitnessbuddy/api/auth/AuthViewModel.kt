@@ -1,7 +1,6 @@
 package com.project.fitnessbuddy.api.auth
 
 import RetrofitInstance
-import RetrofitInstance.userApi
 import android.app.Activity
 import android.app.Application
 import android.content.Context
@@ -11,15 +10,16 @@ import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
-import androidx.compose.ui.platform.LocalContext
 import androidx.credentials.CredentialManager
 import androidx.credentials.CustomCredential
 import androidx.credentials.GetCredentialRequest
 import androidx.credentials.GetCredentialResponse
 import androidx.credentials.exceptions.GetCredentialException
+import androidx.credentials.exceptions.NoCredentialException
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.android.libraries.identity.googleid.GetGoogleIdOption
+import com.project.fitnessbuddy.MainActivity
 import com.project.fitnessbuddy.database.dao.ExerciseDao
 import com.project.fitnessbuddy.database.dao.UserDao
 import com.project.fitnessbuddy.database.entity.Exercise
@@ -114,18 +114,21 @@ class AuthViewModel(
         clearToken()
     }
 
-    fun loginWithGoogle(activity: Activity) {
+    fun loginWithGoogle(activity: MainActivity) {
+
+        Log.d("AuthViewModel", "loginWithGoogle called")
+
         val googleIdOption = GetGoogleIdOption.Builder()
             .setServerClientId("663662917989-055c6as89abel9k2tb3fvri5kkj552r6.apps.googleusercontent.com")
-            .setFilterByAuthorizedAccounts(false)
-            .setAutoSelectEnabled(false)
+            .setFilterByAuthorizedAccounts(true)
+            .setAutoSelectEnabled(true)
             .build()
 
         val getRequest = GetCredentialRequest.Builder()
             .addCredentialOption(googleIdOption)
             .build()
 
-        val credentialManager = CredentialManager.create(appContext)
+        val credentialManager = CredentialManager.create(activity)
 
         viewModelScope.launch {
             try {
@@ -136,17 +139,27 @@ class AuthViewModel(
                 )
                 handleGoogleLoginSuccess(response)
             } catch (e: GetCredentialException) {
-                _error.value = "Google Sign-In failed: ${e.localizedMessage}"
+                if (e is NoCredentialException) {
+                    Log.e(
+                        "AuthViewModel",
+                        "NoCredentialException occurred. Requesting account addition."
+                    )
+                    activity.launchAddGoogleAccount()
+                } else {
+                    Log.e("AuthViewModel", "Google Sign-In failed: ${e.localizedMessage}", e)
+                    _error.value = "Google Sign-In failed: ${e.localizedMessage}"
+                }
             } catch (e: Exception) {
-                Log.e("AuthViewModel", "An unexpected error occurred: ${e.localizedMessage}", e)
+                Log.e("AuthViewModel", "Unexpected error: ${e.localizedMessage}", e)
                 Toast.makeText(
-                    appContext,
+                    activity,
                     "An unexpected error occurred: ${e.localizedMessage}",
                     Toast.LENGTH_LONG
                 ).show()
             }
         }
     }
+
 
     private fun handleGoogleLoginSuccess(response: GetCredentialResponse) {
         val credential = response.credential
@@ -257,30 +270,31 @@ class AuthViewModel(
     }
 
     fun onEvent(authEvent: AuthEvent) {
-        when(authEvent) {
+        when (authEvent) {
             is AuthEvent.UpsertUser -> {
                 viewModelScope.launch {
                     var userId = userDao.upsert(_userState.value.user)
 
-                    if(userId == -1L) {
+                    if (userId == -1L) {
                         userId = _userState.value.user.userId ?: -1
                     }
                     val userExercises = exerciseDao.getExercises(userId)
 
-                    if(userExercises.isEmpty()) {
-                        RetrofitInstance.exerciseApi.getTemplateExercise().forEach { templateExerciseDTO ->
-                            val exercise = Exercise(
-                                name = templateExerciseDTO.name ?: "",
-                                instructions = templateExerciseDTO.instructions ?: "",
-                                videoLink = templateExerciseDTO.videoLink ?: "",
-                                category = templateExerciseDTO.category ?: Category.CHEST,
-                                language = templateExerciseDTO.language ?: Language.ENGLISH,
-                                userId = userId
-                            )
-                            println("Upserting exercise: $exercise")
+                    if (userExercises.isEmpty()) {
+                        RetrofitInstance.exerciseApi.getTemplateExercise()
+                            .forEach { templateExerciseDTO ->
+                                val exercise = Exercise(
+                                    name = templateExerciseDTO.name ?: "",
+                                    instructions = templateExerciseDTO.instructions ?: "",
+                                    videoLink = templateExerciseDTO.videoLink ?: "",
+                                    category = templateExerciseDTO.category ?: Category.CHEST,
+                                    language = templateExerciseDTO.language ?: Language.ENGLISH,
+                                    userId = userId
+                                )
+                                println("Upserting exercise: $exercise")
 
-                            exerciseDao.upsert(exercise)
-                        }
+                                exerciseDao.upsert(exercise)
+                            }
                     }
                 }
             }

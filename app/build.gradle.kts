@@ -61,6 +61,8 @@ ksp {
     arg("room.schemaLocation", "$projectDir/schemas")
 }
 
+
+
 dependencies {
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
@@ -112,6 +114,7 @@ dependencies {
 
     implementation (libs.ucrop)
 
+    testImplementation(kotlin("test"))
 
 
     ksp(libs.hilt.android.compiler)

@@ -16,6 +16,7 @@ import androidx.compose.ui.res.stringResource
 import com.project.fitnessbuddy.R
 import com.project.fitnessbuddy.api.auth.AuthViewModel
 import androidx.compose.ui.res.painterResource
+import com.project.fitnessbuddy.MainActivity
 
 @Composable
 fun LoginScreen(
@@ -98,7 +99,7 @@ fun LoginScreen(
                     HorizontalDivider()
 
                     Button(
-                        onClick = { authViewModel.loginWithGoogle(context as Activity) },
+                        onClick = { authViewModel.loginWithGoogle(context as MainActivity) },
                         modifier = Modifier.fillMaxWidth(),
                         colors = ButtonDefaults.buttonColors(MaterialTheme.colorScheme.secondary)
                     ) {

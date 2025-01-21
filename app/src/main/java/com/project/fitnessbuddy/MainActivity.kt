@@ -1,11 +1,15 @@
 package com.project.fitnessbuddy
 
+import android.app.Activity
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.provider.Settings
 import android.util.Log
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -83,6 +87,29 @@ class MainActivity : ComponentActivity() {
                 }
             }
         }
+    }
+
+    private val addAccountLauncher =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            if (result.resultCode == Activity.RESULT_OK) {
+                Log.d("MainActivity", "Account added successfully.")
+                // Trigger Google login again or inform the ViewModel
+                authViewModel.loginWithGoogle(this)
+            } else {
+                Log.e("MainActivity", "Account addition canceled or failed.")
+                Toast.makeText(
+                    this,
+                    "Google account addition canceled. Please try again.",
+                    Toast.LENGTH_LONG
+                ).show()
+            }
+        }
+
+    fun launchAddGoogleAccount() {
+        val intent = Intent(Settings.ACTION_ADD_ACCOUNT).apply {
+            putExtra(Settings.EXTRA_ACCOUNT_TYPES, arrayOf("com.google"))
+        }
+        addAccountLauncher.launch(intent)
     }
 
 
