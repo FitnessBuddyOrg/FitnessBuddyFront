@@ -16,7 +16,7 @@
     <string name="already_have_account">Уже есть аккаунт? Войти</string>
     <string name="login">Войти</string>
     <string name="dont_have_account">Нет аккаунта? Зарегистрироваться</string>
-    <string name="welcome">Добро пожаловать, %1$s</string>
+    <string name="welcome">Добро пожаловать</string>
     <string name="logout">Выйти</string>
     <string name="instructions">Инструкции</string>
     <string name="no_vid_available">Видео для этого упражнения недоступно</string>

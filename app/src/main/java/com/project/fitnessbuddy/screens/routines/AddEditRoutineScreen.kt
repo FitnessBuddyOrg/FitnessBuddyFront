@@ -359,6 +359,9 @@ fun NewExerciseWidget(
                         textAlign = TextAlign.Center
                     )
                 )
+                if (editingEnabled) {
+                    Spacer(modifier = Modifier.width(extraColumnWidth))
+                }
                 SmallTextWidget(
                     text = stringResource(R.string.reps),
                     modifier = Modifier.weight(thirdColumnWidth),
@@ -369,9 +372,6 @@ fun NewExerciseWidget(
                     modifier = Modifier.weight(secondColumnWidth),
                     textAlign = TextAlign.Center
                 )
-                if (editingEnabled) {
-                    Spacer(modifier = Modifier.width(extraColumnWidth))
-                }
                 if (checkboxEnabled) {
                     Spacer(modifier = Modifier.width(extraColumnWidth))
                 }
@@ -463,6 +463,26 @@ fun RoutineExerciseSetWidget(
                 textAlign = TextAlign.Center
             )
         )
+        if (checkboxEnabled) {
+            Checkbox(
+                checked = checked,
+                onCheckedChange = {
+                    routinesViewModel.onEvent(
+                        RoutinesEvent.UpdateRoutineExerciseSet(
+                            routineExerciseSetDTO = routineExerciseSetDTO.copy(
+                                checked = it,
+                                tempId = routineExerciseSetDTO.tempId
+                            ),
+                            routineExercise = routineExerciseDTO.routineExercise
+                        )
+                    )
+                    checked = it
+                },
+                modifier = Modifier
+                    .width(extraColumnWidth),
+                enabled = checkBoxEnabled
+            )
+        }
         CustomIntegerField(
             value = reps,
             onValueChange = {
@@ -535,26 +555,6 @@ fun RoutineExerciseSetWidget(
                 },
                 modifier = Modifier
                     .width(extraColumnWidth),
-            )
-        }
-        if (checkboxEnabled) {
-            Checkbox(
-                checked = checked,
-                onCheckedChange = {
-                    routinesViewModel.onEvent(
-                        RoutinesEvent.UpdateRoutineExerciseSet(
-                            routineExerciseSetDTO = routineExerciseSetDTO.copy(
-                                checked = it,
-                                tempId = routineExerciseSetDTO.tempId
-                            ),
-                            routineExercise = routineExerciseDTO.routineExercise
-                        )
-                    )
-                    checked = it
-                },
-                modifier = Modifier
-                    .width(extraColumnWidth),
-                enabled = checkBoxEnabled
             )
         }
     }

@@ -42,15 +42,19 @@ class ExercisesViewModel(
         if (userState.user.userId == null) {
             MutableStateFlow(emptyList())
         } else {
-            when (sortType) {
-                SortType.NAME -> exerciseDao.getExercisesOrderedByName(
-                    searchValue,
-                    userState.user.userId
-                )
-                SortType.CATEGORY -> exerciseDao.getExercisesOrderedByCategory(
-                    searchValue,
-                    userState.user.userId
-                )
+            try {
+                when (sortType) {
+                    SortType.NAME -> exerciseDao.getExercisesOrderedByName(
+                        searchValue,
+                        userState.user.userId
+                    )
+                    SortType.CATEGORY -> exerciseDao.getExercisesOrderedByCategory(
+                        searchValue,
+                        userState.user.userId
+                    )
+                }
+            } catch(e: Exception) {
+                MutableStateFlow(emptyList())
             }
         }
     }

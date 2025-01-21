@@ -69,7 +69,7 @@ fun CompletedRoutineScreen(
             navigationViewModel.onEvent(
                 NavigationEvent.SetCloseButton(
                     onClick = {
-                        navigationState.navController?.navigate(context.getString(R.string.routines_route))
+                        navigationState.navController?.navigate(context.getString(R.string.history_route))
                     }
                 ))
 

@@ -20,8 +20,12 @@ import androidx.credentials.exceptions.GetCredentialException
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.android.libraries.identity.googleid.GetGoogleIdOption
+import com.project.fitnessbuddy.database.dao.ExerciseDao
 import com.project.fitnessbuddy.database.dao.UserDao
+import com.project.fitnessbuddy.database.entity.Exercise
 import com.project.fitnessbuddy.database.entity.User
+import com.project.fitnessbuddy.database.entity.enums.Category
+import com.project.fitnessbuddy.database.entity.enums.Language
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -29,7 +33,8 @@ import org.json.JSONObject
 
 class AuthViewModel(
     application: Application,
-    private val userDao: UserDao
+    private val userDao: UserDao,
+    private val exerciseDao: ExerciseDao
 ) : AndroidViewModel(application) {
 
     private val _userState = MutableStateFlow(UserState())
@@ -254,9 +259,29 @@ class AuthViewModel(
     fun onEvent(authEvent: AuthEvent) {
         when(authEvent) {
             is AuthEvent.UpsertUser -> {
-                println("logged in user: ${_userState.value.user}")
                 viewModelScope.launch {
-                    userDao.upsert(_userState.value.user)
+                    var userId = userDao.upsert(_userState.value.user)
+
+                    if(userId == -1L) {
+                        userId = _userState.value.user.userId ?: -1
+                    }
+                    val userExercises = exerciseDao.getExercises(userId)
+
+                    if(userExercises.isEmpty()) {
+                        RetrofitInstance.exerciseApi.getTemplateExercise().forEach { templateExerciseDTO ->
+                            val exercise = Exercise(
+                                name = templateExerciseDTO.name ?: "",
+                                instructions = templateExerciseDTO.instructions ?: "",
+                                videoLink = templateExerciseDTO.videoLink ?: "",
+                                category = templateExerciseDTO.category ?: Category.CHEST,
+                                language = templateExerciseDTO.language ?: Language.ENGLISH,
+                                userId = userId
+                            )
+                            println("Upserting exercise: $exercise")
+
+                            exerciseDao.upsert(exercise)
+                        }
+                    }
                 }
             }
         }

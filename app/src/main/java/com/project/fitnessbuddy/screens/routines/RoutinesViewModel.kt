@@ -46,7 +46,11 @@ class RoutinesViewModel(
         if (userState.user.userId == null) {
             MutableStateFlow(emptyList())
         } else {
-            routineDao.getTemplateRoutineDTOs(searchValue, userState.user.userId)
+            try {
+                routineDao.getTemplateRoutineDTOs(searchValue, userState.user.userId)
+            } catch(e: Exception) {
+                MutableStateFlow(emptyList())
+            }
         }
     }
         .flatMapLatest { it }
@@ -58,7 +62,11 @@ class RoutinesViewModel(
         if (userState.user.userId == null) {
             MutableStateFlow(emptyList())
         } else {
-            routineDao.getCompletedRoutineDTOs(userState.user.userId)
+            try {
+                routineDao.getCompletedRoutineDTOs(userState.user.userId)
+            } catch(e: Exception) {
+                MutableStateFlow(emptyList())
+            }
         }
     }
         .flatMapLatest { it }

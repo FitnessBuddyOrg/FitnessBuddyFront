@@ -21,4 +21,7 @@ interface ExerciseDao {
 
     @Query("SELECT * FROM exercise WHERE user_id = :userId AND name LIKE '%' || :searchValue || '%' ORDER BY category ASC")
     fun getExercisesOrderedByCategory(searchValue: String, userId: Long): Flow<List<Exercise>>
+
+    @Query("SELECT * FROM exercise WHERE user_id = :userId")
+    suspend fun getExercises(userId: Long): List<Exercise>
 }
