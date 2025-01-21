@@ -288,7 +288,7 @@ class AuthViewModel(
                                     instructions = templateExerciseDTO.instructions ?: "",
                                     videoLink = templateExerciseDTO.videoLink ?: "",
                                     category = templateExerciseDTO.category ?: Category.CHEST,
-                                    language = templateExerciseDTO.language ?: Language.ENGLISH,
+                                    language = templateExerciseDTO.language ?: Language.CUSTOM,
                                     userId = userId
                                 )
                                 println("Upserting exercise: $exercise")
